@@ -1,0 +1,966 @@
+{
+  "seed": 42,
+  "n_seeds": 2,
+  "n_pairs": 60,
+  "n_calib_ticks": 8,
+  "fast": true,
+  "safe_window": {
+    "k_cover": 2,
+    "min_degree": 3,
+    "snr_floor": -6.0,
+    "p_min": 0.5,
+    "p_max": 1.0,
+    "p_static": 0.8
+  },
+  "topology": {
+    "giant_nodes": 632,
+    "giant_edges": 1577,
+    "avg_degree": 3.448742746615087,
+    "class_quantiles": {
+      "q40_deg": 2.0,
+      "q80_deg": 7.0
+    },
+    "class_counts": {
+      "mittel": 207,
+      "bruecke_blatt": 296,
+      "hub": 129
+    }
+  },
+  "lookup_table": [
+    [
+      0.6130118198082489,
+      0.6630118198082489,
+      0.763011819808249
+    ],
+    [
+      0.6789897126993045,
+      0.7289897126993046,
+      0.8289897126993045
+    ],
+    [
+      0.7506793425450236,
+      0.8006793425450236,
+      0.9006793425450236
+    ]
+  ],
+  "lookup_edges": {
+    "deg": [
+      3.0,
+      6.0
+    ],
+    "red": [
+      2.5,
+      4.0
+    ]
+  },
+  "sweep": [
+    {
+      "label": "single",
+      "alpha": 1.0,
+      "n_mhr": 1,
+      "agg": {
+        "baseline": {
+          "deliv": 0.95,
+          "deliv_sem": 0.0,
+          "air": 616.1315789473684,
+          "air_sem": 0.008771929824547442,
+          "deliv_bruecke_blatt": 0.9137931034482758,
+          "deliv_bruecke_blatt_sem": 0.017241379310344807,
+          "air_bruecke_blatt": 616.1880341880342,
+          "air_bruecke_blatt_sem": 1.0341880341879914,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 617.340909090909,
+          "air_mittel_sem": 1.340909090909065,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 613.2916666666666,
+          "air_hub_sem": 0.625
+        },
+        "static": {
+          "deliv": 0.95,
+          "deliv_sem": 0.0,
+          "air": 615.7719298245614,
+          "air_sem": 0.07017543859649322,
+          "deliv_bruecke_blatt": 0.9137931034482758,
+          "deliv_bruecke_blatt_sem": 0.017241379310344807,
+          "air_bruecke_blatt": 615.9330484330485,
+          "air_bruecke_blatt_sem": 0.5484330484330826,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 616.5126262626263,
+          "air_mittel_sem": 1.123737373737356,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 613.5972222222222,
+          "air_hub_sem": 0.8194444444444002
+        },
+        "local_full": {
+          "deliv": 0.95,
+          "deliv_sem": 0.0,
+          "air": 616.0087719298245,
+          "air_sem": 0.13157894736843898,
+          "deliv_bruecke_blatt": 0.9137931034482758,
+          "deliv_bruecke_blatt_sem": 0.017241379310344807,
+          "air_bruecke_blatt": 616.0441595441596,
+          "air_bruecke_blatt_sem": 0.6595441595441685,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 617.0858585858587,
+          "air_mittel_sem": 0.6414141414141454,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 613.5972222222222,
+          "air_hub_sem": 0.8194444444444002
+        },
+        "local_lookup": {
+          "deliv": 0.95,
+          "deliv_sem": 0.0,
+          "air": 615.7719298245614,
+          "air_sem": 0.07017543859649322,
+          "deliv_bruecke_blatt": 0.9137931034482758,
+          "deliv_bruecke_blatt_sem": 0.017241379310344807,
+          "air_bruecke_blatt": 615.9330484330485,
+          "air_bruecke_blatt_sem": 0.5484330484330826,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 616.5126262626263,
+          "air_mittel_sem": 1.123737373737356,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 613.5972222222222,
+          "air_hub_sem": 0.8194444444444002
+        }
+      },
+      "airtime_gain": {
+        "static": 0.058372129443755666,
+        "local_full": 0.019931946639336603,
+        "local_lookup": 0.058372129443755666
+      },
+      "airtime_gain_by_class": {
+        "static": {
+          "bruecke_blatt": 0.04138115978212451,
+          "mittel": 0.1341694380018333,
+          "hub": -0.049822225241748966
+        },
+        "local_full": {
+          "bruecke_blatt": 0.023349146022315033,
+          "mittel": 0.04131436962859534,
+          "hub": -0.049822225241748966
+        },
+        "local_lookup": {
+          "bruecke_blatt": 0.04138115978212451,
+          "mittel": 0.1341694380018333,
+          "hub": -0.049822225241748966
+        }
+      },
+      "p_by_class": {
+        "static": {
+          "bruecke_blatt": NaN,
+          "mittel": 0.8,
+          "hub": NaN
+        },
+        "local_full": {
+          "bruecke_blatt": NaN,
+          "mittel": 0.8313569052336234,
+          "hub": NaN
+        },
+        "local_lookup": {
+          "bruecke_blatt": NaN,
+          "mittel": 0.8006793425450236,
+          "hub": NaN
+        }
+      }
+    },
+    {
+      "label": 0.05,
+      "alpha": 0.05,
+      "n_mhr": 32,
+      "agg": {
+        "baseline": {
+          "deliv": 0.9583333333333333,
+          "deliv_sem": 0.00833333333333336,
+          "air": 616.3032365396249,
+          "air_sem": 0.1277979431337144,
+          "deliv_bruecke_blatt": 0.9310344827586208,
+          "deliv_bruecke_blatt_sem": 0.03448275862068967,
+          "air_bruecke_blatt": 614.5892857142858,
+          "air_bruecke_blatt_sem": 0.08928571428572239,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 617.7752525252525,
+          "air_mittel_sem": 0.4974747474747118,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 617.5694444444445,
+          "air_hub_sem": 1.680555555555543
+        },
+        "static": {
+          "deliv": 0.9583333333333333,
+          "deliv_sem": 0.00833333333333336,
+          "air": 608.767846339988,
+          "air_sem": 0.6976709013914045,
+          "deliv_bruecke_blatt": 0.9310344827586207,
+          "deliv_bruecke_blatt_sem": 0.0,
+          "air_bruecke_blatt": 609.1481481481482,
+          "air_bruecke_blatt_sem": 1.7037037037036953,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 608.1616161616162,
+          "air_mittel_sem": 1.8838383838383377,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 608.0277777777778,
+          "air_hub_sem": 4.138888888888857
+        },
+        "local_full": {
+          "deliv": 0.9583333333333333,
+          "deliv_sem": 0.00833333333333336,
+          "air": 609.3948880822746,
+          "air_sem": 0.4121294615849819,
+          "deliv_bruecke_blatt": 0.9310344827586207,
+          "deliv_bruecke_blatt_sem": 0.0,
+          "air_bruecke_blatt": 610.0925925925926,
+          "air_bruecke_blatt_sem": 0.27777777777777146,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 608.5378787878788,
+          "air_mittel_sem": 0.8712121212121247,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 608.3888888888889,
+          "air_hub_sem": 4.611111111111086
+        },
+        "local_lookup": {
+          "deliv": 0.9583333333333333,
+          "deliv_sem": 0.00833333333333336,
+          "air": 609.7937084089534,
+          "air_sem": 0.2764670296430722,
+          "deliv_bruecke_blatt": 0.9310344827586207,
+          "deliv_bruecke_blatt_sem": 0.0,
+          "air_bruecke_blatt": 610.5185185185185,
+          "air_bruecke_blatt_sem": 0.14814814814815236,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 609.3207070707072,
+          "air_mittel_sem": 1.0429292929292726,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 608.0416666666667,
+          "air_hub_sem": 4.041666666666686
+        }
+      },
+      "airtime_gain": {
+        "static": 1.2226757467551368,
+        "local_full": 1.1209333405644202,
+        "local_lookup": 1.0562216364821804
+      },
+      "airtime_gain_by_class": {
+        "static": {
+          "bruecke_blatt": 0.8853290632643958,
+          "mittel": 1.5561705206447067,
+          "hub": 1.5450354211177268
+        },
+        "local_full": {
+          "bruecke_blatt": 0.7316582352175305,
+          "mittel": 1.495264450884781,
+          "hub": 1.4865624648600002
+        },
+        "local_lookup": {
+          "bruecke_blatt": 0.662355704921896,
+          "mittel": 1.368547124538594,
+          "hub": 1.5427864612616562
+        }
+      },
+      "p_by_class": {
+        "static": {
+          "bruecke_blatt": 0.8,
+          "mittel": 0.8,
+          "hub": 0.8000000000000002
+        },
+        "local_full": {
+          "bruecke_blatt": 0.6245598366874892,
+          "mittel": 0.7500665925414812,
+          "hub": 0.9460232355754942
+        },
+        "local_lookup": {
+          "bruecke_blatt": 0.6130118198082489,
+          "mittel": 0.7394505208390459,
+          "hub": 0.8852947271604082
+        }
+      }
+    },
+    {
+      "label": 0.1,
+      "alpha": 0.1,
+      "n_mhr": 63,
+      "agg": {
+        "baseline": {
+          "deliv": 0.9666666666666666,
+          "deliv_sem": 0.016666666666666663,
+          "air": 615.8712459113887,
+          "air_sem": 0.46773713945879075,
+          "deliv_bruecke_blatt": 0.9482758620689655,
+          "deliv_bruecke_blatt_sem": 0.05172413793103447,
+          "air_bruecke_blatt": 616.090848806366,
+          "air_bruecke_blatt_sem": 0.667771883289106,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 613.2828282828283,
+          "air_mittel_sem": 0.171717171717205,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 620.1388888888889,
+          "air_hub_sem": 0.02777777777777146
+        },
+        "static": {
+          "deliv": 0.9583333333333333,
+          "deliv_sem": 0.00833333333333336,
+          "air": 602.552480338778,
+          "air_sem": 1.4647610405323803,
+          "deliv_bruecke_blatt": 0.9310344827586208,
+          "deliv_bruecke_blatt_sem": 0.03448275862068967,
+          "air_bruecke_blatt": 603.125,
+          "air_bruecke_blatt_sem": 0.125,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 601.3787878787879,
+          "air_mittel_sem": 2.2878787878787534,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 603.3888888888889,
+          "air_hub_sem": 2.9444444444444566
+        },
+        "local_full": {
+          "deliv": 0.9583333333333333,
+          "deliv_sem": 0.00833333333333336,
+          "air": 602.1627344222625,
+          "air_sem": 0.28554143980642266,
+          "deliv_bruecke_blatt": 0.9310344827586208,
+          "deliv_bruecke_blatt_sem": 0.03448275862068967,
+          "air_bruecke_blatt": 602.1318681318681,
+          "air_bruecke_blatt_sem": 1.0604395604395904,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 600.7020202020201,
+          "air_mittel_sem": 1.5202020202020206,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 605.3333333333333,
+          "air_hub_sem": 0.6666666666666856
+        },
+        "local_lookup": {
+          "deliv": 0.9583333333333333,
+          "deliv_sem": 0.00833333333333336,
+          "air": 602.1462492437992,
+          "air_sem": 1.1813369630973511,
+          "deliv_bruecke_blatt": 0.9310344827586208,
+          "deliv_bruecke_blatt_sem": 0.03448275862068967,
+          "air_bruecke_blatt": 602.0412087912089,
+          "air_bruecke_blatt_sem": 0.612637362637372,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 601.0075757575758,
+          "air_mittel_sem": 3.3257575757576205,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 605.1805555555555,
+          "air_hub_sem": 1.069444444444457
+        }
+      },
+      "airtime_gain": {
+        "static": 2.1625892848595476,
+        "local_full": 2.2258729531754367,
+        "local_lookup": 2.2285496779897143
+      },
+      "airtime_gain_by_class": {
+        "static": {
+          "bruecke_blatt": 2.1045352047488546,
+          "mittel": 1.94103598781191,
+          "hub": 2.7010078387458005
+        },
+        "local_full": {
+          "bruecke_blatt": 2.2657341367011763,
+          "mittel": 2.051387630733775,
+          "hub": 2.387458006718941
+        },
+        "local_lookup": {
+          "bruecke_blatt": 2.2804493919001323,
+          "mittel": 2.0015646874742674,
+          "hub": 2.412094064949614
+        }
+      },
+      "p_by_class": {
+        "static": {
+          "bruecke_blatt": 0.8,
+          "mittel": 0.8000000000000002,
+          "hub": 0.8
+        },
+        "local_full": {
+          "bruecke_blatt": 0.6244946598799803,
+          "mittel": 0.7362932460116073,
+          "hub": 0.9521468602616049
+        },
+        "local_lookup": {
+          "bruecke_blatt": 0.6130118198082489,
+          "mittel": 0.7320659310797568,
+          "hub": 0.8918558131332588
+        }
+      }
+    },
+    {
+      "label": 0.25,
+      "alpha": 0.25,
+      "n_mhr": 158,
+      "agg": {
+        "baseline": {
+          "deliv": 0.9583333333333333,
+          "deliv_sem": 0.024999999999999963,
+          "air": 616.1563256658596,
+          "air_sem": 0.32581719128330633,
+          "deliv_bruecke_blatt": 0.9310344827586207,
+          "deliv_bruecke_blatt_sem": 0.06896551724137934,
+          "air_bruecke_blatt": 615.2986206896552,
+          "air_bruecke_blatt_sem": 0.2186206896551539,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 616.9419191919192,
+          "air_mittel_sem": 0.33080808080808305,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 616.9305555555555,
+          "air_hub_sem": 1.513888888888914
+        },
+        "static": {
+          "deliv": 0.975,
+          "deliv_sem": 0.008333333333333304,
+          "air": 580.594827586207,
+          "air_sem": 0.5948275862069181,
+          "deliv_bruecke_blatt": 0.9655172413793103,
+          "deliv_bruecke_blatt_sem": 0.03448275862068967,
+          "air_bruecke_blatt": 580.2522349936144,
+          "air_bruecke_blatt_sem": 1.5625798212004725,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 581.2373737373737,
+          "air_mittel_sem": 1.873737373737356,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 581.1388888888889,
+          "air_hub_sem": 2.6388888888889137
+        },
+        "local_full": {
+          "deliv": 0.975,
+          "deliv_sem": 0.008333333333333304,
+          "air": 580.8816481589713,
+          "air_sem": 2.152834599649338,
+          "deliv_bruecke_blatt": 0.9655172413793103,
+          "deliv_bruecke_blatt_sem": 0.03448275862068967,
+          "air_bruecke_blatt": 580.1257982120051,
+          "air_bruecke_blatt_sem": 3.02234993614303,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 580.7626262626263,
+          "air_mittel_sem": 1.873737373737356,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 583.0416666666666,
+          "air_hub_sem": 0.625
+        },
+        "local_lookup": {
+          "deliv": 0.975,
+          "deliv_sem": 0.008333333333333304,
+          "air": 581.0714494447691,
+          "air_sem": 1.3595850379894612,
+          "deliv_bruecke_blatt": 0.9655172413793103,
+          "deliv_bruecke_blatt_sem": 0.03448275862068967,
+          "air_bruecke_blatt": 580.5357598978289,
+          "air_bruecke_blatt_sem": 2.5012771392081845,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 581.3737373737374,
+          "air_mittel_sem": 0.2373737373737299,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 582.3472222222222,
+          "air_hub_sem": 1.4305555555555995
+        }
+      },
+      "airtime_gain": {
+        "static": 5.771505801100481,
+        "local_full": 5.724955833045805,
+        "local_lookup": 5.694151753319337
+      },
+      "airtime_gain_by_class": {
+        "static": {
+          "bruecke_blatt": 5.6958336192529115,
+          "mittel": 5.787343077823583,
+          "hub": 5.80157139962628
+        },
+        "local_full": {
+          "bruecke_blatt": 5.71638246778886,
+          "mittel": 5.864294806986221,
+          "hub": 5.493144825412553
+        },
+        "local_lookup": {
+          "bruecke_blatt": 5.649754383142032,
+          "mittel": 5.765239921574717,
+          "hub": 5.605709268556255
+        }
+      },
+      "p_by_class": {
+        "static": {
+          "bruecke_blatt": 0.8,
+          "mittel": 0.7999999999999999,
+          "hub": 0.7999999999999997
+        },
+        "local_full": {
+          "bruecke_blatt": 0.6259378515453979,
+          "mittel": 0.7342140518973295,
+          "hub": 0.9360195565062478
+        },
+        "local_lookup": {
+          "bruecke_blatt": 0.6130118198082489,
+          "mittel": 0.7287122540530637,
+          "hub": 0.8773460092116904
+        }
+      }
+    },
+    {
+      "label": 0.5,
+      "alpha": 0.5,
+      "n_mhr": 316,
+      "agg": {
+        "baseline": {
+          "deliv": 0.95,
+          "deliv_sem": 0.0,
+          "air": 618.421052631579,
+          "air_sem": 0.5614035087719458,
+          "deliv_bruecke_blatt": 0.9310344827586207,
+          "deliv_bruecke_blatt_sem": 0.0,
+          "air_bruecke_blatt": 617.8148148148148,
+          "air_bruecke_blatt_sem": 0.07407407407407618,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 619.6414141414141,
+          "air_mittel_sem": 0.0858585858586025,
+          "deliv_hub": 0.905982905982906,
+          "deliv_hub_sem": 0.01709401709401714,
+          "air_hub": 618.1875,
+          "air_hub_sem": 2.9374999999999996
+        },
+        "static": {
+          "deliv": 0.9333333333333333,
+          "deliv_sem": 0.016666666666666663,
+          "air": 562.9795853269538,
+          "air_sem": 0.8567783094098899,
+          "deliv_bruecke_blatt": 0.8793103448275862,
+          "deliv_bruecke_blatt_sem": 0.05172413793103447,
+          "air_bruecke_blatt": 562.5925925925926,
+          "air_bruecke_blatt_sem": 1.7407407407407616,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 564.6792929292928,
+          "air_mittel_sem": 1.9570707070707272,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 559.875,
+          "air_hub_sem": 4.208333333333371
+        },
+        "local_full": {
+          "deliv": 0.9583333333333333,
+          "deliv_sem": 0.00833333333333336,
+          "air": 564.5317604355716,
+          "air_sem": 0.1524500907441393,
+          "deliv_bruecke_blatt": 0.9310344827586208,
+          "deliv_bruecke_blatt_sem": 0.03448275862068967,
+          "air_bruecke_blatt": 565.9972527472528,
+          "air_bruecke_blatt_sem": 0.5741758241758248,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 565.1919191919192,
+          "air_mittel_sem": 1.080808080808083,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 559.1666666666666,
+          "air_hub_sem": 0.5
+        },
+        "local_lookup": {
+          "deliv": 0.9583333333333333,
+          "deliv_sem": 0.00833333333333336,
+          "air": 565.4112220205686,
+          "air_sem": 0.2905323653962455,
+          "deliv_bruecke_blatt": 0.9310344827586208,
+          "deliv_bruecke_blatt_sem": 0.03448275862068967,
+          "air_bruecke_blatt": 565.2596153846154,
+          "air_bruecke_blatt_sem": 0.5096153846153583,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 566.3383838383838,
+          "air_mittel_sem": 0.6161616161616621,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 563.7638888888889,
+          "air_hub_sem": 1.3194444444444569
+        }
+      },
+      "airtime_gain": {
+        "static": 8.965003223726615,
+        "local_full": 8.714013206162885,
+        "local_lookup": 8.571802396674011
+      },
+      "airtime_gain_by_class": {
+        "static": {
+          "bruecke_blatt": 8.938313050776324,
+          "mittel": 8.86998834451337,
+          "hub": 9.43281771307249
+        },
+        "local_full": {
+          "bruecke_blatt": 8.387232035394604,
+          "mittel": 8.787258841460925,
+          "hub": 9.547399993259873
+        },
+        "local_lookup": {
+          "bruecke_blatt": 8.506626608808732,
+          "mittel": 8.602238179461885,
+          "hub": 8.803738527730031
+        }
+      },
+      "p_by_class": {
+        "static": {
+          "bruecke_blatt": 0.7999999999999998,
+          "mittel": 0.7999999999999999,
+          "hub": 0.8
+        },
+        "local_full": {
+          "bruecke_blatt": 0.6259488932653237,
+          "mittel": 0.7214107100671475,
+          "hub": 0.9139140419433992
+        },
+        "local_lookup": {
+          "bruecke_blatt": 0.613011819808249,
+          "mittel": 0.7176974258469697,
+          "hub": 0.861737034852716
+        }
+      }
+    },
+    {
+      "label": 0.75,
+      "alpha": 0.75,
+      "n_mhr": 474,
+      "agg": {
+        "baseline": {
+          "deliv": 0.9583333333333333,
+          "deliv_sem": 0.024999999999999963,
+          "air": 617.2885895883777,
+          "air_sem": 0.2707324455205935,
+          "deliv_bruecke_blatt": 0.9482758620689655,
+          "deliv_bruecke_blatt_sem": 0.05172413793103447,
+          "air_bruecke_blatt": 615.9920424403183,
+          "air_bruecke_blatt_sem": 1.1458885941644894,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 618.2752525252525,
+          "air_mittel_sem": 0.9974747474747118,
+          "deliv_hub": 0.905982905982906,
+          "deliv_hub_sem": 0.01709401709401714,
+          "air_hub": 618.4375,
+          "air_hub_sem": 0.5625
+        },
+        "static": {
+          "deliv": 0.9583333333333333,
+          "deliv_sem": 0.00833333333333336,
+          "air": 547.5421960072596,
+          "air_sem": 1.3525408348457404,
+          "deliv_bruecke_blatt": 0.9310344827586207,
+          "deliv_bruecke_blatt_sem": 0.0,
+          "air_bruecke_blatt": 546.4259259259259,
+          "air_bruecke_blatt_sem": 0.27777777777777146,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 547.5,
+          "air_mittel_sem": 1.4999999999999998,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 550.2222222222222,
+          "air_hub_sem": 3.4444444444444
+        },
+        "local_full": {
+          "deliv": 0.9666666666666666,
+          "deliv_sem": 0.016666666666666663,
+          "air": 552.2140945584299,
+          "air_sem": 0.417484388938476,
+          "deliv_bruecke_blatt": 0.9655172413793103,
+          "deliv_bruecke_blatt_sem": 0.03448275862068967,
+          "air_bruecke_blatt": 551.1877394636015,
+          "air_bruecke_blatt_sem": 1.256704980842926,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 553.9191919191919,
+          "air_mittel_sem": 0.19191919191916895,
+          "deliv_hub": 0.905982905982906,
+          "deliv_hub_sem": 0.01709401709401714,
+          "air_hub": 551.5416666666667,
+          "air_hub_sem": 1.2916666666666856
+        },
+        "local_lookup": {
+          "deliv": 0.95,
+          "deliv_sem": 0.016666666666666663,
+          "air": 552.1647167487685,
+          "air_sem": 1.388854679802989,
+          "deliv_bruecke_blatt": 0.9310344827586208,
+          "deliv_bruecke_blatt_sem": 0.03448275862068967,
+          "air_bruecke_blatt": 550.4986263736264,
+          "air_bruecke_blatt_sem": 3.462912087912059,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 553.4191919191919,
+          "air_mittel_sem": 0.808080808080831,
+          "deliv_hub": 0.905982905982906,
+          "deliv_hub_sem": 0.01709401709401714,
+          "air_hub": 553.5625,
+          "air_hub_sem": 3.1874999999999996
+        }
+      },
+      "airtime_gain": {
+        "static": 11.298830847922629,
+        "local_full": 10.541988970400533,
+        "local_lookup": 10.549988115451049
+      },
+      "airtime_gain_by_class": {
+        "static": {
+          "bruecke_blatt": 11.293346621621739,
+          "mittel": 11.447207734125156,
+          "hub": 11.030262197518395
+        },
+        "local_full": {
+          "bruecke_blatt": 10.520314957314651,
+          "mittel": 10.408965965111484,
+          "hub": 10.816910897759799
+        },
+        "local_lookup": {
+          "bruecke_blatt": 10.632185410583023,
+          "mittel": 10.489836095034658,
+          "hub": 10.490146538655887
+        }
+      },
+      "p_by_class": {
+        "static": {
+          "bruecke_blatt": 0.7999999999999999,
+          "mittel": 0.7999999999999999,
+          "hub": 0.8
+        },
+        "local_full": {
+          "bruecke_blatt": 0.6242747944689025,
+          "mittel": 0.7141424820193151,
+          "hub": 0.9041374742634649
+        },
+        "local_lookup": {
+          "bruecke_blatt": 0.613011819808249,
+          "mittel": 0.7122635090320072,
+          "hub": 0.8601834747764286
+        }
+      }
+    },
+    {
+      "label": 1.0,
+      "alpha": 1.0,
+      "n_mhr": 632,
+      "agg": {
+        "baseline": {
+          "deliv": 0.9583333333333333,
+          "deliv_sem": 0.024999999999999963,
+          "air": 616.7902542372881,
+          "air_sem": 0.9597457627118615,
+          "deliv_bruecke_blatt": 0.9482758620689655,
+          "deliv_bruecke_blatt_sem": 0.05172413793103447,
+          "air_bruecke_blatt": 616.2871352785146,
+          "air_bruecke_blatt_sem": 1.5974801061007609,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 617.1085858585859,
+          "air_mittel_sem": 0.1641414141413975,
+          "deliv_hub": 0.905982905982906,
+          "deliv_hub_sem": 0.01709401709401714,
+          "air_hub": 617.7708333333333,
+          "air_hub_sem": 0.8541666666666855
+        },
+        "static": {
+          "deliv": 0.9666666666666667,
+          "deliv_sem": 0.0,
+          "air": 541.4913793103449,
+          "air_sem": 1.094827586206918,
+          "deliv_bruecke_blatt": 0.9482758620689655,
+          "deliv_bruecke_blatt_sem": 0.01724137931034486,
+          "air_bruecke_blatt": 541.6653439153439,
+          "air_bruecke_blatt_sem": 0.4060846560846585,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 539.5530303030303,
+          "air_mittel_sem": 0.2803030303030596,
+          "deliv_hub": 0.9615384615384616,
+          "deliv_hub_sem": 0.038461538461538436,
+          "air_hub": 544.2361111111111,
+          "air_hub_sem": 3.680555555555543
+        },
+        "local_full": {
+          "deliv": 0.95,
+          "deliv_sem": 0.016666666666666663,
+          "air": 547.254618226601,
+          "air_sem": 0.486761083743886,
+          "deliv_bruecke_blatt": 0.9310344827586208,
+          "deliv_bruecke_blatt_sem": 0.03448275862068967,
+          "air_bruecke_blatt": 547.3571428571429,
+          "air_bruecke_blatt_sem": 0.14285714285716722,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 547.8787878787879,
+          "air_mittel_sem": 0.7121212121212466,
+          "deliv_hub": 0.905982905982906,
+          "deliv_hub_sem": 0.01709401709401714,
+          "air_hub": 544.6041666666667,
+          "air_hub_sem": 5.229166666666686
+        },
+        "local_lookup": {
+          "deliv": 0.9583333333333333,
+          "deliv_sem": 0.00833333333333336,
+          "air": 549.5267695099818,
+          "air_sem": 1.4215063520871354,
+          "deliv_bruecke_blatt": 0.9482758620689655,
+          "deliv_bruecke_blatt_sem": 0.01724137931034486,
+          "air_bruecke_blatt": 549.4742063492063,
+          "air_bruecke_blatt_sem": 0.9186507936507836,
+          "deliv_mittel": 1.0,
+          "deliv_mittel_sem": 0.0,
+          "air_mittel": 550.0353535353536,
+          "air_mittel_sem": 1.3535353535353918,
+          "deliv_hub": 0.905982905982906,
+          "deliv_hub_sem": 0.01709401709401714,
+          "air_hub": 548.2916666666667,
+          "air_hub_sem": 3.291666666666685
+        }
+      },
+      "airtime_gain": {
+        "static": 12.20818169704326,
+        "local_full": 11.273789676958113,
+        "local_lookup": 10.905406540588599
+      },
+      "airtime_gain_by_class": {
+        "static": {
+          "bruecke_blatt": 12.108283151074923,
+          "mittel": 12.567570332480834,
+          "hub": 11.90323632235074
+        },
+        "local_full": {
+          "bruecke_blatt": 11.184720315510177,
+          "mittel": 11.218414322250648,
+          "hub": 11.843658314504411
+        },
+        "local_lookup": {
+          "bruecke_blatt": 10.841201301259355,
+          "mittel": 10.868951406649616,
+          "hub": 11.246754122685708
+        }
+      },
+      "p_by_class": {
+        "static": {
+          "bruecke_blatt": 0.7999999999999999,
+          "mittel": 0.7999999999999998,
+          "hub": 0.7999999999999999
+        },
+        "local_full": {
+          "bruecke_blatt": 0.6228640649805616,
+          "mittel": 0.7112178697838254,
+          "hub": 0.9018360661274252
+        },
+        "local_lookup": {
+          "bruecke_blatt": 0.6130118198082489,
+          "mittel": 0.7095006198727767,
+          "hub": 0.8595940712271942
+        }
+      }
+    }
+  ],
+  "safety": {
+    "static": {
+      "overall_ok": false,
+      "class_ok": false,
+      "worst_overall": -0.016666666666666607,
+      "worst_class": -0.051724137931034475,
+      "worst_class_where": "0.5/bruecke_blatt"
+    },
+    "local_full": {
+      "overall_ok": true,
+      "class_ok": true,
+      "worst_overall": -0.008333333333333304,
+      "worst_class": -0.01724137931034475,
+      "worst_class_where": "0.1/bruecke_blatt"
+    },
+    "local_lookup": {
+      "overall_ok": true,
+      "class_ok": true,
+      "worst_overall": -0.008333333333333304,
+      "worst_class": -0.01724137931034475,
+      "worst_class_where": "0.1/bruecke_blatt"
+    }
+  },
+  "decision": {
+    "mean_extra_full_pp_high_alpha": -0.49516602449384783,
+    "mean_extra_lookup_pp_high_alpha": -0.6112046789947114,
+    "mean_hub_extra_pp": -0.039586756854385285,
+    "worst_bridge_deliv_delta": -0.01724137931034475,
+    "local_full_safe": true,
+    "useful_threshold_pp": 2.0,
+    "go_local_full": false,
+    "lookup_retained_gain_pct": 0.0
+  },
+  "interval_sweep": {
+    "12h": {
+      "calib_ticks": 2,
+      "mean_cover_cv": 0.023706800582873253,
+      "airtime_gain_pct": 11.336684807323378,
+      "static_gain_pct": 12.20818169704326,
+      "extra_vs_static_pp": -0.8714968897198823,
+      "deliv": 0.95,
+      "baseline_deliv": 0.9583333333333333,
+      "deliv_delta": -0.008333333333333304
+    },
+    "24h": {
+      "calib_ticks": 4,
+      "mean_cover_cv": 0.02653350362524474,
+      "airtime_gain_pct": 11.312375340269494,
+      "static_gain_pct": 12.20818169704326,
+      "extra_vs_static_pp": -0.8958063567737664,
+      "deliv": 0.95,
+      "baseline_deliv": 0.9583333333333333,
+      "deliv_delta": -0.008333333333333304
+    },
+    "48h": {
+      "calib_ticks": 8,
+      "mean_cover_cv": 0.028005777493882607,
+      "airtime_gain_pct": 11.273789676958113,
+      "static_gain_pct": 12.20818169704326,
+      "extra_vs_static_pp": -0.9343920200851468,
+      "deliv": 0.95,
+      "baseline_deliv": 0.9583333333333333,
+      "deliv_delta": -0.008333333333333304
+    }
+  },
+  "adaptive_interval": {
+    "airtime_gain_pct": 11.273789676958113,
+    "deliv_delta": -0.008333333333333304,
+    "best_fixed_gain_pct": 11.336684807323378,
+    "adaptive_vs_best_fixed_pp": -0.0628951303652645
+  },
+  "interval_sweetspot": "12h",
+  "on_node": {
+    "lookup_bytes": 9,
+    "extra_state_bytes_per_node": 4,
+    "eval_ops": "≤5 Integer-Vergleiche + 1 Array-Index; kein float, kein Heap, kein Sort",
+    "calib_period": "12-48h (Sweetspot s.o.); 1x pro Periode neuer Lookup-Read",
+    "features_used": [
+      "degree (lokal, vorhanden)",
+      "cover_mean (EWMA gehoerter Cover-Sender)"
+    ]
+  }
+}
