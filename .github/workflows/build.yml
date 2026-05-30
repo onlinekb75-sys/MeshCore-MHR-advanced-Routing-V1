@@ -12,10 +12,13 @@ jobs:
       fail-fast: false
       matrix:
         env:
-          - heltec_v4_repeater          # Hauptziel (Heltec V4, ESP32-S3 -> .bin)
+          - heltec_v4_repeater              # Hauptziel: MHR-Repeater (Stufe A + Best-of-N aktiv)
+          - heltec_v4_companion_radio_usb   # teilt den geänderten Mesh-Kern (DV/Best-of-N base-OFF)
+          - heltec_v4_room_server           # teilt CommonCLI-Prefs + Mesh-Kern
           # weitere Ziele bei Bedarf einkommentieren:
-          # - heltec_v3_repeater
+          # - heltec_v4_sensor
           # - heltec_v4_companion_radio_ble
+          # - heltec_v3_repeater
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
