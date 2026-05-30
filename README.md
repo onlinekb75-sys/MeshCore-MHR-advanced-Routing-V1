@@ -4,6 +4,8 @@ Ein **Fork von [meshcore-dev/MeshCore](https://github.com/meshcore-dev/MeshCore)
 
 **MHR** steht für **M**eshCore **H**ybrid **R**outing.
 
+📖 **Doku-Übersicht & Einstieg:** [`docs/MHR/`](docs/MHR/README.md) — was MHR kann, wie es funktioniert, alle Studien/Validierungen + Bench-Test.
+
 > ⚠️ **Experimentell & auf Hardware ungetestet.** Aktiv (default-an): Phase 0, Stufe A und Best-of-N — alle „nie schlechter als Upstream". **Stufe B** (Suppression) und **Phase 2** (DV-Backbone) sind im Code, aber **default-AUS** und erst nach Bench-Test zu aktivieren (`docs/MHR/BENCH_TEST_PLAN.md`). Flashe **zuerst auf ein Ersatz-/Bench-Gerät**, nicht auf produktive Repeater. Voller Status: Abschnitt „Stand der Optimierungs-Schicht".
 
 ---
