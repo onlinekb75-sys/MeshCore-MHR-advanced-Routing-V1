@@ -764,6 +764,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#stufe-a-aus-der-realdaten-studie-hop-basierte-pfadwahl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stufe A (aus der Realdaten-Studie) — hop-basierte Pfadwahl
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Stufe A (aus der Realdaten-Studie) — hop-basierte Pfadwahl">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#patch-5-hop-gewichtetes-rebroadcast-delay-primarer-hebel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Patch 5 — Hop-gewichtetes Rebroadcast-Delay (PRIMÄRER Hebel)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#patch-6-floodmax-default-64-15-datenbelegt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Patch 6 — flood.max-Default 64 → 15 (datenbelegt)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#bewusst-nicht-geandert" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -980,6 +1019,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sim/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MHR-Simulationen &amp; Realdatensatz
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -1268,6 +1335,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#stufe-a-aus-der-realdaten-studie-hop-basierte-pfadwahl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stufe A (aus der Realdaten-Studie) — hop-basierte Pfadwahl
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Stufe A (aus der Realdaten-Studie) — hop-basierte Pfadwahl">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#patch-5-hop-gewichtetes-rebroadcast-delay-primarer-hebel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Patch 5 — Hop-gewichtetes Rebroadcast-Delay (PRIMÄRER Hebel)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#patch-6-floodmax-default-64-15-datenbelegt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Patch 6 — flood.max-Default 64 → 15 (datenbelegt)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#bewusst-nicht-geandert" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1365,12 +1471,38 @@ Build verifiziert: <code>pio run -e heltec_v4_repeater</code> → SUCCESS (RAM 3
   spätere ETX-Metrik (Phase 1+) und bessere <code>neighbors</code>-Auswertung. Kein int8-Overflow
   (gewichtetes Mittel zweier int8 bleibt in int8).</li>
 </ul>
+<h2 id="stufe-a-aus-der-realdaten-studie-hop-basierte-pfadwahl">Stufe A (aus der Realdaten-Studie) — hop-basierte Pfadwahl</h2>
+<p>Begründet durch <code>docs/MHR/study/MeshCore_Routing_Study.md</code>: SNR ist ein schwacher Hebel, die
+<strong>Hop-Zahl</strong> ist verlässlicher. Beide Patches sind rein lokal, „nie schlechter als Upstream", ab
+einem einzelnen Knoten sicher und monoton — ideal für langsame Verbreitung im Mischbetrieb.</p>
+<h3 id="patch-5-hop-gewichtetes-rebroadcast-delay-primarer-hebel">Patch 5 — Hop-gewichtetes Rebroadcast-Delay (PRIMÄRER Hebel)</h3>
+<ul>
+<li>Datei: <code>examples/simple_repeater/MyMesh.cpp</code>, <code>getRetransmitDelay()</code></li>
+<li>Neuer persistierter Parameter <code>tx_hop_weight</code> (float 0..1, Default <strong>0.6</strong>), ergänzt am Ende von
+  <code>NodePrefs</code> (<code>CommonCLI.h</code>) + Persistenz-Offset 295 (forward-/backward-kompatibel) + CLI
+  <code>set/get txhopweight</code>.</li>
+<li>Wirkung: Eine Flood-Kopie mit <strong>weniger akkumulierten Hops</strong> (= verlässliches Signal für kurzen
+  Pfad) zieht ihre zufällige Backoff-Zeit aus einem zu 0 hin geschrumpften Fenster → sendet früher
+  und unterdrückt langsamere Umweg-Kopien via <code>hasSeen()</code>-Dedup. Der Hop-Term <strong>dominiert</strong> den
+  bisherigen SNR-Term (kombiniert, gecappt; Fenster nie &lt; <code>t+1</code> → keine synchronen Kollisionen).</li>
+<li><code>tx_hop_weight == 0</code> <strong>und</strong> <code>tx_snr_weight == 0</code> reproduzieren Upstream exakt. Hop-Horizont
+  <code>MHR_HOP_HORIZON = 12</code> (≈ realer Netzdurchmesser). Reversibel: <code>set txhopweight 0</code>.</li>
+</ul>
+<h3 id="patch-6-floodmax-default-64-15-datenbelegt">Patch 6 — <code>flood.max</code>-Default 64 → 15 (datenbelegt)</h3>
+<ul>
+<li>Datei: <code>examples/simple_repeater/MyMesh.cpp</code> (<code>flood_max</code> Default)</li>
+<li>Realer Netzdurchmesser: Median 10, P90 18 Hops → 64 ist massiv überdimensioniert. Die Studie
+  zeigte: <strong>12 ist zu aggressiv</strong> (kappt ferne Zustellungen bei voller Adoption), <strong>15 bleibt über
+  alle Adoptionsgrade sicher</strong>.</li>
+<li><code>flood.max</code> ist ein rein <strong>lokales Forward-Limit</strong> (<code>allowPacketForward</code>): Stock-Knoten (64)
+  tragen längere Pfade weiter → ein einzelner MHR-Knoten ist nie schlechter, tötet aber lokal
+  Fern-Umweg-Kopien. Netzabhängig, weiter per CLI einstellbar: <code>set flood.max &lt;n&gt;</code>.</li>
+</ul>
 <h2 id="bewusst-nicht-geandert">Bewusst NICHT geändert</h2>
 <ul>
-<li><code>flood.max</code> (Default 64): netz­abhängig, besser per CLI setzen (<code>set flood.max &lt;n&gt;</code>).</li>
 <li>Kein neues Paketformat, keine Metrik im Paket, kein Backbone, kein echtes Best-of-N am Ziel —
   Letzteres würde die <code>hasSeen()</code>-Dedup aufbohren (Risiko von Nachrichten-Duplikaten) und gehört
-  in eine eigene, gründlich getestete Stufe. Siehe Design-Dokumente (Phase 2).</li>
+  in eine eigene, gründlich getestete Stufe (siehe Studie Stufe A „Best-of-N am Ziel" + Stufe B/C).</li>
 </ul>
 <h2 id="validierung-simulation">Validierung (Simulation)</h2>
 <ul>
