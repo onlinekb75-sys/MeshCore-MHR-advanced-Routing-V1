@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-MeshCore vs. NHR — 25 ECHTE Knoten aus CoreScope (corescope.meshrheinland.de, live
+MeshCore vs. MHR — 25 ECHTE Knoten aus CoreScope (corescope.meshrheinland.de, live
 abgerufen 2026-05-29 via /api/nodes). Position + Rolle sind real (Raum Bonn / Rhein-Sieg
 / Siebengebirge / Lohmar / Leverkusen). Links physikbasiert auf den realen Koordinaten
 (keine reale SNR-Adjazenz verfuegbar -> Log-Distance-Modell; Gelaende/Sicht nicht modelliert).
@@ -120,8 +120,8 @@ for ai,ca in enumerate(clis):
         res.append(dict(pair=(name[ca],name[cb]),ra=name[ra],rb=name[rb],
             opt_hops=oh,opt_etx=oe,mc_hops_mean=float(hh.mean()),mc_hops_max=int(hh.max()),
             mc_etx_mean=float(ee.mean()),detour_ratio=float(ee.mean()/oe),
-            frac_detour=float(np.mean(ee>oe*1.05)),mc_tx_mean=float(tt.mean()),nhr_tx=1+oh,
-            mc_rel=rel(list(sp) if sp else [ra,rb]),nhr_rel=rel(opt),
+            frac_detour=float(np.mean(ee>oe*1.05)),mc_tx_mean=float(tt.mean()),mhr_tx=1+oh,
+            mc_rel=rel(list(sp) if sp else [ra,rb]),mhr_rel=rel(opt),
             opt_path=[name[x] for x in opt]))
 
 def agg(k): return np.array([r[k] for r in res])
@@ -130,9 +130,9 @@ S=dict(n_pairs=len(res),mean_opt_hops=float(agg("opt_hops").mean()),
  mean_detour_ratio=float(agg("detour_ratio").mean()),
  pct_pairs_detour=float(np.mean(agg("frac_detour")>0.10)*100),
  mean_detour_rate=float(agg("frac_detour").mean()*100),
- mean_mc_tx=float(agg("mc_tx_mean").mean()),mean_nhr_tx=float(agg("nhr_tx").mean()),
- airtime_red_pct=float((1-agg("nhr_tx").mean()/agg("mc_tx_mean").mean())*100),
- mean_mc_rel=float(agg("mc_rel").mean()),mean_nhr_rel=float(agg("nhr_rel").mean()))
+ mean_mc_tx=float(agg("mc_tx_mean").mean()),mean_mhr_tx=float(agg("mhr_tx").mean()),
+ airtime_red_pct=float((1-agg("mhr_tx").mean()/agg("mc_tx_mean").mean())*100),
+ mean_mc_rel=float(agg("mc_rel").mean()),mean_mhr_rel=float(agg("mhr_rel").mean()))
 print(json.dumps(S,indent=2,ensure_ascii=False))
 json.dump(dict(summary=S,detail=res),open("sim_results_real.json","w"),indent=2,ensure_ascii=False)
 
@@ -152,7 +152,7 @@ ax.set_xlabel("Laenge (°O)");ax.set_ylabel("Breite (°N)");ax.legend(loc="lower
 fig.tight_layout();fig.savefig("fig_real_topology.png");plt.close(fig)
 
 fig,ax=plt.subplots(figsize=(5.5,4))
-v=[S["mean_opt_hops"],S["mean_mc_hops"]];b=ax.bar(["NHR / Optimum","MeshCore"],v,color=["#2e7d32","#c0392b"])
+v=[S["mean_opt_hops"],S["mean_mc_hops"]];b=ax.bar(["MHR / Optimum","MeshCore"],v,color=["#2e7d32","#c0392b"])
 for bb,vv in zip(b,v):ax.text(bb.get_x()+bb.get_width()/2,vv+0.02,f"{vv:.2f}",ha="center")
 ax.set_ylabel("Ø Backbone-Hops");ax.set_title("Pfadlaenge (echte Topologie)");ax.grid(axis="y",alpha=0.2)
 fig.tight_layout();fig.savefig("fig_real_hops.png");plt.close(fig)
@@ -164,7 +164,7 @@ ax.set_title(f"Umweg-Verteilung (Ø {S['mean_detour_ratio']:.2f}×)");ax.legend(
 fig.tight_layout();fig.savefig("fig_real_detour.png");plt.close(fig)
 
 fig,ax=plt.subplots(figsize=(5.5,4))
-v=[S["mean_mc_tx"],S["mean_nhr_tx"]];b=ax.bar(["MeshCore\n(netzweiter Flood)","NHR\n(lokal+Backbone)"],v,color=["#c0392b","#2e7d32"])
+v=[S["mean_mc_tx"],S["mean_mhr_tx"]];b=ax.bar(["MeshCore\n(netzweiter Flood)","MHR\n(lokal+Backbone)"],v,color=["#c0392b","#2e7d32"])
 for bb,vv in zip(b,v):ax.text(bb.get_x()+bb.get_width()/2,vv+0.1,f"{vv:.1f}",ha="center")
 ax.set_ylabel("Sende-Ereignisse je Discovery");ax.set_title(f"Airtime je Discovery (−{S['airtime_red_pct']:.0f} %)");ax.grid(axis="y",alpha=0.2)
 fig.tight_layout();fig.savefig("fig_real_airtime.png");plt.close(fig)
@@ -186,7 +186,7 @@ def draw(p,c,l):
         ax.annotate("",xy=(lon[p[k+1]],lat[p[k+1]]),xytext=(lon[p[k]],lat[p[k]]),arrowprops=dict(arrowstyle="-|>",color=c,lw=2.4))
     ax.plot([],[],color=c,lw=2.4,label=l)
 if sample: draw(sample,"#c0392b",f"MeshCore-Umweg ({len(sample)-1} Hops)")
-draw(opt,"#2e7d32",f"NHR-Optimum ({len(opt)-1} Hops)")
+draw(opt,"#2e7d32",f"MHR-Optimum ({len(opt)-1} Hops)")
 for r in set(opt+(sample or [])): ax.annotate(name[r],(lon[r],lat[r]),fontsize=7,xytext=(3,3),textcoords="offset points")
 ax.scatter([lon[ra],lon[rb]],[lat[ra],lat[rb]],c="k",s=110,marker="*",zorder=6)
 ax.set_title(f"Beispiel (echt): {worst['pair'][0]} → {worst['pair'][1]}");ax.set_xlabel("Laenge (°O)");ax.set_ylabel("Breite (°N)")

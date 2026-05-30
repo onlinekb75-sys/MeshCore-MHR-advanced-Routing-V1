@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-MeshCore vs. NHR — 25-Knoten-Simulation, verankert an der realen Rheinland-Topologie
+MeshCore vs. MHR — 25-Knoten-Simulation, verankert an der realen Rheinland-Topologie
 (Korridor Koeln - Bonn - Siebengebirge - Bergisches Land - Eifelrand).
 
 Vergleicht:
   (A) MeshCore heute: netzweiter Flood ueber das Repeater-Mesh + "first packet wins"
       Pfad-Caching, Per-Hop-Zufallsverzoegerung, rx_delay_base = 0 (SNR-Gewichtung aus).
-  (B) NHR: metrik-optimaler Pfad (ETX) ueber proaktiven Backbone + Best-of-N,
+  (B) MHR: metrik-optimaler Pfad (ETX) ueber proaktiven Backbone + Best-of-N,
       Discovery-Short-Circuit (Client flutet nur bis zum naechsten Repeater).
 
 Modell ist ein realistisches, physikbasiertes Synthetik-Modell (Log-Distance-Pfadverlust
@@ -112,7 +112,7 @@ for c in clis:
         attach[c]=[max(reps,key=lambda r:P[c,r])]
 
 # ---------------------------------------------------------------------------
-# 4) NHR-Zielpfad: ETX-optimaler Pfad ueber den Backbone (das, wozu Backbone-DV
+# 4) MHR-Zielpfad: ETX-optimaler Pfad ueber den Backbone (das, wozu Backbone-DV
 #    + Best-of-N konvergiert).
 # ---------------------------------------------------------------------------
 def best_backbone_path(r_src,r_dst):
@@ -188,8 +188,8 @@ for (ca,cb) in pairs:
             mc_hops.append(len(p)-1); mc_etx.append(path_etx(list(p))); mc_tx.append(ntx); ok+=1
     if not mc_hops: continue
     mc_hops=np.array(mc_hops); mc_etx=np.array(mc_etx); mc_tx=np.array(mc_tx)
-    # NHR-Airtime: 1 Client-Tx (lokaler Flood bis Repeater) + Backbone-Unicast (Hops)
-    nhr_tx=1+opt_hops
+    # MHR-Airtime: 1 Client-Tx (lokaler Flood bis Repeater) + Backbone-Unicast (Hops)
+    mhr_tx=1+opt_hops
     # Ende-zu-Ende-Zuverlaessigkeit (Produkt der Hop-Zustellwahrsch., 1 Versuch)
     def path_rel(path):
         r=1.0
@@ -202,9 +202,9 @@ for (ca,cb) in pairs:
         mc_etx_mean=float(mc_etx.mean()),
         detour_ratio=float(mc_etx.mean()/opt_etx),
         frac_detour=float(np.mean(mc_etx>opt_etx*1.05)),
-        mc_tx_mean=float(mc_tx.mean()), nhr_tx=nhr_tx,
+        mc_tx_mean=float(mc_tx.mean()), mhr_tx=mhr_tx,
         mc_rel=path_rel(list(simulate_flood(ra,rb)[0] or [ra,rb])),
-        nhr_rel=path_rel(opt),
+        mhr_rel=path_rel(opt),
         deliv_ratio_flood=ok/MC,
         ra=name[ra], rb=name[rb], opt_path=[name[x] for x in opt],
     ))
@@ -222,10 +222,10 @@ summary=dict(
     pct_pairs_with_detour=float(np.mean(agg("frac_detour")>0.10)*100),
     mean_detour_event_rate=float(agg("frac_detour").mean()*100),
     mean_mc_tx=float(agg("mc_tx_mean").mean()),
-    mean_nhr_tx=float(agg("nhr_tx").mean()),
-    airtime_reduction_pct=float((1-agg("nhr_tx").mean()/agg("mc_tx_mean").mean())*100),
+    mean_mhr_tx=float(agg("mhr_tx").mean()),
+    airtime_reduction_pct=float((1-agg("mhr_tx").mean()/agg("mc_tx_mean").mean())*100),
     mean_mc_rel=float(agg("mc_rel").mean()),
-    mean_nhr_rel=float(agg("nhr_rel").mean()),
+    mean_mhr_rel=float(agg("mhr_rel").mean()),
 )
 print(json.dumps(summary,indent=2,ensure_ascii=False))
 json.dump(dict(summary=summary,detail=res),open("sim_results.json","w"),indent=2,ensure_ascii=False)
@@ -258,23 +258,23 @@ ax.grid(alpha=0.2); fig.tight_layout(); fig.savefig("fig_topology.png"); plt.clo
 # (B) mittlere Hopzahl
 fig,ax=plt.subplots(figsize=(5.5,4))
 vals=[summary["mean_opt_hops"],summary["mean_mc_hops"]]
-bars=ax.bar(["NHR / Optimum","MeshCore (first-wins)"],vals,color=["#2e7d32","#c0392b"])
+bars=ax.bar(["MHR / Optimum","MeshCore (first-wins)"],vals,color=["#2e7d32","#c0392b"])
 for b,v in zip(bars,vals): ax.text(b.get_x()+b.get_width()/2,v+0.03,f"{v:.2f}",ha="center")
-ax.set_ylabel("mittlere Backbone-Hops je Zustellung"); ax.set_title("Pfadlaenge: MeshCore vs. NHR")
+ax.set_ylabel("mittlere Backbone-Hops je Zustellung"); ax.set_title("Pfadlaenge: MeshCore vs. MHR")
 ax.grid(axis="y",alpha=0.2); fig.tight_layout(); fig.savefig("fig_hops.png"); plt.close(fig)
 
 # (C) Detour-Ratio-Histogramm
 fig,ax=plt.subplots(figsize=(5.5,4))
 ax.hist(agg("detour_ratio"),bins=18,color="#c0392b",alpha=0.8)
-ax.axvline(1.0,color="#2e7d32",ls="--",label="Optimum (NHR)")
+ax.axvline(1.0,color="#2e7d32",ls="--",label="Optimum (MHR)")
 ax.set_xlabel("Umweg-Faktor  (MeshCore-Pfadkosten / Optimum)"); ax.set_ylabel("Anzahl Knotenpaare")
 ax.set_title(f"Umweg-Verteilung MeshCore\nMittel = {summary['mean_detour_ratio']:.2f}×")
 ax.legend(); ax.grid(alpha=0.2); fig.tight_layout(); fig.savefig("fig_detour.png"); plt.close(fig)
 
 # (D) Airtime je Discovery
 fig,ax=plt.subplots(figsize=(5.5,4))
-vals=[summary["mean_mc_tx"],summary["mean_nhr_tx"]]
-bars=ax.bar(["MeshCore\n(netzweiter Flood)","NHR\n(lokal+Backbone)"],vals,color=["#c0392b","#2e7d32"])
+vals=[summary["mean_mc_tx"],summary["mean_mhr_tx"]]
+bars=ax.bar(["MeshCore\n(netzweiter Flood)","MHR\n(lokal+Backbone)"],vals,color=["#c0392b","#2e7d32"])
 for b,v in zip(bars,vals): ax.text(b.get_x()+b.get_width()/2,v+0.1,f"{v:.1f}",ha="center")
 ax.set_ylabel("Sende-Ereignisse je Pfadaufbau (Airtime-Proxy)")
 ax.set_title(f"Airtime je Discovery  (−{summary['airtime_reduction_pct']:.0f} %)")
@@ -302,10 +302,10 @@ def draw(path,color,lab,off):
                     arrowprops=dict(arrowstyle="-|>",color=color,lw=2.2))
     ax.plot([],[],color=color,lw=2.2,label=lab)
 if sample: draw(sample,"#c0392b",f"MeshCore-Umweg ({len(sample)-1} Hops)",0)
-draw(opt,"#2e7d32",f"NHR-Optimum ({len(opt)-1} Hops)",0)
+draw(opt,"#2e7d32",f"MHR-Optimum ({len(opt)-1} Hops)",0)
 for r in set(opt+(sample or [])): ax.annotate(name[r],(lon[r],lat[r]),fontsize=7,xytext=(3,3),textcoords="offset points")
 ax.scatter([lon[ra],lon[rb]],[lat[ra],lat[rb]],c="k",s=90,marker="*",zorder=6)
-ax.set_title(f"Beispiel: {worst['pair'][0]} → {worst['pair'][1]}\nMeshCore waehlt Umweg, NHR den Direktweg")
+ax.set_title(f"Beispiel: {worst['pair'][0]} → {worst['pair'][1]}\nMeshCore waehlt Umweg, MHR den Direktweg")
 ax.set_xlabel("Laenge (°O)"); ax.set_ylabel("Breite (°N)"); ax.legend(loc="lower left")
 ax.grid(alpha=0.2); fig.tight_layout(); fig.savefig("fig_example.png"); plt.close(fig)
 

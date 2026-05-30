@@ -10,11 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://meshcore-dev.github.io/meshcore/NHR/MeshCore_Simulation_ECHTE_Daten/">
+        <link rel="canonical" href="https://meshcore-dev.github.io/meshcore/MHR/MeshCore_Simulation_25Knoten/">
       
       
-        <link rel="prev" href="../MeshCore_Simulation_25Knoten/">
+        <link rel="prev" href="../MeshCore_Routing_Analyse_und_Optimierung/">
       
+      
+        <link rel="next" href="../MeshCore_Simulation_ECHTE_Daten/">
       
       
         
@@ -25,7 +27,7 @@
     
     
       
-        <title>Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland - MeshCore Docs</title>
+        <title>Simulation: MeshCore vs. MHR – 25 Knoten, Rheinland-Topologie - MeshCore Docs</title>
       
     
     
@@ -68,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#simulation-mit-echten-corescope-daten-25-knoten-rheinland" class="md-skip">
+        <a href="#simulation-meshcore-vs-mhr-25-knoten-rheinland-topologie" class="md-skip">
           Skip to content
         </a>
       
@@ -103,7 +105,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+              Simulation: MeshCore vs. MHR – 25 Knoten, Rheinland-Topologie
             
           </span>
         </div>
@@ -595,7 +597,7 @@
   <span class="md-ellipsis">
     
   
-    NHR
+    MHR
   
 
     
@@ -611,7 +613,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    NHR
+    MHR
   
 
           </label>
@@ -624,14 +626,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../CHANGES_NHR/" class="md-nav__link">
+      <a href="../CHANGES_MHR/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    NHR – Änderungen gegenüber Upstream (Phase 0 + Phase 1)
+    MHR – Änderungen gegenüber Upstream (Phase 0 + Phase 1)
   
 
     
@@ -659,7 +661,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore Hybrid Routing (NHR) – ein fusionierter Routing-Entwurf für 10 % Duty-Cycle
+    MeshCore Hybrid Routing (MHR) – ein fusionierter Routing-Entwurf für 10 % Duty-Cycle
   
 
     
@@ -687,7 +689,7 @@
   <span class="md-ellipsis">
     
   
-    NHR v2 – Härtung für Robustheit &amp; Stabilität (aus Realdaten)
+    MHR v2 – Härtung für Robustheit &amp; Stabilität (aus Realdaten)
   
 
     
@@ -733,34 +735,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../MeshCore_Simulation_25Knoten/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Simulation: MeshCore vs. NHR – 25 Knoten, Rheinland-Topologie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -780,7 +754,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    Simulation: MeshCore vs. MHR – 25 Knoten, Rheinland-Topologie
   
 
     
@@ -798,7 +772,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    Simulation: MeshCore vs. MHR – 25 Knoten, Rheinland-Topologie
   
 
     
@@ -824,10 +798,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ergebnisse-19-cluster-ubergreifende-client-paare-200-monte-carlo-floods-je-paar" class="md-nav__link">
+  <a href="#modell-in-kurze" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Ergebnisse (19 cluster-übergreifende Client-Paare, 200 Monte-Carlo-Floods je Paar)
+        Modell in Kürze
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ergebnisse-31-cluster-ubergreifende-client-paare" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ergebnisse (31 cluster-übergreifende Client-Paare)
       
     </span>
   </a>
@@ -846,10 +831,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#bewertung" class="md-nav__link">
+  <a href="#einordnung-grenzen-ehrlich" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Bewertung
+        Einordnung &amp; Grenzen (ehrlich)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mit-echten-corescope-daten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mit echten CoreScope-Daten
       
     </span>
   </a>
@@ -860,6 +856,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MeshCore_Simulation_ECHTE_Daten/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -899,10 +923,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ergebnisse-19-cluster-ubergreifende-client-paare-200-monte-carlo-floods-je-paar" class="md-nav__link">
+  <a href="#modell-in-kurze" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Ergebnisse (19 cluster-übergreifende Client-Paare, 200 Monte-Carlo-Floods je Paar)
+        Modell in Kürze
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ergebnisse-31-cluster-ubergreifende-client-paare" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ergebnisse (31 cluster-übergreifende Client-Paare)
       
     </span>
   </a>
@@ -921,10 +956,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#bewertung" class="md-nav__link">
+  <a href="#einordnung-grenzen-ehrlich" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Bewertung
+        Einordnung &amp; Grenzen (ehrlich)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mit-echten-corescope-daten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mit echten CoreScope-Daten
       
     </span>
   </a>
@@ -948,7 +994,7 @@
 
 
   
-    <a href="https://github.com/meshcore-dev/meshcore/edit/main/docs/NHR/MeshCore_Simulation_ECHTE_Daten.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/meshcore-dev/meshcore/edit/main/docs/MHR/MeshCore_Simulation_25Knoten.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -956,89 +1002,100 @@
   
 
 
-<h1 id="simulation-mit-echten-corescope-daten-25-knoten-rheinland">Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland</h1>
-<p>Diesmal mit <strong>realen Live-Daten</strong>: Über den verbundenen Chrome-Browser habe ich CoreScope (<code>corescope.meshrheinland.de</code>) geöffnet und die API <code>/api/nodes</code> ausgelesen — <strong>1936 Knoten</strong>, davon im Raum <strong>Bonn / Rhein-Sieg / Siebengebirge / Lohmar / Leverkusen</strong> 106 aktive (80 Repeater, 20 Companions, 6 Room-Server). Daraus 25 reale Knoten ausgewählt (18 aktivste Repeater + 7 Companions). <strong>Position und Rolle sind echt.</strong></p>
+<h1 id="simulation-meshcore-vs-mhr-25-knoten-rheinland-topologie">Simulation: MeshCore vs. MHR – 25 Knoten, Rheinland-Topologie</h1>
+<p>Vergleich des heutigen MeshCore-Routings (netzweiter Flood + „first packet wins") mit dem MHR-Entwurf (metrik-optimaler Pfad + Backbone-Short-Circuit) auf einer realistischen 25-Knoten-Topologie im Korridor <strong>Köln–Bonn–Siebengebirge–Bergisches Land–Eifelrand</strong>.</p>
 <blockquote>
-<p>Was nicht real ist: CoreScope bietet keine fertige Kanten-/SNR-Adjazenz über die API (die Karte zieht nur <code>/api/nodes</code> + <code>/api/stats</code>; Links werden aus Paketpfaden abgeleitet). Die Funk-Links habe ich daher physikbasiert (Log-Distance) auf den <strong>echten Koordinaten</strong> modelliert. Geländeabschattung und Antennenhöhen sind nicht enthalten — reale Sichtverbindungen (z. B. Hochstandort Oelberg) können einzelne Links besser/schlechter machen.</p>
+<p><strong>Datengrundlage – ehrlich:</strong> Die Live-Daten von CoreScope (<code>corescope.meshrheinland.de</code>) und der offiziellen Map-API ließen sich <strong>nicht programmatisch abrufen</strong> (Single-Page-App ohne über das Fetch-Werkzeug erreichbare JSON-Schnittstelle; ein direkter Zugriff per <code>curl</code>/Skript ist mir aus Sicherheitsgründen untersagt; es war außerdem kein Chrome-Browser verbunden). Die Topologie ist daher ein <strong>physikbasiertes Synthetik-Modell</strong>, aber an der <strong>realen Rheinland-Realität verankert</strong>: echte Hochstandorte (Colonius/Köln, Oelberg/Siebengebirge, Deutz-Hochhaus, Lindenthal, Bergisch Gladbach), echte geografische Lage, und das real dokumentierte Verhalten, dass <strong>Companion-Clients nicht weiterleiten</strong> (nur Repeater bilden das Relais-Mesh). Mit echten CoreScope-Daten lässt sich exakt dasselbe Skript erneut fahren – siehe Schluss.</p>
 </blockquote>
-<p>Reale Knoten u. a.: Oelberg IGFS (Siebengebirge), Bonn-Duisdorf FGZ, DTAG-Tower-Umfeld, Alfter, Bornheim, Bonn-Nord/Oberkassel, SU-SGB, Lohmar #17/#27, Leverkusen, Lichtenberg.</p>
 <hr />
-<h2 id="ergebnisse-19-cluster-ubergreifende-client-paare-200-monte-carlo-floods-je-paar">Ergebnisse (19 cluster-übergreifende Client-Paare, 200 Monte-Carlo-Floods je Paar)</h2>
+<h2 id="modell-in-kurze">Modell in Kürze</h2>
+<ul>
+<li><strong>25 Knoten:</strong> 12 Repeater (davon 5 Hochstandorte), 13 Companion-Clients. Clients hängen per Zero-Hop an den Repeatern, die sie hören; <strong>geroutet wird nur über das Repeater-Mesh</strong>.</li>
+<li><strong>Funkmodell:</strong> Log-Distance-Pfadverlust mit sichtlinienabhängigem Exponenten – Hochstandort↔Hochstandort quasi-Freiraum (lange Links), Bodenknoten urban/NLoS (kurze Links). Daraus SNR → weiche Zustellwahrscheinlichkeit pro Link.</li>
+<li><strong>Metrik:</strong> Linkkosten = ETX = 1/(p·p_rück); Pfadkosten additiv.</li>
+<li><strong>MeshCore:</strong> Monte-Carlo-Flood (200 Durchläufe je Paar) mit Per-Hop-Zufallsverzögerung ~U(0, 5·Airtime), <code>rx_delay_base = 0</code> (SNR-Gewichtung aus), <code>flood.max = 8</code>, „erste Kopie gewinnt".</li>
+<li><strong>MHR:</strong> ETX-optimaler Backbone-Pfad (das Konvergenzziel von Backbone-DV + Best-of-N) + Discovery-Short-Circuit (Client flutet nur bis zum nächsten Repeater, dann Backbone-Unicast).</li>
+</ul>
+<hr />
+<h2 id="ergebnisse-31-cluster-ubergreifende-client-paare">Ergebnisse (31 cluster-übergreifende Client-Paare)</h2>
 <table>
 <thead>
 <tr>
 <th>Kennzahl</th>
 <th>MeshCore (heute)</th>
-<th>NHR</th>
+<th>MHR</th>
+<th>Bedeutung</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Ø Backbone-Hops je Zustellung</td>
-<td><strong>2,21</strong></td>
-<td>1,79 (Optimum)</td>
+<td><strong>1,40</strong></td>
+<td>1,10 (Optimum)</td>
+<td>MeshCore-Pfade sind im Mittel länger</td>
 </tr>
 <tr>
 <td>schlechtester Pfad</td>
-<td><strong>8 Hops</strong></td>
-<td>–</td>
+<td><strong>4 Hops</strong></td>
+<td>1 Hop</td>
+<td>krasse Einzel-Umwege kommen vor</td>
 </tr>
 <tr>
 <td>Ø Umweg-Faktor (Kosten/Optimum)</td>
-<td><strong>1,35×</strong></td>
+<td><strong>1,26×</strong></td>
 <td>1,00×</td>
+<td>+26 % Pfadkosten im Schnitt</td>
 </tr>
 <tr>
-<td><strong>Umweg-Trefferquote</strong></td>
-<td><strong>60,2 %</strong> der Floods</td>
+<td>Umweg-Trefferquote</td>
+<td><strong>28,8 %</strong> der Floods</td>
 <td>–</td>
+<td>knapp jeder dritte Pfadaufbau landet auf einem Umweg</td>
 </tr>
 <tr>
 <td>Paare, die je Umwege erleben</td>
 <td><strong>100 %</strong></td>
 <td>–</td>
+<td>kein Paar ist davor sicher</td>
 </tr>
 <tr>
 <td>Airtime je Discovery (Sende-Ereignisse)</td>
-<td><strong>15,3</strong></td>
-<td>2,8</td>
-</tr>
-<tr>
-<td><strong>Airtime-Ersparnis NHR</strong></td>
-<td>–</td>
-<td><strong>≈ 82 %</strong></td>
+<td><strong>5,7</strong></td>
+<td>2,1</td>
+<td>MHR spart <strong>≈ 63 %</strong> Airtime</td>
 </tr>
 <tr>
 <td>Ø Ende-zu-Ende-Zuverlässigkeit (1 Versuch)</td>
-<td>0,58</td>
-<td><strong>0,66</strong></td>
+<td>0,74</td>
+<td><strong>0,79</strong></td>
+<td>kürzere Pfade = weniger Verlustpunkte</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Das ist deutlich drastischer als im synthetischen Modell</strong> — und realistischer. Im echten, über ~50 km gestreckten Netz mit vielen Alternativpfaden:</p>
-<ul>
-<li><strong>Über die Hälfte (60 %) aller Pfadaufbauten landet auf einem Umweg.</strong> „First packet wins" + Zufalls-Timing trifft hier viel häufiger daneben, weil es mehr konkurrierende Wege gibt.</li>
-<li>Einzelne Pfade explodieren auf <strong>bis zu 8 Hops</strong>, wo optimal 2 reichen — exakt das Phänomen, das du beobachtest.</li>
-<li>Der netzweite Flood kostet im Schnitt <strong>15,3 Sende-Ereignisse</strong> pro Erstkontakt; NHR braucht <strong>2,8</strong> (lokaler Flood bis zum nächsten Repeater + Backbone-Unicast) → <strong>~82 % weniger Airtime</strong>.</li>
-<li>Die Zuverlässigkeit steigt von 0,58 auf 0,66 — und das ist nur <em>ein</em> Sendeversuch; mit den realen 3 Retries bestraft jeder Zusatz-Hop den Umweg-Pfad zusätzlich (deckt sich mit den Community-Berichten „~45 % unzuverlässig bei Pfadlänge ≥ 2").</li>
-</ul>
+<p><strong>Lesart:</strong> Der Kern bestätigt sich quantitativ. „First packet wins" + Zufalls-Timing wählt in <strong>~29 %</strong> der Fälle einen Umweg, im Mittel <strong>26 % teurer</strong>, im Extremfall einen 4-Hop-Weg, wo 1 Hop reichen würde. Weil MHR die netzweite Flutung durch lokalen Flood + gezielten Backbone-Unicast ersetzt, sinkt die <strong>Airtime pro Pfadaufbau um ~63 %</strong> – genau der Posten, der im realen Mesh die Lastspitzen erzeugt. Die Zuverlässigkeit steigt leicht mit, weil jeder vermiedene Zusatz-Hop ein potenzieller Verlustpunkt weniger ist (im echten Netz mit Retries verstärkt sich dieser Effekt).</p>
 <hr />
 <h2 id="abbildungen">Abbildungen</h2>
-<p><strong>Echte Topologie</strong> (Position+Rolle live aus CoreScope; ein Leverkusen-Knoten ist funkseitig isoliert):</p>
-<p><img alt="Topologie" src="../sim/fig_real_topology.png" /></p>
-<p><strong>Pfadlänge:</strong></p>
-<p><img alt="Hops" src="../sim/fig_real_hops.png" /></p>
-<p><strong>Umweg-Verteilung</strong> (Faktor MeshCore/Optimum):</p>
-<p><img alt="Detour" src="../sim/fig_real_detour.png" /></p>
-<p><strong>Airtime je Discovery</strong> (−82 %):</p>
-<p><img alt="Airtime" src="../sim/fig_real_airtime.png" /></p>
-<p><strong>Konkretes Beispiel</strong> — Ulli/p → Marcus-E: NHR nimmt MakiAlfter→Pending-Bonn→SU-SGB (2 Hops), MeshCore schwenkt über Ruengsdorf/Oberkassel nach Süden (3 Hops):</p>
-<p><img alt="Beispiel" src="../sim/fig_real_example.png" /></p>
+<p><strong>Topologie</strong> – Repeater-Mesh (blau), Client-Anbindung (grau gepunktet), Hochstandorte als rote Dreiecke:</p>
+<p><img alt="Topologie" src="../sim/fig_topology.png" /></p>
+<p><strong>Pfadlänge</strong> – mittlere Hop-Zahl:</p>
+<p><img alt="Hops" src="../sim/fig_hops.png" /></p>
+<p><strong>Umweg-Verteilung</strong> – Faktor MeshCore-Kosten / Optimum über alle Paare:</p>
+<p><img alt="Detour" src="../sim/fig_detour.png" /></p>
+<p><strong>Airtime je Discovery</strong> – Sende-Ereignisse pro Pfadaufbau:</p>
+<p><img alt="Airtime" src="../sim/fig_airtime.png" /></p>
+<p><strong>Konkretes Beispiel</strong> – MeshCore leitet Köln-Süd→Köln-Nord über Bergisch-Gladbach im Osten um, MHR nimmt den direkten Hochstandort-Hop:</p>
+<p><img alt="Beispiel" src="../sim/fig_example.png" /></p>
 <hr />
-<h2 id="bewertung">Bewertung</h2>
-<p>Mit echten Knotenpositionen bestätigt sich der NHR-Vorteil <strong>stärker</strong> als im idealisierten Modell: Je realer (gestreckter, redundanter) die Topologie, desto häufiger die zufälligen Umwege und desto größer der Airtime-Gewinn durch Backbone-Routing statt netzweitem Flood. Die Größenordnungen (60 % Umwege, ~82 % Airtime, +8 Pp Zuverlässigkeit) sind belastbar; die exakten Werte hängen vom Link-Modell ab.</p>
-<p><strong>Noch realer ginge es so:</strong> CoreScope kennt aus den Paketpfaden die tatsächlich beobachteten Hop-Folgen und SNR-Werte. Diese ließen sich aus der Packets-/Tools-Ansicht extrahieren, um die modellierten Links durch <strong>gemessene</strong> zu ersetzen. Sag Bescheid, wenn ich das angehen soll.</p>
-<p><em>Datenabruf: CoreScope <code>/api/nodes</code> (live, 2026-05-29). Skript: <code>sim/nhr_sim_real.py</code> (Seed 42, reproduzierbar). Vgl. <code>MeshCore_Simulation_25Knoten.md</code> (synthetische Variante), <code>MeshCore_Hybrid_Routing_Entwurf.md</code>.</em></p>
+<h2 id="einordnung-grenzen-ehrlich">Einordnung &amp; Grenzen (ehrlich)</h2>
+<ul>
+<li>Die <strong>absoluten</strong> Zahlen hängen von Modellparametern ab (Pfadverlust, Schwelle, Dichte). Belastbar ist die <strong>Richtung und Größenordnung</strong>: deutliche Airtime-Ersparnis, systematische, aber nicht dramatische Pfad-Umwege, leicht bessere Zuverlässigkeit.</li>
+<li>Ein gut platzierter Hochstandort-Backbone macht viele Paare ohnehin zu 1–2-Hop-Verbindungen – der Umweg-Effekt zeigt sich dann seltener in der <em>Hopzahl</em>, dafür klar in der <strong>Airtime</strong> (vermeidbare netzweite Floods) und in <strong>Einzel-Ausreißern</strong> (4-Hop-Umweg statt 1 Hop).</li>
+<li>Nicht modelliert: ACK-Retries (würden Umweg-Pfade zusätzlich bestrafen), Tageszeit-/Lastdynamik, Mobilität, Kollisionen auf dem geteilten Kanal (würden netzweite Floods <em>zusätzlich</em> benachteiligen → MHR-Vorteil eher größer).</li>
+<li>Das Skript (<code>sim/mhr_sim.py</code>) ist parametrisiert und reproduzierbar (Seed 42).</li>
+</ul>
+<h2 id="mit-echten-corescope-daten">Mit echten CoreScope-Daten</h2>
+<p>Sobald die echten Knoten/Links vorliegen (Koordinaten, gehörte Nachbarn, SNR), ersetzt man im Skript einfach die <code>NODES</code>-Liste und die Linkmatrix durch die Messwerte – Routing-Logik und Auswertung bleiben identisch. Das ginge, wenn du den <strong>Claude-in-Chrome-Browser verbindest</strong> (dann navigiere ich CoreScope live und lese die Knoten-/Link-Tabelle aus), oder du exportierst aus CoreScope eine Knoten-/Nachbarliste (CSV/JSON) und legst sie in den Projektordner.</p>
+<p><em>Verwandte Dokumente: <code>MeshCore_Routing_Analyse_und_Optimierung.md</code>, <code>MeshCore_Hybrid_Routing_Entwurf.md</code>.</em></p>
 
 
 

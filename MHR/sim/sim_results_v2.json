@@ -21,7 +21,7 @@
       "delivery_ratio": 0.9876315789473684,
       "mean_hops": 2.2168931521449506
     },
-    "nhr": {
+    "mhr": {
       "flap_rate": 0.1671523178807947,
       "switches": 631,
       "comparisons": 3775,
@@ -62,7 +62,7 @@
         0.9447368421052632
       ]
     },
-    "nhr": {
+    "mhr": {
       "unreachable": [
         0.0,
         0.0,
@@ -103,7 +103,7 @@
       "floods": 50,
       "airtime_per_attempt": 16.98
     },
-    "nhr": {
+    "mhr": {
       "total_airtime": 17.0,
       "floods": 1,
       "gave_up_after_floods": 1,
