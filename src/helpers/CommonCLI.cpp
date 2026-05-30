@@ -89,7 +89,8 @@ void CommonCLI::loadPrefsInt(FILESYSTEM* fs, const char* filename) {
     file.read((uint8_t *)_prefs->owner_info, sizeof(_prefs->owner_info));                          // 170
     file.read((uint8_t *)&_prefs->rx_boosted_gain, sizeof(_prefs->rx_boosted_gain));              // 290
     file.read((uint8_t *)&_prefs->tx_snr_weight, sizeof(_prefs->tx_snr_weight));                  // 291 (MHR; old files leave default)
-    // next: 295
+    file.read((uint8_t *)&_prefs->tx_hop_weight, sizeof(_prefs->tx_hop_weight));                  // 295 (MHR; old files leave default)
+    // next: 299
 
     // sanitise bad pref values
     _prefs->rx_delay_base = constrain(_prefs->rx_delay_base, 0, 20.0f);
@@ -105,6 +106,7 @@ void CommonCLI::loadPrefsInt(FILESYSTEM* fs, const char* filename) {
     _prefs->adc_multiplier = constrain(_prefs->adc_multiplier, 0.0f, 10.0f);
     _prefs->path_hash_mode = constrain(_prefs->path_hash_mode, 0, 2);   // NOTE: mode 3 reserved for future
     _prefs->tx_snr_weight = constrain(_prefs->tx_snr_weight, 0.0f, 1.0f);  // MHR
+    _prefs->tx_hop_weight = constrain(_prefs->tx_hop_weight, 0.0f, 1.0f);  // MHR
 
     // sanitise bad bridge pref values
     _prefs->bridge_enabled = constrain(_prefs->bridge_enabled, 0, 1);
@@ -182,7 +184,8 @@ void CommonCLI::savePrefs(FILESYSTEM* fs) {
     file.write((uint8_t *)_prefs->owner_info, sizeof(_prefs->owner_info));                          // 170
     file.write((uint8_t *)&_prefs->rx_boosted_gain, sizeof(_prefs->rx_boosted_gain));              // 290
     file.write((uint8_t *)&_prefs->tx_snr_weight, sizeof(_prefs->tx_snr_weight));                  // 291 (MHR)
-    // next: 295
+    file.write((uint8_t *)&_prefs->tx_hop_weight, sizeof(_prefs->tx_hop_weight));                  // 295 (MHR)
+    // next: 299
 
     file.close();
   }
@@ -608,6 +611,15 @@ void CommonCLI::handleSetCmd(uint32_t sender_timestamp, char* command, char* rep
     } else {
       strcpy(reply, "Error, must be 0..1");
     }
+  } else if (memcmp(config, "txhopweight ", 12) == 0) {   // MHR
+    float f = atof(&config[12]);
+    if (f >= 0 && f <= 1.0f) {
+      _prefs->tx_hop_weight = f;
+      savePrefs();
+      strcpy(reply, "OK");
+    } else {
+      strcpy(reply, "Error, must be 0..1");
+    }
   } else if (memcmp(config, "flood.max ", 10) == 0) {
     uint8_t m = atoi(&config[10]);
     if (m <= 64) {
@@ -789,6 +801,8 @@ void CommonCLI::handleGetCmd(uint32_t sender_timestamp, char* command, char* rep
     sprintf(reply, "> %s,%s,%d,%d", freq, bw, (uint32_t)_prefs->sf, (uint32_t)_prefs->cr);
   } else if (memcmp(config, "rxdelay", 7) == 0) {
     sprintf(reply, "> %s", StrHelper::ftoa(_prefs->rx_delay_base));
+  } else if (memcmp(config, "txhopweight", 11) == 0) {   // MHR
+    sprintf(reply, "> %s", StrHelper::ftoa(_prefs->tx_hop_weight));
   } else if (memcmp(config, "txsnrweight", 11) == 0) {   // MHR
     sprintf(reply, "> %s", StrHelper::ftoa(_prefs->tx_snr_weight));
   } else if (memcmp(config, "txdelay", 7) == 0) {

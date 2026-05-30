@@ -65,6 +65,10 @@ struct NodePrefs { // persisted to file
   //      >0 biases strong-SNR receptions to rebroadcast earlier so quality links lead the flood.
   //      Appended at end of struct for forward-compatible persistence. Reversible: set txsnrweight 0.
   float tx_snr_weight;
+  // MHR: hop-count weighting for flood-rebroadcast timing — the PRIMARY quality lever (the real-data
+  //       study found hop count far more reliable than SNR for path length). 0.0 = off. Appended at end
+  //       of struct for forward-compatible persistence. Reversible: set txhopweight 0.
+  float tx_hop_weight;
 };
 
 class CommonCLICallbacks {

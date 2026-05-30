@@ -541,18 +541,38 @@ int MyMesh::calcRxDelay(float score, uint32_t air_time) const {
   return (int)((pow(_prefs.rx_delay_base, 0.85f - score) - 1.0) * air_time);
 }
 
+// MHR: hop horizon for the rebroadcast-timing lever. Copies that have travelled more than this many hops
+//      get no early lead (they are most likely detours). Chosen near the real network diameter (median 10).
+#ifndef MHR_HOP_HORIZON
+  #define MHR_HOP_HORIZON 12
+#endif
+
 uint32_t MyMesh::getRetransmitDelay(const mesh::Packet *packet) {
   uint32_t t = (_radio->getEstAirtimeFor(packet->getPathByteLen() + packet->payload_len + 2) * _prefs.tx_delay_factor);
   uint32_t window = 5*t + 1;
-  // MHR: SNR-weighted rebroadcast. A reception with strong SNR (usually a short, direct link) draws its
-  //      random backoff from a window shrunk toward 0, so it rebroadcasts earlier and its copy suppresses
-  //      slower detour copies downstream via hasSeen() dedup. Randomness within the window is kept to avoid
-  //      synchronised collisions among equally-strong neighbours, and the window never shrinks below t+1.
-  //      tx_snr_weight == 0 reproduces upstream exactly. Reversible at runtime: set txsnrweight 0.
-  if (_prefs.tx_snr_weight > 0.0f && t > 0) {
-    float q = (packet->getSNR() + 10.0f) * (1.0f / 20.0f);   // ~0 at -10 dB .. 1 at +10 dB
-    if (q < 0.0f) q = 0.0f; else if (q > 1.0f) q = 1.0f;
-    uint32_t hi = window - (uint32_t)(_prefs.tx_snr_weight * q * (window - t - 1));  // stays >= t+1
+  // MHR: quality-guided flood rebroadcast. A copy that arrived via FEWER accumulated hops (the reliable
+  //      signal — the real-data study found SNR correlates only weakly with path length) and/or with
+  //      stronger SNR draws its random backoff from a window shrunk toward 0, so it rebroadcasts earlier and
+  //      suppresses slower detour copies downstream via hasSeen() dedup. The hop term dominates by default.
+  //      Randomness is preserved (the window never shrinks below t+1) to avoid synchronised collisions among
+  //      equally-good neighbours. Purely local and mixed-firmware-safe; never worse than upstream — both
+  //      weights 0 (or t == 0) reproduce the upstream random backoff exactly. Reversible at runtime:
+  //      set txhopweight 0 / set txsnrweight 0.
+  if (t > 0 && (_prefs.tx_hop_weight > 0.0f || _prefs.tx_snr_weight > 0.0f)) {
+    float q = 0.0f;
+    if (_prefs.tx_hop_weight > 0.0f) {
+      // fewer hops -> closer to 1 (lead the flood); beyond the hop horizon -> 0 (likely a detour)
+      float qhop = 1.0f - (float)packet->getPathHashCount() * (1.0f / (float)MHR_HOP_HORIZON);
+      if (qhop < 0.0f) qhop = 0.0f;
+      q += _prefs.tx_hop_weight * qhop;
+    }
+    if (_prefs.tx_snr_weight > 0.0f) {
+      float qsnr = (packet->getSNR() + 10.0f) * (1.0f / 20.0f);   // ~0 at -10 dB .. 1 at +10 dB
+      if (qsnr < 0.0f) qsnr = 0.0f; else if (qsnr > 1.0f) qsnr = 1.0f;
+      q += _prefs.tx_snr_weight * qsnr;
+    }
+    if (q > 1.0f) q = 1.0f;
+    uint32_t hi = window - (uint32_t)(q * (window - t - 1));   // stays >= t+1
     return getRNG()->nextInt(0, hi);
   }
   return getRNG()->nextInt(0, window);
@@ -891,7 +911,8 @@ MyMesh::MyMesh(mesh::MainBoard &board, mesh::Radio &radio, mesh::MillisecondCloc
   _prefs.rx_delay_base = 10.0f;  // MHR: SNR-weighted flood rebroadcast ON by default (revert at runtime via CLI: set rxdelay 0)
   _prefs.tx_delay_factor = 0.5f; // was 0.25f
   _prefs.direct_tx_delay_factor = 0.3f; // was 0.2
-  _prefs.tx_snr_weight = 0.5f;   // MHR: bias strong-SNR receptions to rebroadcast earlier (revert at runtime: set txsnrweight 0)
+  _prefs.tx_snr_weight = 0.5f;   // MHR: secondary lever — bias strong-SNR receptions earlier (revert: set txsnrweight 0)
+  _prefs.tx_hop_weight = 0.6f;   // MHR: PRIMARY lever — fewer-hop copies rebroadcast earlier (revert: set txhopweight 0)
   StrHelper::strncpy(_prefs.node_name, ADVERT_NAME, sizeof(_prefs.node_name));
   _prefs.node_lat = ADVERT_LAT;
   _prefs.node_lon = ADVERT_LON;
@@ -903,7 +924,10 @@ MyMesh::MyMesh(mesh::MainBoard &board, mesh::Radio &radio, mesh::MillisecondCloc
   _prefs.tx_power_dbm = LORA_TX_POWER;
   _prefs.advert_interval = 1;        // default to 2 minutes for NEW installs
   _prefs.flood_advert_interval = 12; // 12 hours
-  _prefs.flood_max = 64;
+  // MHR: data-backed default (real diameter P90=18; study: 15 safe at all adoption levels, 12 too
+  //      aggressive). Purely LOCAL forward limit (allowPacketForward) — stock nodes (64) still carry
+  //      longer paths, so a single MHR node is never worse. Network-dependent: set flood.max <n>.
+  _prefs.flood_max = 15;
   _prefs.interference_threshold = 0; // disabled
 
   // bridge defaults

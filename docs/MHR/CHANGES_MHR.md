@@ -50,11 +50,37 @@ Lokale, additive Verbesserungen — weiterhin **kein** Paketformat-Eingriff, **k
   spätere ETX-Metrik (Phase 1+) und bessere `neighbors`-Auswertung. Kein int8-Overflow
   (gewichtetes Mittel zweier int8 bleibt in int8).
 
+## Stufe A (aus der Realdaten-Studie) — hop-basierte Pfadwahl
+
+Begründet durch `docs/MHR/study/MeshCore_Routing_Study.md`: SNR ist ein schwacher Hebel, die
+**Hop-Zahl** ist verlässlicher. Beide Patches sind rein lokal, „nie schlechter als Upstream", ab
+einem einzelnen Knoten sicher und monoton — ideal für langsame Verbreitung im Mischbetrieb.
+
+### Patch 5 — Hop-gewichtetes Rebroadcast-Delay (PRIMÄRER Hebel)
+- Datei: `examples/simple_repeater/MyMesh.cpp`, `getRetransmitDelay()`
+- Neuer persistierter Parameter `tx_hop_weight` (float 0..1, Default **0.6**), ergänzt am Ende von
+  `NodePrefs` (`CommonCLI.h`) + Persistenz-Offset 295 (forward-/backward-kompatibel) + CLI
+  `set/get txhopweight`.
+- Wirkung: Eine Flood-Kopie mit **weniger akkumulierten Hops** (= verlässliches Signal für kurzen
+  Pfad) zieht ihre zufällige Backoff-Zeit aus einem zu 0 hin geschrumpften Fenster → sendet früher
+  und unterdrückt langsamere Umweg-Kopien via `hasSeen()`-Dedup. Der Hop-Term **dominiert** den
+  bisherigen SNR-Term (kombiniert, gecappt; Fenster nie < `t+1` → keine synchronen Kollisionen).
+- `tx_hop_weight == 0` **und** `tx_snr_weight == 0` reproduzieren Upstream exakt. Hop-Horizont
+  `MHR_HOP_HORIZON = 12` (≈ realer Netzdurchmesser). Reversibel: `set txhopweight 0`.
+
+### Patch 6 — `flood.max`-Default 64 → 15 (datenbelegt)
+- Datei: `examples/simple_repeater/MyMesh.cpp` (`flood_max` Default)
+- Realer Netzdurchmesser: Median 10, P90 18 Hops → 64 ist massiv überdimensioniert. Die Studie
+  zeigte: **12 ist zu aggressiv** (kappt ferne Zustellungen bei voller Adoption), **15 bleibt über
+  alle Adoptionsgrade sicher**.
+- `flood.max` ist ein rein **lokales Forward-Limit** (`allowPacketForward`): Stock-Knoten (64)
+  tragen längere Pfade weiter → ein einzelner MHR-Knoten ist nie schlechter, tötet aber lokal
+  Fern-Umweg-Kopien. Netzabhängig, weiter per CLI einstellbar: `set flood.max <n>`.
+
 ## Bewusst NICHT geändert
-- `flood.max` (Default 64): netz­abhängig, besser per CLI setzen (`set flood.max <n>`).
 - Kein neues Paketformat, keine Metrik im Paket, kein Backbone, kein echtes Best-of-N am Ziel —
   Letzteres würde die `hasSeen()`-Dedup aufbohren (Risiko von Nachrichten-Duplikaten) und gehört
-  in eine eigene, gründlich getestete Stufe. Siehe Design-Dokumente (Phase 2).
+  in eine eigene, gründlich getestete Stufe (siehe Studie Stufe A „Best-of-N am Ziel" + Stufe B/C).
 
 ## Validierung (Simulation)
 - `docs/MHR/sim/mhr_sim_v2.py` — Stress-Szenarien auf der realen 25-Knoten-Topologie:
