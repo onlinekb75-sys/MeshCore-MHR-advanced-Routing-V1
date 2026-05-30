@@ -1,0 +1,80 @@
+{
+  "seed": 42,
+  "measured": {
+    "topology": {
+      "backbone_nodes": 745,
+      "directed_edges": 6246,
+      "largest_component": 724,
+      "degree_min_median_max": [
+        1,
+        6.0,
+        118
+      ]
+    },
+    "snr_calibration": {
+      "n": 14399,
+      "snr0": 2.7774048839853362,
+      "ple": 0.412013835623663,
+      "sigma": 7.663949263101529,
+      "snr0_binned": -0.7483966057284027,
+      "ple_binned": 0.24042748943146944,
+      "corr_logd_snr": -0.4226711960462943,
+      "rssi0": -90.59131405497669,
+      "rssi_ple": 1.37637036346833,
+      "snr_saturation_db": 13.0,
+      "d_km_median": 5.801952430673818,
+      "snr_median": 0.0,
+      "sim_ple_used": 2.0,
+      "sim_snr0_used": 22.07280895865176,
+      "old_snr0": 17.0,
+      "old_ple": 2.55,
+      "snr_threshold_db": -12.0,
+      "lora_max_km": 45.0,
+      "empirical_hop_km_median": 10.084176721730225,
+      "empirical_hop_km_p75": 19.276552951675324,
+      "empirical_hop_km_p90": 28.779448035836463,
+      "empirical_hop_n": 172052
+    },
+    "real_detour": {
+      "n_packets": 29433,
+      "real_hops_median": 10.0,
+      "real_hops_p90": 18.0,
+      "real_hops_max": 32,
+      "geo_lower_bound_hop_km": 19.276552951675324,
+      "detour_factor_median": 2.111111111111111,
+      "detour_factor_mean": 2.61597738596906,
+      "detour_factor_p90": 4.333333333333333,
+      "detour_factor_p99": 10.0,
+      "frac_detour_gt_1_5x": 0.7875513878979377,
+      "frac_detour_gt_2x": 0.5023612951449054
+    },
+    "hash_resolution": {
+      "unique": 256675,
+      "geo": 1130,
+      "geo_back": 687,
+      "ambig": 1094685,
+      "unknown": 57210
+    },
+    "packets_processed": 109980
+  },
+  "simulated": {
+    "active_subgraph_size": 881,
+    "link_graph_nodes": 881,
+    "link_graph_edges": 9861,
+    "largest_component": 831,
+    "baseline_vs_mhr": {
+      "n_pairs": 196,
+      "mean_mhr_hops": 7.122448979591836,
+      "mean_base_hops": 8.304800162149435,
+      "worst_base_hops": 16,
+      "mean_detour_ratio": 1.1985207996525742,
+      "median_detour_ratio": 1.1673333333333333,
+      "pct_pairs_with_detour": 97.95918367346938,
+      "mean_base_tx": 786.2151803808641,
+      "mean_mhr_tx": 7.122448979591836,
+      "airtime_reduction_pct": 99.09408401703188,
+      "mean_base_reliability": 0.4708694364481492,
+      "mean_mhr_reliability": 0.5544126180841246
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "n_packets": 29433,
+  "real_hops_median": 10.0,
+  "real_hops_p90": 18.0,
+  "real_hops_max": 32,
+  "geo_lower_bound_hop_km": 19.276552951675324,
+  "detour_factor_median": 2.111111111111111,
+  "detour_factor_mean": 2.61597738596906,
+  "detour_factor_p90": 4.333333333333333,
+  "detour_factor_p99": 10.0,
+  "frac_detour_gt_1_5x": 0.7875513878979377,
+  "frac_detour_gt_2x": 0.5023612951449054
+}

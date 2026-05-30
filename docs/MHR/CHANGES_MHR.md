@@ -62,3 +62,5 @@ Lokale, additive Verbesserungen — weiterhin **kein** Paketformat-Eingriff, **k
   - **Linkausfall (0–30 %)**: Re-Discovery ≤ 1,6 % statt bis 49,5 %, Airtime nahezu flach.
   - **Partition**: −98 % Airtime (Baseline läuft in Endlos-Flood, MHR flutet einmal + Fallback).
   - Ergebnisse in `sim/sim_results_v2.json`, Plots `fig_v2_*.png`. Reproduzierbar (Seed 42).
+- `docs/MHR/sim/mhr_sim_real_v3.py` — **auf echten CoreScope-Live-Daten** (109.980 Pakete, 1962 Knoten) kalibriert. GEMESSEN: realer Umweg-Median **2,1×** (78,8 % der Pakete > 1,5×) — belegt das „first-wins"-Problem mit Produktionsdaten; das alte Log-Distance-SNR-Modell trägt für dieses Netz nicht (real PLE ≈ 0,4). Datensatz reproduzierbar via `mhr_collect_corescope.py`.
+- `docs/MHR/study/MeshCore_Routing_Study.md` — **Mechanismus-Studie mit Adoptions-Sweep** (1 Knoten → alle) auf der realen 776-Knoten-Topologie, Safety-Invariante „nie schlechter als Baseline". Ergebnis: hop-basierte Pfadwahl (Best-of-N nach Hops, Hop-Delay) + `flood.max` 15 sind ab 1 Knoten safe; Airtime-Suppression (Cancel/Counter/MPR) braucht adaptive Redundanz-Bedingung. Verschiebt die Priorität von SNR weg hin zur Hop-Zahl.

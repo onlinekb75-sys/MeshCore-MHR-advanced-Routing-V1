@@ -74,17 +74,19 @@ CoreScope `corescope.meshrheinland.de` ist eine SPA — nur über einen **verbun
 
 ## Konkrete nächste Schritte (Roadmap)
 
-**Phase 1 — ETX-Metrik + Best-of-N (höchster Nutzen/Risiko-mittel):**
-- Am Ziel statt first-wins ein kurzes Sammelfenster: mehrere Flood-Kopien einsammeln, günstigste (Hops, dann SNR) zurückmelden. Einstieg: `src/Mesh.cpp:138` / `onPeerPathRecv`.
-- Linkqualität (EWMA-SNR + Advert-Empfangsrate) in der Neighbour-Tabelle erfassen; ETX-Kosten. Einstieg: `putNeighbour` in `MyMesh.cpp`.
-- Sender: opportunistisches Pfad-Upgrade (über Phase 0 hinaus) in `BaseChatMesh::onContactPathRecv`.
+**Neu priorisiert durch Realdaten + Mechanismus-Studie** (`docs/MHR/sim/MeshCore_Simulation_v3_Realdaten.md`, `docs/MHR/study/MeshCore_Routing_Study.md`): SNR ist ein schwacher Hebel (Distanz erklärt SNR kaum) → **Hop-Zahl priorisieren**. Realer Umweg-Median 2,1×. Mechanismen mit Adoptions-Sweep (1 Knoten → alle) auf realer 776-Knoten-Topologie getestet, Safety-Invariante „nie schlechter als Baseline".
 
-**Phase 2 — proaktiver Regions-Backbone (großer Eingriff):**
-- Eigener, ignorierbarer Payload-Typ für DV-Vektoren; Zero-Hop-Austausch unter Repeatern; Bellman-Ford + Seqno + Babel-Feasibility + Feasible-Successor.
-- Regionen (bereits via `region_map`/`filterRecvFloodPacket` vorhanden) als Cluster-Grenzen nutzen.
-- Discovery-Short-Circuit: lokaler Flood nur bis zum nächsten Repeater, dann Backbone-Unicast.
+**Stufe A — ab 1 Knoten safe & monoton (zuerst umsetzen):**
+- **`flood.max` 64 → 15** (datenbelegt: Netzdurchmesser P90=18; 12 ist zu aggressiv). Reine Konfig, `set flood.max 15`.
+- **Hop-gewichtetes Rebroadcast-Delay** in `getRetransmitDelay` (`MyMesh.cpp`) — Kopien mit weniger akkumulierten Hops senden früher. Ersetzt/ergänzt den schwachen SNR-Hebel.
+- **Best-of-N am Ziel nach HOPS** (nicht SNR): Sammelfenster, kürzesten Pfad zurückmelden. Einstieg `src/Mesh.cpp:138` / `onPeerPathRecv`. **Kernrisiko: Dedup (`hasSeen`) nicht brechen** → sorgfältig + Bench-Test.
+- **Passives Topologie-Lernen** aus den Pfad-Ketten (`path_json`-Äquivalent im Paket, 0 Airtime) → lokale Link-Tabelle → Backup-Pfad statt Re-Flood bei Linkbruch (spart 94–96 % Re-Discovery). Einstieg: neue Tabelle, gefüllt in `routeRecvPacket`/`onAdvertRecv`.
 
-**Validierung:** `mhr_sim_real.py` um Störszenarien erweitern (Knoten-Churn nach advert_count, Linkausfall, Partition) und v1 vs. v2 vergleichen (Routen-Stabilität, Konvergenz, Airtime, Lieferquote). Idealerweise vor jedem Hardware-Test.
+**Stufe B — adaptive Airtime-Suppression** (nur unterdrücken bei lokal bestätigter Redundanz → auch bei voller Adoption sicher): Shorter-Path-Cancel des eigenen anstehenden Rebroadcasts; Counter-Suppression (k≈3). In `routeRecvPacket` / der Outbound-Queue.
+
+**Stufe C — proaktiver Regions-Backbone / MPR-CDS** (großer Eingriff): ignorierbarer DV-Payload-Typ, Zero-Hop-Austausch, Bellman-Ford + Seqno + Babel-Feasibility + Feasible-Successor; Regionen via `region_map` als Cluster-Grenzen. Nur mit harter Redundanz-Garantie (MPR kippt sonst bei voller Adoption in Coverage-Verlust — in der Studie belegt).
+
+**Validierung:** vorhanden — v3-Realdaten-Sim + Adoptions-Sweep-Studie (`docs/MHR/study/study_sim.py`). Vor Hardware-Tests Mechanismen dort gegenrechnen; Safety-Invariante (Lieferquote ≥ Baseline, Airtime ≤ Baseline) je Adoptionsgrad prüfen.
 
 ## Existierende Forks (Stand der Recherche)
 

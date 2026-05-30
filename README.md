@@ -109,9 +109,19 @@ Lege das Repo auf GitHub vorher als **Private** an. (Ich kann das nicht für dic
 
 ## Roadmap
 
-- **Phase 0**: konservativer Patch (RX-SNR-Flutung + prefer-shorter) ✅
-- **Phase 1** (teilweise ✅): TX-SNR-Flutung + EWMA-Link-Sensing umgesetzt; Stress-Sim validiert (`docs/MHR/sim/mhr_sim_v2.py`). Noch offen: echtes Best-of-N am Ziel + ETX-Kostenmetrik → `docs/MHR/MeshCore_Hybrid_Routing_Entwurf.md`
-- **Phase 2**: proaktiver Regions-Backbone, gehärtet → `docs/MHR/MeshCore_Hybrid_Routing_v2_Robustheit.md`
+**Umgesetzt:** Phase 0 (RX-SNR-Flutung + prefer-shorter ✅) und erster Teil Phase 1 (TX-SNR-Flutung `tx_snr_weight` + EWMA-Link-Sensing ✅).
+
+**Neu priorisiert auf Basis echter Realdaten** — die Auswertung von 109.980 CoreScope-Live-Paketen (`docs/MHR/sim/MeshCore_Simulation_v3_Realdaten.md`) und die Mechanismus-Studie mit Adoptions-Sweep (`docs/MHR/study/MeshCore_Routing_Study.md`) zeigten: **SNR ist ein schwacher Hebel** (Distanz erklärt SNR kaum), **Hop-Zahl ist verlässlicher**, und reale Umwege liegen bei **Median 2,1×**. Daraus die gestufte, mischbetriebs-sichere Roadmap:
+
+- **Stufe A — „nie schlechter", ab 1 Knoten safe & monoton:**
+  - `flood.max` 64 → **15** (empirischer Netzdurchmesser P90 = 18; datenbelegt)
+  - **Hop-gewichtetes Rebroadcast-Delay** (ersetzt den schwachen SNR-Hebel)
+  - **Best-of-N am Ziel nach Hops** (der Detour-Killer: 1,11 → 1,00 ab 1 Knoten)
+  - **Passives Topologie-Lernen** aus den Pfad-Ketten (0 Airtime) → Backup-Pfad statt Re-Flood (spart 94–96 % Re-Discovery)
+- **Stufe B — adaptive Airtime-Suppression** (nur unterdrücken bei lokal bestätigter Redundanz → bleibt auch bei voller Adoption sicher): Shorter-Path-Cancel, Counter-Suppression.
+- **Stufe C** — proaktiver Regions-Backbone / MPR-CDS, gehärtet → `docs/MHR/MeshCore_Hybrid_Routing_v2_Robustheit.md`.
+
+Die SNR-Gewichtung (`tx_snr_weight`) bleibt als „nie schlechter"-Option, verliert aber Priorität gegenüber den hop-basierten Verfahren.
 
 ## Lizenz & Attribution
 
