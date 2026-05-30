@@ -305,6 +305,16 @@ void Dispatcher::checkSend() {
 
   outbound = _mgr->getNextOutbound(_ms->getMillis());
   if (outbound) {
+    // MHR Stufe B: redundancy-guarded flood suppression decision point. For a flood rebroadcast that has
+    //   completed its backoff, ask the sub-class whether enough proven redundancy was observed to stay
+    //   silent. Default impl returns true (upstream behaviour). Only flood packets are considered; direct
+    //   routed traffic is never suppressed.
+    if (outbound->isRouteFlood() && !allowFloodRebroadcast(outbound)) {
+      _mgr->free(outbound);   // drop our own rebroadcast: proven redundant (do NOT log/bridge a TX that never happened)
+      outbound = NULL;
+      return;
+    }
+
     int len = 0;
     uint8_t raw[MAX_TRANS_UNIT];
 

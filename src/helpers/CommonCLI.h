@@ -69,6 +69,16 @@ struct NodePrefs { // persisted to file
   //       study found hop count far more reliable than SNR for path length). 0.0 = off. Appended at end
   //       of struct for forward-compatible persistence. Reversible: set txhopweight 0.
   float tx_hop_weight;
+  // MHR: Stufe B — redundancy-guarded flood suppression (the 5-guard mechanism, see
+  //       docs/MHR/study/Suppression_Design.md / SUPPRESSION_VALIDATION.md). All fields appended at the
+  //       STRUCT END for forward/backward-compatible persistence; old config files keep these defaults.
+  //       supp_enable=0 (DEFAULT) => behaviour EXACTLY as Stufe A, no extra effect anywhere. The whole
+  //       feature is dormant until deliberately enabled per CLI (set supp.enable 1) after bench validation.
+  uint8_t supp_enable;     // 0 = off (default, = Stufe A); 1 = suppression active
+  uint8_t supp_min_degree; // G1: never stay silent below this many known neighbours (validated default 3..4)
+  uint8_t supp_k_cover;    // G2: required number of distinct qualified cover senders heard in the backoff
+  int8_t  supp_snr_floor;  // G4: minimum EWMA-SNR (dB) of a cover sender to count it
+  uint8_t supp_prob;       // G5: suppress probability in percent (0..100); a fraction always still sends
 };
 
 class CommonCLICallbacks {

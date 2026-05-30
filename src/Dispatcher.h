@@ -169,6 +169,14 @@ protected:
   virtual int getAGCResetInterval() const { return 0; }    // disabled by default
   virtual unsigned long getDutyCycleWindowMs() const { return 3600000; }
 
+  // MHR Stufe B: send-time hook, called once for each FLOOD packet dequeued for transmit, right before it
+  //   goes on air (i.e. after its full hop-weighted backoff window, so all redundant cover copies that
+  //   arrived during the backoff have been observed). Sub-classes may return false to SUPPRESS this
+  //   rebroadcast. Default returns true => EXACTLY upstream behaviour (always rebroadcast). This is the
+  //   only core-Dispatcher change for the feature; it is purely local, touches no packet format, and is a
+  //   no-op for every build that does not override it.
+  virtual bool allowFloodRebroadcast(Packet* packet) { return true; }
+
 public:
   void begin();
   void loop();

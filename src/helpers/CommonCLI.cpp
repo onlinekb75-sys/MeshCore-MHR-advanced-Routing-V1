@@ -90,7 +90,12 @@ void CommonCLI::loadPrefsInt(FILESYSTEM* fs, const char* filename) {
     file.read((uint8_t *)&_prefs->rx_boosted_gain, sizeof(_prefs->rx_boosted_gain));              // 290
     file.read((uint8_t *)&_prefs->tx_snr_weight, sizeof(_prefs->tx_snr_weight));                  // 291 (MHR; old files leave default)
     file.read((uint8_t *)&_prefs->tx_hop_weight, sizeof(_prefs->tx_hop_weight));                  // 295 (MHR; old files leave default)
-    // next: 299
+    file.read((uint8_t *)&_prefs->supp_enable, sizeof(_prefs->supp_enable));                      // 299 (MHR Stufe B; old files leave default 0 = off)
+    file.read((uint8_t *)&_prefs->supp_min_degree, sizeof(_prefs->supp_min_degree));              // 300 (MHR)
+    file.read((uint8_t *)&_prefs->supp_k_cover, sizeof(_prefs->supp_k_cover));                    // 301 (MHR)
+    file.read((uint8_t *)&_prefs->supp_snr_floor, sizeof(_prefs->supp_snr_floor));                // 302 (MHR)
+    file.read((uint8_t *)&_prefs->supp_prob, sizeof(_prefs->supp_prob));                          // 303 (MHR)
+    // next: 304
 
     // sanitise bad pref values
     _prefs->rx_delay_base = constrain(_prefs->rx_delay_base, 0, 20.0f);
@@ -107,6 +112,15 @@ void CommonCLI::loadPrefsInt(FILESYSTEM* fs, const char* filename) {
     _prefs->path_hash_mode = constrain(_prefs->path_hash_mode, 0, 2);   // NOTE: mode 3 reserved for future
     _prefs->tx_snr_weight = constrain(_prefs->tx_snr_weight, 0.0f, 1.0f);  // MHR
     _prefs->tx_hop_weight = constrain(_prefs->tx_hop_weight, 0.0f, 1.0f);  // MHR
+    // MHR Stufe B: sanitise suppression prefs (old/zeroed configs => safe Stufe-A behaviour, supp_enable 0)
+    _prefs->supp_enable = constrain(_prefs->supp_enable, 0, 1);
+    if (_prefs->supp_min_degree == 0) _prefs->supp_min_degree = 4;  // 0 from an old/zeroed file => restore default
+    _prefs->supp_min_degree = constrain(_prefs->supp_min_degree, 1, 64);
+    if (_prefs->supp_k_cover == 0) _prefs->supp_k_cover = 2;        // 0 => restore default
+    _prefs->supp_k_cover = constrain(_prefs->supp_k_cover, 1, 8);
+    _prefs->supp_snr_floor = constrain(_prefs->supp_snr_floor, -30, 30);
+    if (_prefs->supp_prob == 0) _prefs->supp_prob = 80;            // 0 => restore default (G5 never fully 0)
+    _prefs->supp_prob = constrain(_prefs->supp_prob, 1, 100);
 
     // sanitise bad bridge pref values
     _prefs->bridge_enabled = constrain(_prefs->bridge_enabled, 0, 1);
@@ -185,7 +199,12 @@ void CommonCLI::savePrefs(FILESYSTEM* fs) {
     file.write((uint8_t *)&_prefs->rx_boosted_gain, sizeof(_prefs->rx_boosted_gain));              // 290
     file.write((uint8_t *)&_prefs->tx_snr_weight, sizeof(_prefs->tx_snr_weight));                  // 291 (MHR)
     file.write((uint8_t *)&_prefs->tx_hop_weight, sizeof(_prefs->tx_hop_weight));                  // 295 (MHR)
-    // next: 299
+    file.write((uint8_t *)&_prefs->supp_enable, sizeof(_prefs->supp_enable));                      // 299 (MHR Stufe B)
+    file.write((uint8_t *)&_prefs->supp_min_degree, sizeof(_prefs->supp_min_degree));              // 300 (MHR)
+    file.write((uint8_t *)&_prefs->supp_k_cover, sizeof(_prefs->supp_k_cover));                    // 301 (MHR)
+    file.write((uint8_t *)&_prefs->supp_snr_floor, sizeof(_prefs->supp_snr_floor));                // 302 (MHR)
+    file.write((uint8_t *)&_prefs->supp_prob, sizeof(_prefs->supp_prob));                          // 303 (MHR)
+    // next: 304
 
     file.close();
   }
@@ -620,6 +639,51 @@ void CommonCLI::handleSetCmd(uint32_t sender_timestamp, char* command, char* rep
     } else {
       strcpy(reply, "Error, must be 0..1");
     }
+  } else if (memcmp(config, "supp.enable ", 12) == 0) {   // MHR Stufe B
+    int v = atoi(&config[12]);
+    if (v == 0 || v == 1) {
+      _prefs->supp_enable = (uint8_t)v;
+      savePrefs();
+      strcpy(reply, "OK");
+    } else {
+      strcpy(reply, "Error, must be 0 or 1");
+    }
+  } else if (memcmp(config, "supp.mindeg ", 12) == 0) {   // MHR Stufe B (G1)
+    int v = atoi(&config[12]);
+    if (v >= 1 && v <= 64) {
+      _prefs->supp_min_degree = (uint8_t)v;
+      savePrefs();
+      strcpy(reply, "OK");
+    } else {
+      strcpy(reply, "Error, must be 1..64");
+    }
+  } else if (memcmp(config, "supp.kcover ", 12) == 0) {   // MHR Stufe B (G2)
+    int v = atoi(&config[12]);
+    if (v >= 1 && v <= 8) {
+      _prefs->supp_k_cover = (uint8_t)v;
+      savePrefs();
+      strcpy(reply, "OK");
+    } else {
+      strcpy(reply, "Error, must be 1..8");
+    }
+  } else if (memcmp(config, "supp.snrfloor ", 14) == 0) { // MHR Stufe B (G4)
+    int v = atoi(&config[14]);
+    if (v >= -30 && v <= 30) {
+      _prefs->supp_snr_floor = (int8_t)v;
+      savePrefs();
+      strcpy(reply, "OK");
+    } else {
+      strcpy(reply, "Error, must be -30..30 dB");
+    }
+  } else if (memcmp(config, "supp.prob ", 10) == 0) {     // MHR Stufe B (G5)
+    int v = atoi(&config[10]);
+    if (v >= 1 && v <= 100) {
+      _prefs->supp_prob = (uint8_t)v;
+      savePrefs();
+      strcpy(reply, "OK");
+    } else {
+      strcpy(reply, "Error, must be 1..100 (percent)");
+    }
   } else if (memcmp(config, "flood.max ", 10) == 0) {
     uint8_t m = atoi(&config[10]);
     if (m <= 64) {
@@ -805,6 +869,16 @@ void CommonCLI::handleGetCmd(uint32_t sender_timestamp, char* command, char* rep
     sprintf(reply, "> %s", StrHelper::ftoa(_prefs->tx_hop_weight));
   } else if (memcmp(config, "txsnrweight", 11) == 0) {   // MHR
     sprintf(reply, "> %s", StrHelper::ftoa(_prefs->tx_snr_weight));
+  } else if (memcmp(config, "supp.mindeg", 11) == 0) {   // MHR Stufe B (G1)
+    sprintf(reply, "> %d", (uint32_t)_prefs->supp_min_degree);
+  } else if (memcmp(config, "supp.kcover", 11) == 0) {   // MHR Stufe B (G2)
+    sprintf(reply, "> %d", (uint32_t)_prefs->supp_k_cover);
+  } else if (memcmp(config, "supp.snrfloor", 13) == 0) { // MHR Stufe B (G4)
+    sprintf(reply, "> %d", (int)_prefs->supp_snr_floor);
+  } else if (memcmp(config, "supp.prob", 9) == 0) {      // MHR Stufe B (G5)
+    sprintf(reply, "> %d", (uint32_t)_prefs->supp_prob);
+  } else if (memcmp(config, "supp.enable", 11) == 0) {   // MHR Stufe B
+    sprintf(reply, "> %d", (uint32_t)_prefs->supp_enable);
   } else if (memcmp(config, "txdelay", 7) == 0) {
     sprintf(reply, "> %s", StrHelper::ftoa(_prefs->tx_delay_factor));
   } else if (memcmp(config, "flood.max", 9) == 0) {

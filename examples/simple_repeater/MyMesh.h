@@ -68,6 +68,45 @@ struct NeighbourInfo {
   int8_t snr; // multiplied by 4, user should divide to get float value
 };
 
+// MHR Stufe B: fixed-size tables for redundancy-guarded flood suppression (no dynamic allocation outside
+//   begin(); least-recently-heard eviction). See docs/MHR/study/Suppression_Design.md.
+#ifndef MHR_SUPP_PENDING       // tracked in-flight flood rebroadcasts awaiting their backoff
+  #define MHR_SUPP_PENDING       12
+#endif
+#ifndef MHR_SUPP_MAX_COVERS     // distinct cover senders recorded per pending flood
+  #define MHR_SUPP_MAX_COVERS    4
+#endif
+#ifndef MHR_SUPP_TWOHOP         // passive 2-hop table: rows of (heard sender X -> its neighbour hashes)
+  #define MHR_SUPP_TWOHOP        24
+#endif
+#ifndef MHR_SUPP_TWOHOP_ADJ     // neighbour hashes stored per 2-hop row
+  #define MHR_SUPP_TWOHOP_ADJ    6
+#endif
+#ifndef MHR_SUPP_HASHLEN        // bytes of a node hash we key on. 2 bytes matches the network's real path
+  #define MHR_SUPP_HASHLEN       2 //   hash size and makes aliasing (a wrong "covered" verdict in G3) negligible.
+#endif
+#ifndef MHR_SUPP_FRESH_SECS     // G3 only "sharp" if 2-hop knowledge for a node is fresher than this
+  #define MHR_SUPP_FRESH_SECS    1800
+#endif
+
+// One in-flight flood we scheduled to rebroadcast; collects distinct cover senders heard during backoff.
+struct SuppPending {
+  uint8_t  pkt_hash[MAX_HASH_SIZE];           // identity of the flood (path-independent packet hash)
+  uint8_t  cover_hash[MHR_SUPP_MAX_COVERS][MHR_SUPP_HASHLEN]; // distinct cover-sender hashes (last path hop)
+  int8_t   cover_snr[MHR_SUPP_MAX_COVERS];    // EWMA-SNR (x4) of each cover sender at observation time
+  uint8_t  num_covers;
+  uint32_t heard_at;                          // ms timestamp (LRU eviction); 0 = empty slot
+  bool     active;
+};
+
+// One passive 2-hop row: which neighbour hashes a heard sender X is adjacent to (learnt from path chains).
+struct SuppTwoHop {
+  uint8_t  node_hash[MHR_SUPP_HASHLEN];               // the sender X
+  uint8_t  adj_hash[MHR_SUPP_TWOHOP_ADJ][MHR_SUPP_HASHLEN]; // X's observed neighbours
+  uint8_t  num_adj;
+  uint32_t updated_secs;                              // RTC secs of last update (freshness gate, 0 = empty)
+};
+
 #ifndef FIRMWARE_BUILD_DATE
   #define FIRMWARE_BUILD_DATE   "19 Apr 2026"
 #endif
@@ -106,6 +145,9 @@ class MyMesh : public mesh::Mesh, public CommonCLICallbacks {
 #if MAX_NEIGHBOURS
   NeighbourInfo neighbours[MAX_NEIGHBOURS];
 #endif
+  // MHR Stufe B: suppression state (fixed tables, zeroed in begin()/ctor; only used when supp_enable=1)
+  SuppPending supp_pending[MHR_SUPP_PENDING];
+  SuppTwoHop  supp_twohop[MHR_SUPP_TWOHOP];
   CayenneLPP telemetry;
   unsigned long set_radio_at, revert_radio_at;
   float pending_freq;
@@ -120,6 +162,15 @@ class MyMesh : public mesh::Mesh, public CommonCLICallbacks {
 #endif
 
   void putNeighbour(const mesh::Identity& id, uint32_t timestamp, float snr);
+
+  // MHR Stufe B helpers (all no-ops/idempotent unless _prefs.supp_enable == 1)
+  void suppLearnFromFlood(const mesh::Packet* pkt);                 // passive 2-hop learning + cover counting
+  void suppRecordPending(const mesh::Packet* pkt);                  // mark a flood we just scheduled to rebroadcast
+  int  suppCountKnownNeighbours() const;                            // G1 degree
+  int  suppLookupNeighbourSnr(const uint8_t* hash) const;          // EWMA-SNR (x4) of a 1-hop neighbour by hash, or INT_MIN
+  bool suppNodeKnowsNeighbour(const uint8_t* node_hash, const uint8_t* nb_hash, uint32_t now_secs) const; // G3 lookup (fresh)
+  void suppTwoHopAdd(const uint8_t* node_hash, const uint8_t* nb_hash, uint32_t now_secs);
+  void suppClearPending(SuppPending* p);                           // free a pending slot after a decision
   uint8_t handleLoginReq(const mesh::Identity& sender, const uint8_t* secret, uint32_t sender_timestamp, const uint8_t* data, bool is_flood);
   uint8_t handleAnonRegionsReq(const mesh::Identity& sender, uint32_t sender_timestamp, const uint8_t* data);
   uint8_t handleAnonOwnerReq(const mesh::Identity& sender, uint32_t sender_timestamp, const uint8_t* data);
@@ -146,6 +197,9 @@ protected:
 
   uint32_t getRetransmitDelay(const mesh::Packet* packet) override;
   uint32_t getDirectRetransmitDelay(const mesh::Packet* packet) override;
+
+  // MHR Stufe B: send-time suppression decision (returns false only when ALL active guards prove redundancy)
+  bool allowFloodRebroadcast(mesh::Packet* packet) override;
 
   int getInterferenceThreshold() const override {
     return _prefs.interference_threshold;

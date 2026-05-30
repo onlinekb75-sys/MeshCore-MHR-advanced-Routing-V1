@@ -77,10 +77,38 @@ einem einzelnen Knoten sicher und monoton — ideal für langsame Verbreitung im
   tragen längere Pfade weiter → ein einzelner MHR-Knoten ist nie schlechter, tötet aber lokal
   Fern-Umweg-Kopien. Netzabhängig, weiter per CLI einstellbar: `set flood.max <n>`.
 
+## Stufe B — redundanz-gesicherte Flood-Suppression (im Code, **default-AUS**)
+
+Implementiert, aber **dormant** (`supp_enable = 0`): bei AUS verhält sich der Knoten **exakt wie
+Stufe A** (adversarial reviewt — kein einziger Zusatzeffekt im Sende-/Empfangspfad). Erst nach
+Bench-Test per CLI aktivieren (`set supp.enable 1`). Design + Validierung:
+`docs/MHR/study/Suppression_Design.md`, `SUPPRESSION_VALIDATION.md`.
+
+### Patch 7 — 5-Guard-Suppression + passives 2-Hop-Lernen
+- Dateien: `examples/simple_repeater/MyMesh.{h,cpp}`, `src/Dispatcher.{h,cpp}` (neuer virtueller Hook
+  `allowFloodRebroadcast()`, Default `true` → andere Builds bit-identisch), `src/helpers/CommonCLI.{h,cpp}`.
+- Logik: ein Repeater unterdrückt seinen Flood-Rebroadcast NUR, wenn alle Guards halten —
+  **G1** degree ≥ `supp_min_degree`, **G2** ≥ `supp_k_cover` verschiedene Cover-Sender im Backoff
+  gehört, **G3** jeder eigene Nachbar ist durch einen Cover gedeckt (via passiv gelernter, frische-
+  gegateter 2-Hop-Tabelle — die *tragende* Schicht gegen „letzten Pfad kappen"), **G4** Cover-SNR ≥
+  `supp_snr_floor`, **G5** Prob `supp_prob`. Default-Aktion = senden (nie schlechter).
+- Neue persistierte Prefs @299–303: `supp_enable`(0), `supp_min_degree`(4), `supp_k_cover`(2),
+  `supp_snr_floor`(-6 dB), `supp_prob`(80 %). CLI `set/get supp.enable|mindeg|kcover|snrfloor|prob`.
+- Fixe Tabellen (~0,8 KB, keine dyn. Allokation). Validiert: Lieferquote ≥ Baseline über den
+  GESAMTEN Adoptions-Sweep, −12…15 % Airtime bei hoher Adoption. Bench-Test offen (Cover-Timing in
+  HW, 2-Hop-Konvergenz, Frische-Gating).
+
+## Adaptiver Selbst-Regler — geprüft und VERWORFEN (NO-GO)
+Ein langsamer (1–2 h) Regler, der `supp_prob` an die lokale Umgebung anpasst, wurde entworfen und
+simuliert (`docs/MHR/study/Adaptive_Controller_Design.md`). Ergebnis: oszilliert nicht, bringt aber
+nur **+0,76 pp** Airtime über den statischen sicheren Satz (< 2 pp Schwelle) und ist minimal weniger
+strikt-safe → **nicht codiert** (Qualität/Stabilität vor letzter Optimierung). Der statische sichere
+Satz ist die Empfehlung.
+
 ## Bewusst NICHT geändert
 - Kein neues Paketformat, keine Metrik im Paket, kein Backbone, kein echtes Best-of-N am Ziel —
   Letzteres würde die `hasSeen()`-Dedup aufbohren (Risiko von Nachrichten-Duplikaten) und gehört
-  in eine eigene, gründlich getestete Stufe (siehe Studie Stufe A „Best-of-N am Ziel" + Stufe B/C).
+  in eine eigene, gründlich getestete Stufe (siehe Studie Stufe A „Best-of-N am Ziel").
 
 ## Validierung (Simulation)
 - `docs/MHR/sim/mhr_sim_v2.py` — Stress-Szenarien auf der realen 25-Knoten-Topologie:

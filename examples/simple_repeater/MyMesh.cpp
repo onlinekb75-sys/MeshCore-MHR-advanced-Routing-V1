@@ -1,5 +1,6 @@
 #include "MyMesh.h"
 #include <algorithm>
+#include <limits.h>   // MHR Stufe B: INT_MIN
 
 /* ------------------------------ Config -------------------------------- */
 
@@ -90,6 +91,228 @@ void MyMesh::putNeighbour(const mesh::Identity &id, uint32_t timestamp, float sn
   int8_t sample = (int8_t)(snr * 4);
   neighbour->snr = existing ? (int8_t)(((int)neighbour->snr * 3 + sample) / 4) : sample;
 #endif
+}
+
+// ====================== MHR Stufe B: redundancy-guarded flood suppression =========================
+//  All of the following is dormant unless _prefs.supp_enable == 1 (callers gate on it). Purely local,
+//  passive, no packet-format change, never alters hasSeen()/dedup or the forwarding decision itself —
+//  the only effect, when enabled and ALL guards prove redundancy, is to drop our OWN already-scheduled
+//  rebroadcast at send time (Dispatcher::allowFloodRebroadcast). Default action is always "send".
+
+#if MAX_NEIGHBOURS
+// EWMA-SNR (x4) of a known 1-hop neighbour identified by a path-hash prefix; INT_MIN if unknown.
+int MyMesh::suppLookupNeighbourSnr(const uint8_t* hash) const {
+  for (int i = 0; i < MAX_NEIGHBOURS; i++) {
+    if (neighbours[i].heard_timestamp == 0) continue;
+    if (memcmp(neighbours[i].id.pub_key, hash, MHR_SUPP_HASHLEN) == 0) {
+      return (int)neighbours[i].snr;  // x4
+    }
+  }
+  return INT_MIN;
+}
+
+// G1 degree = number of currently known 1-hop neighbours.
+int MyMesh::suppCountKnownNeighbours() const {
+  int n = 0;
+  for (int i = 0; i < MAX_NEIGHBOURS; i++) {
+    if (neighbours[i].heard_timestamp != 0) n++;
+  }
+  return n;
+}
+#else
+int MyMesh::suppLookupNeighbourSnr(const uint8_t*) const { return INT_MIN; }
+int MyMesh::suppCountKnownNeighbours() const { return 0; }
+#endif
+
+// Passive 2-hop table: record that node_hash (a heard sender X) is adjacent to nb_hash, with freshness.
+void MyMesh::suppTwoHopAdd(const uint8_t* node_hash, const uint8_t* nb_hash, uint32_t now_secs) {
+  if (memcmp(node_hash, nb_hash, MHR_SUPP_HASHLEN) == 0) return;  // don't record self-adjacency
+
+  // find existing row for X, else evict the least-recently-updated (also reuse empty rows)
+  SuppTwoHop* row = NULL;
+  uint32_t oldest = 0xFFFFFFFF;
+  SuppTwoHop* lru = &supp_twohop[0];
+  for (int i = 0; i < MHR_SUPP_TWOHOP; i++) {
+    SuppTwoHop* r = &supp_twohop[i];
+    if (r->updated_secs != 0 && memcmp(r->node_hash, node_hash, MHR_SUPP_HASHLEN) == 0) { row = r; break; }
+    if (r->updated_secs < oldest) { oldest = r->updated_secs; lru = r; }
+  }
+  if (row == NULL) {  // new node X: take LRU slot and reset it
+    row = lru;
+    memset(row, 0, sizeof(*row));
+    memcpy(row->node_hash, node_hash, MHR_SUPP_HASHLEN);
+  }
+  row->updated_secs = now_secs;
+
+  // upsert nb_hash into X's adjacency list
+  for (int j = 0; j < row->num_adj; j++) {
+    if (memcmp(row->adj_hash[j], nb_hash, MHR_SUPP_HASHLEN) == 0) return;  // already known
+  }
+  if (row->num_adj < MHR_SUPP_TWOHOP_ADJ) {
+    memcpy(row->adj_hash[row->num_adj], nb_hash, MHR_SUPP_HASHLEN);
+    row->num_adj++;
+  } else {
+    // ring-replace oldest slot (cheap approximation; rows refresh continuously from live traffic)
+    memmove(&row->adj_hash[0], &row->adj_hash[1], (MHR_SUPP_TWOHOP_ADJ - 1) * MHR_SUPP_HASHLEN);
+    memcpy(row->adj_hash[MHR_SUPP_TWOHOP_ADJ - 1], nb_hash, MHR_SUPP_HASHLEN);
+  }
+}
+
+// G3 lookup: does heard sender node_hash know neighbour nb_hash, with FRESH 2-hop knowledge?
+bool MyMesh::suppNodeKnowsNeighbour(const uint8_t* node_hash, const uint8_t* nb_hash, uint32_t now_secs) const {
+  for (int i = 0; i < MHR_SUPP_TWOHOP; i++) {
+    const SuppTwoHop* r = &supp_twohop[i];
+    if (r->updated_secs == 0) continue;
+    if (memcmp(r->node_hash, node_hash, MHR_SUPP_HASHLEN) != 0) continue;
+    // freshness gate (Design §3): stale knowledge must NOT make G3 sharp -> treat as "doesn't know"
+    if (now_secs - r->updated_secs > MHR_SUPP_FRESH_SECS) return false;
+    for (int j = 0; j < r->num_adj; j++) {
+      if (memcmp(r->adj_hash[j], nb_hash, MHR_SUPP_HASHLEN) == 0) return true;
+    }
+    return false;  // X is known, but not adjacent to nb -> not covered by X
+  }
+  return false;     // X unknown -> unknown coverage -> not covered (conservative)
+}
+
+// Free a pending slot once its rebroadcast decision is made (sent or suppressed).
+void MyMesh::suppClearPending(SuppPending* p) {
+  memset(p, 0, sizeof(*p));
+}
+
+// Mark a flood we just scheduled to rebroadcast, so cover senders heard during its backoff get counted.
+void MyMesh::suppRecordPending(const mesh::Packet* pkt) {
+  uint8_t h[MAX_HASH_SIZE];
+  ((mesh::Packet*)pkt)->calculatePacketHash(h);
+  uint32_t now = _ms->getMillis();   // ms clock (LRU eviction only; freshness uses RTC secs)
+
+  // already tracked? refresh; else take an empty/LRU slot
+  SuppPending* slot = NULL;
+  uint32_t oldest = 0xFFFFFFFF;
+  SuppPending* lru = &supp_pending[0];
+  for (int i = 0; i < MHR_SUPP_PENDING; i++) {
+    SuppPending* p = &supp_pending[i];
+    if (p->active && memcmp(p->pkt_hash, h, MAX_HASH_SIZE) == 0) { slot = p; break; }
+    if (!p->active) { slot = p; break; }
+    if (p->heard_at < oldest) { oldest = p->heard_at; lru = p; }
+  }
+  if (slot == NULL) slot = lru;
+  if (!(slot->active && memcmp(slot->pkt_hash, h, MAX_HASH_SIZE) == 0)) {
+    memset(slot, 0, sizeof(*slot));
+    memcpy(slot->pkt_hash, h, MAX_HASH_SIZE);
+    slot->active = true;
+  }
+  slot->heard_at = now;
+}
+
+// Extract a fixed-length MHR_SUPP_HASHLEN key for the path entry at index `idx` (entries are `sz` bytes
+// on air; we copy min(sz,HASHLEN) bytes and zero-pad so a mode-mismatch can never read across entries).
+static inline void suppPathKey(uint8_t* dst, const mesh::Packet* pkt, uint8_t idx, uint8_t sz) {
+  memset(dst, 0, MHR_SUPP_HASHLEN);
+  uint8_t n = (sz < MHR_SUPP_HASHLEN) ? sz : MHR_SUPP_HASHLEN;
+  memcpy(dst, &pkt->path[idx * sz], n);
+}
+
+// Per received flood: passive 2-hop learning + cover-sender counting against any pending rebroadcast.
+void MyMesh::suppLearnFromFlood(const mesh::Packet* pkt) {
+  uint8_t count = pkt->getPathHashCount();
+  uint8_t sz = pkt->getPathHashSize();
+  if (count == 0 || sz == 0) return;  // zero-hop (e.g. our direct neighbour's advert) — nothing to chain
+  uint32_t now_secs = getRTCClock()->getCurrentTime();
+
+  // -- passive 2-hop learning: consecutive path hops are mutually adjacent (fixed-len keyed, local only) --
+  //    path layout: [h0 .. h_{count-1}], h_{count-1} = most recent hop = the node that just sent to us.
+  uint8_t a[MHR_SUPP_HASHLEN], b[MHR_SUPP_HASHLEN];
+  for (int i = 0; i + 1 < count; i++) {
+    suppPathKey(a, pkt, i, sz);
+    suppPathKey(b, pkt, i + 1, sz);
+    suppTwoHopAdd(a, b, now_secs);
+    suppTwoHopAdd(b, a, now_secs);
+  }
+
+  // -- cover-sender counting: if this is a DUPLICATE of a flood we have pending, the last hop is a
+  //    distinct node that already rebroadcast the same content (a cover sender). Record it (with its
+  //    neighbour EWMA-SNR for G4). We never change dedup here — we only observe. --
+  uint8_t last[MHR_SUPP_HASHLEN];
+  suppPathKey(last, pkt, count - 1, sz);
+  uint8_t self_hash[MHR_SUPP_HASHLEN];
+  self_id.copyHashTo(self_hash, MHR_SUPP_HASHLEN);
+  if (memcmp(last, self_hash, MHR_SUPP_HASHLEN) == 0) return;  // our own echo — not a cover
+
+  uint8_t h[MAX_HASH_SIZE];
+  ((mesh::Packet*)pkt)->calculatePacketHash(h);
+  for (int i = 0; i < MHR_SUPP_PENDING; i++) {
+    SuppPending* p = &supp_pending[i];
+    if (!p->active || memcmp(p->pkt_hash, h, MAX_HASH_SIZE) != 0) continue;
+    // distinct?
+    for (int c = 0; c < p->num_covers; c++) {
+      if (memcmp(p->cover_hash[c], last, MHR_SUPP_HASHLEN) == 0) return;  // already counted this sender
+    }
+    if (p->num_covers < MHR_SUPP_MAX_COVERS) {
+      memcpy(p->cover_hash[p->num_covers], last, MHR_SUPP_HASHLEN);
+      int snr = suppLookupNeighbourSnr(last);
+      p->cover_snr[p->num_covers] = (snr == INT_MIN) ? -128 : (int8_t)snr;  // -128 = unknown SNR
+      p->num_covers++;
+    }
+    return;
+  }
+}
+
+// Send-time decision: return false ONLY when supp_enable AND all active guards prove redundancy.
+bool MyMesh::allowFloodRebroadcast(mesh::Packet* packet) {
+  if (!_prefs.supp_enable) return true;          // DEFAULT path: exactly Stufe A — always rebroadcast
+
+  uint8_t h[MAX_HASH_SIZE];
+  packet->calculatePacketHash(h);
+  SuppPending* p = NULL;
+  for (int i = 0; i < MHR_SUPP_PENDING; i++) {
+    if (supp_pending[i].active && memcmp(supp_pending[i].pkt_hash, h, MAX_HASH_SIZE) == 0) { p = &supp_pending[i]; break; }
+  }
+  if (p == NULL) return true;                    // not tracked (e.g. our own reply) -> send
+
+  uint32_t now_secs = getRTCClock()->getCurrentTime();
+
+  // ---- G4 first: count only cover senders with reliable EWMA-SNR >= snr_floor (x4 in storage) ----
+  int8_t floor_x4 = (int8_t)(_prefs.supp_snr_floor * 4);
+  uint8_t qualified[MHR_SUPP_MAX_COVERS];
+  int nq = 0;
+  for (int c = 0; c < p->num_covers; c++) {
+    if (p->cover_snr[c] == -128) continue;       // unknown SNR cover -> not reliable -> skip (conservative)
+    if (p->cover_snr[c] >= floor_x4) { qualified[nq++] = (uint8_t)c; }
+  }
+
+  // ---- G2: need >= k_cover distinct qualified cover senders ----
+  if (nq < _prefs.supp_k_cover) { suppClearPending(p); return true; }
+
+  // ---- G1: low-degree / leaf protection — never silence below min_degree known neighbours ----
+  int degree = suppCountKnownNeighbours();
+  if (degree < _prefs.supp_min_degree) { suppClearPending(p); return true; }
+
+#if MAX_NEIGHBOURS
+  // ---- G3 (load-bearing): every KNOWN neighbour of ours must be a neighbour of >=1 qualified cover
+  //      sender (per the FRESH passive 2-hop table). Unknown coverage = not covered = send. ----
+  for (int n = 0; n < MAX_NEIGHBOURS; n++) {
+    if (neighbours[n].heard_timestamp == 0) continue;
+    const uint8_t* nb = neighbours[n].id.pub_key;   // compare first MHR_SUPP_HASHLEN bytes
+    // a cover sender that IS this neighbour trivially covers it (the cover reached it / is it)
+    bool covered = false;
+    for (int qi = 0; qi < nq && !covered; qi++) {
+      const uint8_t* cov = p->cover_hash[qualified[qi]];
+      if (memcmp(cov, nb, MHR_SUPP_HASHLEN) == 0) { covered = true; break; }
+      if (suppNodeKnowsNeighbour(cov, nb, now_secs)) covered = true;
+    }
+    if (!covered) { suppClearPending(p); return true; }   // a neighbour might rely on us -> SEND
+  }
+#else
+  // No neighbour table on this build -> G3 cannot be evaluated -> never suppress (safe).
+  suppClearPending(p); return true;
+#endif
+
+  // ---- G5: probabilistic margin — keep a hard fraction of senders always transmitting ----
+  if ((uint32_t)getRNG()->nextInt(0, 100) >= _prefs.supp_prob) { suppClearPending(p); return true; }
+
+  // All active guards proved redundancy -> stay silent.
+  suppClearPending(p);
+  return false;
 }
 
 uint8_t MyMesh::handleLoginReq(const mesh::Identity& sender, const uint8_t* secret, uint32_t sender_timestamp, const uint8_t* data, bool is_flood) {
@@ -474,6 +697,13 @@ void MyMesh::logRxRaw(float snr, float rssi, const uint8_t raw[], int len) {
 }
 
 void MyMesh::logRx(mesh::Packet *pkt, int len, float score) {
+  // MHR Stufe B: this hook fires for EVERY received packet (incl. flood duplicates that hasSeen() will
+  //   later discard) BEFORE onRecvPacket(). It is the clean, non-invasive observation point for passive
+  //   2-hop learning and cover-sender counting. No-op unless supp_enable. Never alters dedup/forwarding.
+  if (_prefs.supp_enable && pkt->isRouteFlood()) {
+    suppLearnFromFlood(pkt);
+  }
+
 #ifdef WITH_BRIDGE
   if (_prefs.bridge_pkt_src == 1) {
     bridge.sendPacket(pkt);
@@ -548,6 +778,12 @@ int MyMesh::calcRxDelay(float score, uint32_t air_time) const {
 #endif
 
 uint32_t MyMesh::getRetransmitDelay(const mesh::Packet *packet) {
+  // MHR Stufe B: this is exactly the moment routeRecvPacket() has decided to rebroadcast this flood (our
+  //   own hash is already appended to the path). Register it as "pending" so cover senders heard during
+  //   the backoff window below get counted against it. No-op / zero effect unless supp_enable.
+  if (_prefs.supp_enable && packet->isRouteFlood()) {
+    suppRecordPending(packet);
+  }
   uint32_t t = (_radio->getEstAirtimeFor(packet->getPathByteLen() + packet->payload_len + 2) * _prefs.tx_delay_factor);
   uint32_t window = 5*t + 1;
   // MHR: quality-guided flood rebroadcast. A copy that arrived via FEWER accumulated hops (the reliable
@@ -905,6 +1141,10 @@ MyMesh::MyMesh(mesh::MainBoard &board, mesh::Radio &radio, mesh::MillisecondCloc
   memset(neighbours, 0, sizeof(neighbours));
 #endif
 
+  // MHR Stufe B: clear suppression tables (fixed allocation, populated passively at runtime)
+  memset(supp_pending, 0, sizeof(supp_pending));
+  memset(supp_twohop, 0, sizeof(supp_twohop));
+
   // defaults
   memset(&_prefs, 0, sizeof(_prefs));
   _prefs.airtime_factor = 1.0;
@@ -913,6 +1153,14 @@ MyMesh::MyMesh(mesh::MainBoard &board, mesh::Radio &radio, mesh::MillisecondCloc
   _prefs.direct_tx_delay_factor = 0.3f; // was 0.2
   _prefs.tx_snr_weight = 0.5f;   // MHR: secondary lever — bias strong-SNR receptions earlier (revert: set txsnrweight 0)
   _prefs.tx_hop_weight = 0.6f;   // MHR: PRIMARY lever — fewer-hop copies rebroadcast earlier (revert: set txhopweight 0)
+  // MHR Stufe B: redundancy-guarded flood suppression. DEFAULT OFF (supp_enable=0) => behaviour EXACTLY
+  //   as Stufe A. Conservative validated guard defaults (docs/MHR/study/SUPPRESSION_VALIDATION.md).
+  //   Enable per CLI only after bench validation: set supp.enable 1.
+  _prefs.supp_enable = 0;        // OFF by default — feature dormant
+  _prefs.supp_min_degree = 4;    // G1: never silence below 4 known neighbours (hard-spec default; study sweet-spot allows 3)
+  _prefs.supp_k_cover = 2;       // G2: need >=2 distinct qualified cover senders
+  _prefs.supp_snr_floor = -6;    // G4: cover senders must have EWMA-SNR >= -6 dB
+  _prefs.supp_prob = 80;         // G5: suppress with 80% probability (a fraction always still sends)
   StrHelper::strncpy(_prefs.node_name, ADVERT_NAME, sizeof(_prefs.node_name));
   _prefs.node_lat = ADVERT_LAT;
   _prefs.node_lon = ADVERT_LON;
