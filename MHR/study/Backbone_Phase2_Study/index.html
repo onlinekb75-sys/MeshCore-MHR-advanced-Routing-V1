@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://meshcore-dev.github.io/meshcore/MHR/study/Local_Calibration_Study/">
+        <link rel="canonical" href="https://meshcore-dev.github.io/meshcore/MHR/study/Backbone_Phase2_Study/">
       
       
-        <link rel="prev" href="../Invisible_Optimizing_Layer/">
+        <link rel="prev" href="../Adaptive_Controller_Design/">
       
       
-        <link rel="next" href="../MeshCore_Routing_Study/">
+        <link rel="next" href="../Invisible_Optimizing_Layer/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Langsame per-Node-Kalibrierung & On-Node-Machbarkeit (Ergebnis: NO-GO) - MeshCore Docs</title>
+        <title>Backbone Phase 2 — Proaktiver Regions-/Backbone-Control-Plane: Nutzen vs. Verlust vs. NETTO-Airtime - MeshCore Docs</title>
       
     
     
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#langsame-per-node-kalibrierung-on-node-machbarkeit-ergebnis-no-go" class="md-skip">
+        <a href="#backbone-phase-2-proaktiver-regions-backbone-control-plane-nutzen-vs-verlust-vs-netto-airtime" class="md-skip">
           Skip to content
         </a>
       
@@ -105,7 +105,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Langsame per-Node-Kalibrierung &amp; On-Node-Machbarkeit (Ergebnis: NO-GO)
+              Backbone Phase 2 — Proaktiver Regions-/Backbone-Control-Plane: Nutzen vs. Verlust vs. NETTO-Airtime
             
           </span>
         </div>
@@ -1007,10 +1007,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../Backbone_Phase2_Study/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backbone Phase 2 — Proaktiver Regions-/Backbone-Control-Plane: Nutzen vs. Verlust vs. NETTO-Airtime
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1026,6 +1053,192 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-methodik-ehrlich-getrennt-gemessen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Methodik (ehrlich, getrennt gemessen)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-daten-vs-kontroll-vs-netto-airtime-zahlen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Daten- vs. Kontroll- vs. NETTO-Airtime (Zahlen)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Daten- vs. Kontroll- vs. NETTO-Airtime (Zahlen)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2a-uber-backbone-groe-flaches-dv-dv-300-s-adoption-100-2000-floods24-h" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2a. Über Backbone-Größe (FLACHES DV, DV 300 s, Adoption 100 %, 2000 Floods/24 h)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2b-uber-dv-periode-backbone-35-flach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2b. Über DV-Periode (Backbone 35 %, flach)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2c-flaches-dv-vs-regions-hierarchie-h1-der-rettungsanker-bei-groem-backbone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2c. Flaches DV vs. Regions-Hierarchie (H1) — der Rettungsanker bei großem Backbone
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-go-no-go" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. GO / NO-GO
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. GO / NO-GO">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#go-aber-bedingt-kein-freifahrtschein" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ GO — aber bedingt, kein Freifahrtschein.
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wann-no-go" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wann NO-GO:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-amortisation-traffic-sensitivitat-backbone-35-300-s-flach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Amortisation (Traffic-Sensitivität, Backbone 35 %/300 s flach)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-delivery-pfad-optimalitat-konvergenz-mixed-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Delivery, Pfad-Optimalität, Konvergenz, Mixed-Firmware
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-bugs-fehler-wahrend-der-entwicklung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Bugs / Fehler während der Entwicklung
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-dateien" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Dateien
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-limitierungen-ehrlich" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Limitierungen (ehrlich)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-einordnung-gegenuber-der-unsichtbaren-schicht" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Einordnung gegenüber der unsichtbaren Schicht
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1063,37 +1276,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Langsame per-Node-Kalibrierung &amp; On-Node-Machbarkeit (Ergebnis: NO-GO)
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../Local_Calibration_Study/" class="md-nav__link">
         
   
   
@@ -1109,92 +1295,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#ergebnis" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Ergebnis
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ehrliche-nuance-ein-verwertbarer-nebenbefund" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Ehrliche Nuance (ein verwertbarer Nebenbefund)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#on-node-machbarkeit-zusatzfrage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        On-Node-Machbarkeit (Zusatzfrage)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gesamtbild-zwei-unabhangige-no-gos-zur-auto-adaption" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Gesamtbild: zwei unabhängige NO-GOs zur Auto-Adaption
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#empfehlung-trotz-no-go" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Empfehlung trotz NO-GO
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#limitierungen" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Limitierungen
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1410,10 +1510,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ergebnis" class="md-nav__link">
+  <a href="#1-methodik-ehrlich-getrennt-gemessen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Ergebnis
+        1. Methodik (ehrlich, getrennt gemessen)
       
     </span>
   </a>
@@ -1421,10 +1521,99 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ehrliche-nuance-ein-verwertbarer-nebenbefund" class="md-nav__link">
+  <a href="#2-daten-vs-kontroll-vs-netto-airtime-zahlen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Ehrliche Nuance (ein verwertbarer Nebenbefund)
+        2. Daten- vs. Kontroll- vs. NETTO-Airtime (Zahlen)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Daten- vs. Kontroll- vs. NETTO-Airtime (Zahlen)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2a-uber-backbone-groe-flaches-dv-dv-300-s-adoption-100-2000-floods24-h" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2a. Über Backbone-Größe (FLACHES DV, DV 300 s, Adoption 100 %, 2000 Floods/24 h)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2b-uber-dv-periode-backbone-35-flach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2b. Über DV-Periode (Backbone 35 %, flach)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2c-flaches-dv-vs-regions-hierarchie-h1-der-rettungsanker-bei-groem-backbone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2c. Flaches DV vs. Regions-Hierarchie (H1) — der Rettungsanker bei großem Backbone
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-go-no-go" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. GO / NO-GO
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. GO / NO-GO">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#go-aber-bedingt-kein-freifahrtschein" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ GO — aber bedingt, kein Freifahrtschein.
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wann-no-go" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wann NO-GO:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-amortisation-traffic-sensitivitat-backbone-35-300-s-flach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Amortisation (Traffic-Sensitivität, Backbone 35 %/300 s flach)
       
     </span>
   </a>
@@ -1432,10 +1621,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#on-node-machbarkeit-zusatzfrage" class="md-nav__link">
+  <a href="#5-delivery-pfad-optimalitat-konvergenz-mixed-firmware" class="md-nav__link">
     <span class="md-ellipsis">
       
-        On-Node-Machbarkeit (Zusatzfrage)
+        5. Delivery, Pfad-Optimalität, Konvergenz, Mixed-Firmware
       
     </span>
   </a>
@@ -1443,10 +1632,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gesamtbild-zwei-unabhangige-no-gos-zur-auto-adaption" class="md-nav__link">
+  <a href="#6-bugs-fehler-wahrend-der-entwicklung" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Gesamtbild: zwei unabhängige NO-GOs zur Auto-Adaption
+        6. Bugs / Fehler während der Entwicklung
       
     </span>
   </a>
@@ -1454,10 +1643,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#empfehlung-trotz-no-go" class="md-nav__link">
+  <a href="#7-dateien" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Empfehlung trotz NO-GO
+        7. Dateien
       
     </span>
   </a>
@@ -1465,10 +1654,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#limitierungen" class="md-nav__link">
+  <a href="#8-limitierungen-ehrlich" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Limitierungen
+        8. Limitierungen (ehrlich)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-einordnung-gegenuber-der-unsichtbaren-schicht" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Einordnung gegenüber der unsichtbaren Schicht
       
     </span>
   </a>
@@ -1492,7 +1692,7 @@
 
 
   
-    <a href="https://github.com/meshcore-dev/meshcore/edit/main/docs/MHR/study/Local_Calibration_Study.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/meshcore-dev/meshcore/edit/main/docs/MHR/study/Backbone_Phase2_Study.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1500,77 +1700,424 @@
   
 
 
-<h1 id="langsame-per-node-kalibrierung-on-node-machbarkeit-ergebnis-no-go">Langsame per-Node-Kalibrierung &amp; On-Node-Machbarkeit (Ergebnis: NO-GO)</h1>
-<p><em>Frage: Bringt eine langsame (12–48 h) Selbst-Kalibrierung pro Knoten an die lokale Dichte/Rolle
-mehr als der globale statische sichere Satz — v. a. an den Extremen (dichte Hubs / sparse Brücken)?
-Und ist eine abgespeckte Version auf dem Node lauffähig?</em></p>
-<p><strong>Antwort: NEIN (zweites, unabhängiges NO-GO).</strong> Lokal-kalibriert schlägt den statischen Satz nicht;
-es ist sogar minimal schlechter bei der Airtime. Der Grund ist strukturell: die <strong>Per-Paket-Guards
-G1–G5 adaptieren bereits in Echtzeit</strong> an die lokale Lage (tatsächliche gehörte Redundanz pro Paket)
-— besser als ein über 12–48 h gemittelter Vorab-Wert das je könnte.</p>
-<p>Validierung: <code>local_calib_sim.py</code> / <code>local_calib_results.json</code> (echter neighbor-graph: 632 Knoten /
-1577 Kanten, Klassen: 129 Hubs / 207 mittel / 296 Brücken-Blätter; Seed 42, ≥5 Seeds).</p>
-<h2 id="ergebnis">Ergebnis</h2>
+<h1 id="backbone-phase-2-proaktiver-regions-backbone-control-plane-nutzen-vs-verlust-vs-netto-airtime">Backbone Phase 2 — Proaktiver Regions-/Backbone-Control-Plane: Nutzen vs. Verlust vs. NETTO-Airtime</h1>
+<p><em>Mechanismus A der Phase 2. Ehrliche, getrennte Airtime-Bilanz auf der ECHTEN Topologie.
+Skript: <code>backbone_sim.py</code> · Daten: <code>backbone_results.json</code> · Plots: <code>fig_bb_*.png</code>.
+Reproduzierbar (Seed 42, 6 Seeds, 120 Paare/Seed).</em></p>
+<blockquote>
+<p><strong>Die Kernfrage:</strong> Spart ein proaktiver Backbone (stabile Repeater tauschen periodisch
+Distance-Vector-Updates aus, sodass DATA als <strong>Unicast</strong> statt netzweitem <strong>Flood</strong> läuft)
+<strong>NETTO</strong> Airtime — <strong>nach Abzug</strong> der Kontroll-Updates, die er selbst kostet? Und wenn ja:
+in welchem Fenster aus Backbone-Größe, DV-Periode und Adoption?</p>
+</blockquote>
+<hr />
+<h2 id="1-methodik-ehrlich-getrennt-gemessen">1. Methodik (ehrlich, getrennt gemessen)</h2>
+<p><strong>Topologie:</strong> echte <code>neighbor_graph.json</code> (1956 Kanten, ambiguous verworfen) → Riesenkomponente
+<strong>632 Knoten / 1577 Kanten</strong>, Ø-Grad 4,99. Per-Link-Reliability aus echtem <code>avg_snr</code> (logistisch
+um die Empfangsschwelle), ETX = 1/p². Identisch zu <code>mhr_sim_real_v4.py</code>.</p>
+<p><strong>Zwei Airtime-Einheiten</strong> — der entscheidende methodische Schritt:
+1. <strong>TX-Ereignisse</strong> (sendende Knoten) — vergleichbar mit der Vorarbeit (v4/Studie).
+2. <strong>Physische Time-on-Air (ms)</strong> per LoRa-ToA (Semtech-Formel, SF11/BW250k „long-fast").
+   Nötig, weil DATA-Pakete (≈40 B → <strong>494 ms</strong> ToA) und kleine DV-Kontroll-Pakete <strong>unterschiedlich
+   groß</strong> sind. <strong>Nur in ms lassen sich Daten-Ersparnis und Kontroll-Kosten ehrlich gegeneinander
+   aufrechnen</strong> — TX-Zählung allein würde die Kontroll-Kosten systematisch unterschätzen oder
+   überschätzen.</p>
+<p><strong>Backbone-Modell:</strong>
+- Auswahl stabiler Repeater nach <code>relay_count_24h</code> (aktiver Transit), Tie-Break Grad (Hub/Border).
+  Companions sind per Definition <strong>nicht</strong> backbone-fähig (leiten nicht weiter). 563 Kandidaten.
+- DATA: Endpunkte „kleben" via lokalem ≤2-Hop-Flood an den nächsten aktiven Backbone-Knoten
+  (Ingress/Egress); dazwischen <strong>ETX-kürzester, proaktiv bekannter Unicast-Pfad</strong> (0 Discovery-Airtime).
+  Nicht über den Backbone erreichbare Paare → <strong>Fallback auf heutiges Flood-and-cache</strong>.
+- <strong>Kontroll-Kosten (DV):</strong> jeder aktive Backbone-Knoten sendet je Periode <strong>einen Zero-Hop-Broadcast</strong>
+  (kein Flood, 1 TX). Paketgröße = Header + #Einträge × 4 B. ToA je Update per LoRa-Formel.</p>
+<p><strong>NETTO</strong> (über 24 h, Kernzahl):</p>
+<pre><code>NETTO = (Baseline-Daten-ToA − Backbone-Daten-ToA) × #Discovery-Floods  −  Kontroll-ToA
+        └──────────────── NUTZEN (gespart) ────────────────┘             └── VERLUST ──┘
+</code></pre>
+<p><strong>Baseline (reines Flood-and-cache):</strong> Lieferquote <strong>0,929</strong>, <strong>617 TX-Ereignisse/Zustellung</strong>
+(= <strong>304 s</strong> ToA bei 494 ms/Hop), Ø 5,0 Hops.</p>
+<p><strong>Zwei DV-Skalierungs-Modelle</strong> (beide gezeigt — ehrlich in beide Richtungen):
+- <strong>FLACHES DV</strong> (Default aller Sweeps): jeder Knoten trägt <strong>alle</strong> Ziele seiner Backbone-Komponente
+  → O(N). Pessimistische, aber faire Annahme für einen naiven Backbone.
+- <strong>REGIONS-HIERARCHIE (H1)</strong>: intra-Region auf ~20 Ziele gedeckelt + aggregierte Inter-Region-Einträge
+  → O(Regionsgröße). Die design-intendierte Variante.</p>
+<hr />
+<h2 id="2-daten-vs-kontroll-vs-netto-airtime-zahlen">2. Daten- vs. Kontroll- vs. NETTO-Airtime (Zahlen)</h2>
+<h3 id="2a-uber-backbone-groe-flaches-dv-dv-300-s-adoption-100-2000-floods24-h">2a. Über Backbone-Größe (FLACHES DV, DV 300 s, Adoption 100 %, 2000 Floods/24 h)</h3>
 <table>
 <thead>
 <tr>
-<th>Kennzahl</th>
-<th>Wert</th>
+<th>Backbone</th>
+<th>Knoten</th>
+<th>% über BB</th>
+<th>Daten-Ersparnis</th>
+<th>Kontroll-Kosten</th>
+<th><strong>NETTO</strong></th>
+<th>Liefer</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Airtime lokal-kalibriert vs. statisch (hohe Adoption)</td>
-<td><strong>−0,50 pp</strong> (schlechter)</td>
+<td>5 %</td>
+<td>28</td>
+<td>4 %</td>
+<td>+29 194 s</td>
+<td>−2 447 s</td>
+<td><strong>+26 748 s</strong></td>
+<td>0,950</td>
 </tr>
 <tr>
-<td>Extra-Gewinn an <strong>Hubs</strong></td>
-<td><strong>−0,04 pp</strong> (kein Vorteil)</td>
+<td>10 %</td>
+<td>56</td>
+<td>24 %</td>
+<td>+151 067 s</td>
+<td>−9 871 s</td>
+<td><strong>+141 196 s</strong></td>
+<td>0,967</td>
 </tr>
 <tr>
-<td>Schlechteste Brücken-Lieferquote-Δ (lokal)</td>
-<td>−0,017 (safe)</td>
+<td>20 %</td>
+<td>113</td>
+<td>53 %</td>
+<td>+333 689 s</td>
+<td>−59 872 s</td>
+<td><strong>+273 817 s</strong> ✅ best</td>
+<td>0,958</td>
 </tr>
 <tr>
-<td>abgespeckte On-Node-Kennlinie: behaltener Gewinn</td>
-<td><strong>0 %</strong> (kein Gewinn vorhanden)</td>
+<td>35 %</td>
+<td>197</td>
+<td>60 %</td>
+<td>+381 189 s</td>
+<td>−230 755 s</td>
+<td><strong>+150 434 s</strong></td>
+<td>0,954</td>
 </tr>
 <tr>
-<td>Entscheidung</td>
-<td><strong><code>go_local_full = false</code></strong></td>
+<td>50 %</td>
+<td>282</td>
+<td>67 %</td>
+<td>+428 611 s</td>
+<td>−564 887 s</td>
+<td><strong>−136 277 s</strong> ❌</td>
+<td>0,949</td>
+</tr>
+<tr>
+<td>70 %</td>
+<td>394</td>
+<td>80 %</td>
+<td>+497 560 s</td>
+<td>−1 371 112 s</td>
+<td><strong>−873 552 s</strong> ❌</td>
+<td>0,976</td>
+</tr>
+<tr>
+<td>100 %</td>
+<td>563</td>
+<td>98 %</td>
+<td>+593 297 s</td>
+<td>−3 045 451 s</td>
+<td><strong>−2 452 154 s</strong> ❌</td>
+<td>0,999</td>
 </tr>
 </tbody>
 </table>
-<h2 id="ehrliche-nuance-ein-verwertbarer-nebenbefund">Ehrliche Nuance (ein verwertbarer Nebenbefund)</h2>
-<p>Die feinere <strong>Pro-Klasse</strong>-Analyse zeigt: der <em>statische</em> Satz dippt an <strong>Brücken</strong> bei α=0,5 leicht
-(worst class-Δ −0,052), die lokale Kalibrierung nicht (−0,017). Lokal ist also etwas <em>sicherer</em> an
-Brücken, aber dafür minimal <em>schlechter</em> bei der Airtime — keiner dominiert. <strong>Konsequenz:</strong> statt
-eines Reglers genügt eine kleine <strong>statische Default-Nachjustierung</strong> (z. B. <code>supp_min_degree</code> an
-Brücken konservativer), falls Stufe B je scharf geschaltet wird. Kein adaptiver Apparat nötig.</p>
-<h2 id="on-node-machbarkeit-zusatzfrage">On-Node-Machbarkeit (Zusatzfrage)</h2>
-<p>Die abgespeckte Kalibrier-Kennlinie wäre <strong>trivial</strong> node-tauglich: ~9 Byte Lookup, 4 Byte Zustand
-pro Knoten, ≤ 5 Integer-Vergleiche, kein float/Heap/Sort, 1× pro 12–48 h. Machbarkeit ist also <strong>kein</strong>
-Hinderungsgrund — aber sie ist <strong>moot</strong>, weil es keinen Gewinn zu holen gibt. (Eine <em>reichhaltige</em>
-RX-Statistik/Telemetrie auf dem Node ist davon unabhängig sinnvoll — siehe Empfehlung unten.)</p>
-<h2 id="gesamtbild-zwei-unabhangige-no-gos-zur-auto-adaption">Gesamtbild: zwei unabhängige NO-GOs zur Auto-Adaption</h2>
+<p>→ <strong>Die Daten-Ersparnis wächst sublinear (sättigt), die Kontroll-Kosten wachsen super­linear</strong>
+(mehr Knoten × größere DV-Tabellen). Beim flachen DV kippt NETTO <strong>oberhalb ~35–40 %</strong> ins Negative.
+Plot: <code>fig_bb_net_airtime.png</code>.</p>
+<h3 id="2b-uber-dv-periode-backbone-35-flach">2b. Über DV-Periode (Backbone 35 %, flach)</h3>
+<table>
+<thead>
+<tr>
+<th>DV-Periode</th>
+<th>Kontroll-Kosten</th>
+<th><strong>NETTO</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>30 s</td>
+<td>−2 307 551 s</td>
+<td><strong>−1 926 362 s</strong> ❌</td>
+</tr>
+<tr>
+<td>60 s</td>
+<td>−1 153 775 s</td>
+<td><strong>−772 587 s</strong> ❌</td>
+</tr>
+<tr>
+<td>120 s</td>
+<td>−576 888 s</td>
+<td><strong>−195 699 s</strong> ❌</td>
+</tr>
+<tr>
+<td><strong>300 s</strong></td>
+<td>−230 755 s</td>
+<td><strong>+150 434 s</strong> ✅</td>
+</tr>
+<tr>
+<td>600 s</td>
+<td>−115 378 s</td>
+<td><strong>+265 811 s</strong> ✅</td>
+</tr>
+<tr>
+<td>1800 s</td>
+<td>−38 459 s</td>
+<td><strong>+342 730 s</strong> ✅</td>
+</tr>
+<tr>
+<td>3600 s</td>
+<td>−19 230 s</td>
+<td><strong>+361 959 s</strong> ✅</td>
+</tr>
+</tbody>
+</table>
+<p>→ <strong>Kipppunkt bei flachem 35 %-Backbone liegt zwischen 120 s und 300 s.</strong> Schneller als alle ~5 min
+zu aktualisieren frisst der Kontroll-Traffic den gesamten Nutzen. Plot: <code>fig_bb_dv_period.png</code>.</p>
+<h3 id="2c-flaches-dv-vs-regions-hierarchie-h1-der-rettungsanker-bei-groem-backbone">2c. Flaches DV vs. Regions-Hierarchie (H1) — der Rettungsanker bei großem Backbone</h3>
+<table>
+<thead>
+<tr>
+<th>Backbone</th>
+<th>FLACH Einträge</th>
+<th>FLACH NETTO</th>
+<th>H1 Einträge</th>
+<th><strong>H1 NETTO</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>35 %</td>
+<td>114</td>
+<td>+150 434 s</td>
+<td>21</td>
+<td><strong>+331 150 s</strong></td>
+</tr>
+<tr>
+<td>50 %</td>
+<td>204</td>
+<td>−136 277 s ❌</td>
+<td>27</td>
+<td><strong>+345 527 s</strong> ✅</td>
+</tr>
+<tr>
+<td>70 %</td>
+<td>354</td>
+<td>−873 552 s ❌</td>
+<td>36</td>
+<td><strong>+345 672 s</strong> ✅</td>
+</tr>
+<tr>
+<td>100 %</td>
+<td>552</td>
+<td>−2 452 154 s ❌</td>
+<td>47</td>
+<td><strong>+329 255 s</strong> ✅</td>
+</tr>
+</tbody>
+</table>
+<p>→ <strong>Genau der vom Design (H1) vorhergesagte Effekt:</strong> ohne Hierarchie skaliert ein flacher Backbone
+nicht (DV-Tabellen O(N), Pakete fragmentieren, Kontroll-Airtime explodiert). <strong>Mit</strong> Regions-Deckelung
+bleibt NETTO auch bei 100 % Backbone klar positiv und nahezu größeninvariant (~+330 000 s/24 h).</p>
+<hr />
+<h2 id="3-go-no-go">3. GO / NO-GO</h2>
+<h3 id="go-aber-bedingt-kein-freifahrtschein">✅ <strong>GO — aber bedingt, kein Freifahrtschein.</strong></h3>
+<p>Der proaktive Backbone lohnt <strong>netto</strong>, <strong>wenn alle vier Bedingungen</strong> erfüllt sind:</p>
 <ol>
-<li>Schneller (1–2 h) supp_prob-Regler → +0,76 pp (zu wenig). <code>Adaptive_Controller_Design.md</code>.</li>
-<li>Langsame (12–48 h) per-Node-Kalibrierung → −0,5 pp (schlechter). Dieses Dokument.</li>
+<li><strong>Regions-Hierarchie (H1) ist Pflicht, nicht optional.</strong> Ein flacher netzweiter DV ist nur in einem
+   engen Fenster (kleiner Backbone ≤ 35 % <strong>und</strong> DV-Periode ≥ 300 s) netto positiv und kippt sonst
+   stark negativ. Mit H1 ist NETTO über <strong>alle</strong> Backbone-Größen positiv (~+330 000 s/24 h).</li>
+<li><strong>DV-Periode ≥ 300 s</strong> (5 min). Darunter frisst der Kontroll-Traffic den Nutzen (Kipppunkt 120–300 s
+   bei flachem 35 %-Backbone).</li>
+<li><strong>Ausreichend DATA-Traffic.</strong> Der Backbone ist eine <strong>fixe</strong> Kontroll-Investition; sie amortisiert
+   erst ab <strong>~2000 netzweiten Discovery-Floods/24 h</strong> (bei 35 %/300 s flach — siehe §4). Bei niedrigem
+   Traffic (≤ 1000/24 h) ist NETTO negativ: man bezahlt einen Backbone, den kaum jemand nutzt.</li>
+<li><strong>Moderate Backbone-Größe.</strong> Ohne H1: 10–35 %. Mit H1: nahezu beliebig, optimal um 35–50 %
+   (maximale Abdeckung bei noch tragbarer Tabellengröße).</li>
 </ol>
-<p>Robuste Schlussfolgerung: <strong>Die Per-Paket-Guards holen die lokale Adaption bereits ein; ein langsamer
-äußerer Regelkreis für Suppressions-Parameter lohnt nicht.</strong> Statischer sicherer Satz + Guards bleibt
-die Empfehlung.</p>
-<h2 id="empfehlung-trotz-no-go">Empfehlung trotz NO-GO</h2>
-<p>Eine <strong>passive On-Node-RX-Statistik/Telemetrie</strong> (kein Regler!) ist sehr wohl sinnvoll und auf dem
-ESP32-S3 problemlos: lokaler Pfadlängen-Histogramm (= lokaler Durchmesser), Nachbar-SNR-Verteilung,
-Redundanz-/Cover-Histogramm, Traffic nach Typ, Duty-Cycle-Auslastung, Churn. Nutzen: Diagnose,
-fundierte <em>manuelle</em> Parameterwahl, Speisen der bestehenden Guards (2-Hop-Frische, Cover-Stats),
-Anomalie-/Selbstschutz (z. B. Advert-Backoff bei gesättigtem Duty-Cycle). Das nutzt die CPU-Reserve
-für echten Wert — ohne die nachweislich nutzlose Auto-Tuning-Schleife.</p>
-<h2 id="limitierungen">Limitierungen</h2>
-<p>Modell-Idealisierungen (kein Duty-Cycle/Kollisionen — die würden Suppression eher aufwerten, aber
-nicht die <em>relative</em> Aussage adaptiv-vs-statisch ändern); neighbor-graph erfasst nur genutzte Links;
-Momentaufnahme; Klassengrenzen nach Grad-Quantilen (q40/q80).</p>
+<p><strong>Bestes Fenster</strong> (gemessen):
+- <em>Ohne H1:</em> <strong>Backbone 20 %, DV ≥ 300 s</strong> → NETTO <strong>+273 817 s/24 h</strong> (= 4,6 h Funkbelegung gespart),
+  53 % der Paare über Backbone, Lieferquote 0,958 ≥ Baseline 0,929.
+- <em>Mit H1:</em> <strong>Backbone 35–50 %, DV 300–600 s</strong> → NETTO <strong>+330 000–345 000 s/24 h</strong>, 60–67 % über Backbone.</p>
+<h3 id="wann-no-go">Wann <strong>NO-GO</strong>:</h3>
+<ul>
+<li>DV-Periode &lt; 120 s (Kontroll-Traffic dominiert immer).</li>
+<li>Flacher Backbone &gt; 40 % (ohne H1 stark negativ).</li>
+<li>Geringes Daten-Aufkommen (&lt; ~1000 Floods/24 h) — fixe Kontroll-Kosten amortisieren nicht.</li>
+</ul>
+<hr />
+<h2 id="4-amortisation-traffic-sensitivitat-backbone-35-300-s-flach">4. Amortisation (Traffic-Sensitivität, Backbone 35 %/300 s flach)</h2>
+<table>
+<thead>
+<tr>
+<th>Floods/24 h</th>
+<th>Daten-Ersparnis</th>
+<th>Kontroll (fix)</th>
+<th><strong>NETTO</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100</td>
+<td>+19 059 s</td>
+<td>−230 755 s</td>
+<td><strong>−211 696 s</strong> ❌</td>
+</tr>
+<tr>
+<td>500</td>
+<td>+95 297 s</td>
+<td>−230 755 s</td>
+<td><strong>−135 458 s</strong> ❌</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>+190 594 s</td>
+<td>−230 755 s</td>
+<td><strong>−40 161 s</strong> ❌</td>
+</tr>
+<tr>
+<td><strong>2000</strong></td>
+<td>+381 189 s</td>
+<td>−230 755 s</td>
+<td><strong>+150 434 s</strong> ✅ break-even</td>
+</tr>
+<tr>
+<td>4000</td>
+<td>+762 377 s</td>
+<td>−230 755 s</td>
+<td><strong>+531 622 s</strong> ✅</td>
+</tr>
+<tr>
+<td>8000</td>
+<td>+1 524 755 s</td>
+<td>−230 755 s</td>
+<td><strong>+1 294 000 s</strong> ✅</td>
+</tr>
+</tbody>
+</table>
+<p>→ <strong>Break-even ≈ 2000 Discovery-Floods/24 h.</strong> Die Kontroll-Kosten sind fix (traffic-unabhängig),
+die Ersparnis skaliert linear mit dem Daten-Aufkommen. <strong>Mit H1 sinkt der Break-even drastisch</strong>
+(Kontroll-Kosten bei 35 % nur ~50 000 s statt 230 755 s → Break-even bei ~260 Floods/24 h).
+Plot: <code>fig_bb_traffic.png</code>.</p>
+<hr />
+<h2 id="5-delivery-pfad-optimalitat-konvergenz-mixed-firmware">5. Delivery, Pfad-Optimalität, Konvergenz, Mixed-Firmware</h2>
+<ul>
+<li><strong>Lieferquote (Safety):</strong> In allen NETTO-positiven Szenarien <strong>≥ Baseline (0,929)</strong> — Bereich
+  0,947–0,999. Der Backbone verschlechtert die Zustellung nicht (Fallback-Flood garantiert das,
+  wo keine Backbone-Route existiert). <strong>Safety-Invariante erfüllt.</strong></li>
+<li><strong>Pfad-Optimalität:</strong> Unicast über den ETX-kürzesten proaktiven Pfad → deterministisch, kein
+  Zufalls-Umweg. Detour gegen Shortest-Path wird mitgeführt; der Backbone wählt metrisch, nicht
+  „first-wins".</li>
+<li><strong>Konvergenz:</strong> im analytischen DV-Modell nicht zeitlich simuliert; das Design (H2: Babel-Feasibility</li>
+<li>Seqno) garantiert Schleifenfreiheit <em>während</em> der Konvergenz. Kosten der Konvergenz stecken in den
+  periodischen Updates (hier voll bilanziert). Eine echte zeit-/churn-aufgelöste Konvergenz-Simulation
+  ist die nächste offene Validierung (s. Limitierungen).</li>
+<li><strong>Mixed-Firmware (Adoption, Backbone 35 %/300 s, flach):</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Adoption</th>
+<th>aktive BB-Knoten</th>
+<th>% über BB</th>
+<th>Kontroll</th>
+<th><strong>NETTO</strong></th>
+<th>Liefer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10 %</td>
+<td>20</td>
+<td>11 %</td>
+<td>−1 703 s</td>
+<td><strong>+67 071 s</strong> ✅</td>
+<td>0,947</td>
+</tr>
+<tr>
+<td>25 %</td>
+<td>49</td>
+<td>14 %</td>
+<td>−5 589 s</td>
+<td><strong>+84 594 s</strong> ✅</td>
+<td>0,968</td>
+</tr>
+<tr>
+<td>50 %</td>
+<td>98</td>
+<td>32 %</td>
+<td>−26 951 s</td>
+<td><strong>+171 009 s</strong> ✅</td>
+<td>0,961</td>
+</tr>
+<tr>
+<td>75 %</td>
+<td>148</td>
+<td>54 %</td>
+<td>−109 053 s</td>
+<td><strong>+223 836 s</strong> ✅</td>
+<td>0,972</td>
+</tr>
+<tr>
+<td>100 %</td>
+<td>197</td>
+<td>60 %</td>
+<td>−230 755 s</td>
+<td><strong>+150 434 s</strong> ✅</td>
+<td>0,954</td>
+</tr>
+</tbody>
+</table>
+<p>→ <strong>Graceful &amp; monoton positiv ab dem ersten Knoten.</strong> Schon bei 10 % Adoption NETTO positiv;
+  Nicht-Adoptierer fluten weiter (sicherer Fallback), Lieferquote bleibt ≥ Baseline. Der Gewinn steigt
+  mit Adoption, bis (bei flachem DV) die wachsenden Kontroll-Kosten ihn ab ~100 % wieder drücken — mit
+  H1 träte dieser Rückgang nicht ein. Plot: <code>fig_bb_adoption.png</code>.</p>
+<hr />
+<h2 id="6-bugs-fehler-wahrend-der-entwicklung">6. Bugs / Fehler während der Entwicklung</h2>
+<ul>
+<li><strong>Einrückungs-Syntaxfehler</strong> (führendes Leerzeichen vor <code>in_bb = attach_repeater(...)</code>) — beim ersten
+  Schreiben eingebaut, sofort gefixt; Skript läuft seitdem fehlerfrei in einem Durchlauf.</li>
+<li>Keine Laufzeitfehler. <code>BB_FAST=1</code>-Smoke-Test und voller Lauf (6 Seeds) sauber.</li>
+</ul>
+<hr />
+<h2 id="7-dateien">7. Dateien</h2>
+<ul>
+<li><code>docs/MHR/study/backbone_sim.py</code> — Simulation (selbst ausgeführt, fehlerfrei).</li>
+<li><code>docs/MHR/study/backbone_results.json</code> — alle Roh-Sweeps + Kennzahlen-Summary.</li>
+<li><code>docs/MHR/study/fig_bb_net_airtime.png</code> — Daten/Kontroll/NETTO über Backbone-Größe (Kernplot).</li>
+<li><code>docs/MHR/study/fig_bb_adoption.png</code> — Mixed-Firmware: NETTO &amp; Abdeckung über Adoption.</li>
+<li><code>docs/MHR/study/fig_bb_dv_period.png</code> — Kipppunkt der DV-Periode.</li>
+<li><code>docs/MHR/study/fig_bb_traffic.png</code> — Amortisation über Daten-Aufkommen.</li>
+<li><code>docs/MHR/study/fig_bb_grid.png</code> — 2D-NETTO-Fenster (Größe × Periode).</li>
+</ul>
+<hr />
+<h2 id="8-limitierungen-ehrlich">8. Limitierungen (ehrlich)</h2>
+<ol>
+<li><strong>Idealisierter Flood ohne Kollisionen.</strong> Das Flood-Modell zählt sendende Knoten, modelliert aber
+   <strong>keine</strong> CSMA-Kollisionen/Capture. Realer Flood ist durch Kollisionen <em>teurer</em> → die Daten-Ersparnis
+   ist hier eher <strong>konservativ</strong> (untere Schranke des Nutzens).</li>
+<li><strong>DV-Kosten als analytisches Modell.</strong> Periode × ToA × #aktive Knoten, mit DV-Tabellengröße aus der
+   Komponenten-/Regionsgröße. Keine simulierte Retransmits/Verluste der DV-Pakete (die Kontroll-Kosten
+   wären real eher <em>höher</em> → NETTO-Schätzung hier eher <strong>optimistisch</strong> auf der Kostenseite). Diese
+   beiden Effekte (1 konservativ, 2 optimistisch) wirken gegenläufig.</li>
+<li><strong>neighbor-graph = nur GENUTZTE Links.</strong> Die echte Topologie enthält nur beobachtete Kanten; latente
+   Links fehlen. Backbone-Konnektivität und Attach-Hops könnten real günstiger sein.</li>
+<li><strong>Traffic-Annahme (#Floods/24 h) ist der dominierende freie Parameter.</strong> NETTO hängt linear davon ab;
+   der reale netzweite Discovery-Flood-Rate ist nicht direkt aus den Daten messbar (nur relay_count als
+   Proxy). Darum als expliziter Sweep geführt, nicht als feste Zahl behauptet.</li>
+<li><strong>Konvergenzzeit / Churn-Flattern nicht zeit-aufgelöst.</strong> Schleifenfreiheit &amp; Stabilität sind
+   Design-Argumente (H2/H3), hier nicht dynamisch simuliert. Offene nächste Validierung.</li>
+<li><strong>Regions-Zuordnung approximiert</strong> (region_cap als Deckel, nicht aus echten <code>region_map</code>-Grenzen) —
+   die H1-Zahlen sind die Größenordnung der Skalierung, nicht eine exakte Deployment-Vorhersage.</li>
+</ol>
+<hr />
+<h2 id="9-einordnung-gegenuber-der-unsichtbaren-schicht">9. Einordnung gegenüber der unsichtbaren Schicht</h2>
+<p>Die unsichtbare, node-lokale Schicht (<code>Invisible_Optimizing_Layer.md</code>) spart Airtime zu <strong>0 Kontroll-Kosten</strong>
+und ist immer sicher. Der Backbone ist <strong>mächtiger</strong> (deterministische Unicast-Pfade, höhere Abdeckung),
+aber <strong>nicht gratis</strong>: er ist NETTO nur in einem definierten Fenster (H1 + DV ≥ 300 s + genug Traffic)
+ein Gewinn. <strong>Empfehlung:</strong> Backbone als optionale Phase-2-Kür <strong>mit Pflicht-H1</strong>, defaultmäßig konservative
+DV-Periode (≥ 300 s), und nur dort aktivieren, wo das Daten-Aufkommen die fixe Kontroll-Investition trägt —
+die unsichtbare Schicht bleibt das risikolose Fundament darunter.</p>
 
 
 
