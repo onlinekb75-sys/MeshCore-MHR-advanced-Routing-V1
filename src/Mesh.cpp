@@ -9,6 +9,7 @@ void Mesh::begin() {
 
 void Mesh::loop() {
   Dispatcher::loop();
+  bofnFlushExpired();   // MHR: emit deferred path-returns whose collection window has expired
 }
 
 bool Mesh::allowPacketForward(const mesh::Packet* packet) { 
@@ -163,9 +164,16 @@ DispatcherAction Mesh::onRecvPacket(Packet* pkt) {
                 uint8_t extra_len = len - k;   // remainder of packet (may be padded with zeroes!)
                 if (onPeerPathRecv(pkt, j, secret, path, path_len, extra_type, extra, extra_len)) {
                   if (pkt->isRouteFlood()) {
-                    // send a reciprocal return path to sender, but send DIRECTLY!
-                    mesh::Packet* rpath = createPathReturn(&src_hash, secret, pkt->path, pkt->path_len, 0, NULL, 0);
-                    if (rpath) sendDirect(rpath, path, path_len, 500);
+                    // MHR: Best-of-N — instead of replying immediately with this (first-heard, possibly
+                    //   detour) path, open a collection window and reply later with the best path seen.
+                    //   The payload was ALREADY delivered above (onPeerPathRecv) exactly once; this only
+                    //   defers/improves the reciprocal PATH-return, never the app payload. If Best-of-N is
+                    //   off or the table is full, fall back to the exact upstream immediate send.
+                    if (!bofnBeginPending(&src_hash, secret, pkt, path, path_len)) {
+                      // send a reciprocal return path to sender, but send DIRECTLY!
+                      mesh::Packet* rpath = createPathReturn(&src_hash, secret, pkt->path, pkt->path_len, 0, NULL, 0);
+                      if (rpath) sendDirect(rpath, path, path_len, 500);
+                    }
                   }
                 }
               } else {
@@ -182,6 +190,12 @@ DispatcherAction Mesh::onRecvPacket(Packet* pkt) {
           }
         }
         action = routeRecvPacket(pkt);
+      } else {
+        // MHR: Best-of-N — this is a DUPLICATE that hasSeen() already classified as seen. We do NOT
+        //   re-decrypt or re-deliver the payload (dedup semantics untouched). We only peek at its flood
+        //   path and, if it is shorter (or equal hops + better SNR), keep it as the candidate to return.
+        //   No-op unless a matching pending discovery exists (i.e. we are the discovery's destination).
+        bofnObserveDuplicate(pkt);
       }
       break;
     }
@@ -471,6 +485,106 @@ Packet* Mesh::createPathReturn(const uint8_t* dest_hash, const uint8_t* secret, 
   packet->payload_len = len;
 
   return packet;
+}
+
+// MHR: Best-of-N path discovery AT THE DESTINATION ----------------------------------------------------
+//   Dedup-safety invariant: the app payload is delivered EXACTLY ONCE, on the first (!hasSeen) copy, by the
+//   caller in onRecvPacket(). These helpers ONLY touch the reciprocal PATH-return (which path we report and
+//   when). They never decrypt, never deliver, never call hasSeen(). With _bestofn_enable==0 the begin/observe
+//   functions are inert (begin returns false => caller does the exact upstream immediate send).
+
+bool Mesh::bofnBeginPending(const uint8_t* src_hash, const uint8_t* secret, const Packet* pkt,
+                            const uint8_t* send_route, uint8_t send_route_len) {
+  if (!_bestofn_enable) return false;   // OFF => caller falls back to immediate first-wins send
+
+  uint8_t hash[MAX_HASH_SIZE];
+  pkt->calculatePacketHash(hash);       // same hash hasSeen() keys on (path-independent)
+
+  // pick a slot: free slot first, otherwise evict the entry with the EARLIEST deadline (LRU-by-deadline).
+  BestOfNEntry* slot = NULL;
+  for (int i = 0; i < MHR_BOFN_TABLE_SIZE; i++) {
+    if (!_bofn[i].in_use) { slot = &_bofn[i]; break; }
+  }
+  if (slot == NULL) {
+    // table full: if an existing entry is already overdue, flushing it first is cheap and frees a slot.
+    BestOfNEntry* oldest = &_bofn[0];
+    for (int i = 1; i < MHR_BOFN_TABLE_SIZE; i++) {
+      // MHR: wrap-safe "earlier deadline" test (signed diff), not a raw unsigned '<' (millis wraps ~49.7d).
+      if ((long)(_bofn[i].deadline - oldest->deadline) < 0) oldest = &_bofn[i];
+    }
+    if (millisHasNowPassed(oldest->deadline)) {
+      // emit the soon-to-be-evicted entry's best path now, so we never silently drop a discovery's reply.
+      Packet* rp = createPathReturn(oldest->dest_hash, oldest->secret, oldest->best_path, oldest->best_path_enc, 0, NULL, 0);
+      if (rp) sendDirect(rp, oldest->send_route, oldest->send_route_enc, 500);
+      oldest->in_use = false;
+      slot = oldest;
+    } else {
+      // every slot is still within its window; do not steal a live discovery. Signal caller to send now.
+      return false;
+    }
+  }
+
+  uint8_t path_byte_len = pkt->getPathByteLen();
+  if (path_byte_len > MAX_PATH_SIZE) return false;   // defensive; should never happen
+  uint8_t route_byte_len = Packet::isValidPathLen(send_route_len) ? ((send_route_len & 63) * ((send_route_len >> 6) + 1)) : 0;
+  if (route_byte_len > MAX_PATH_SIZE) return false;  // defensive
+
+  slot->in_use = true;
+  memcpy(slot->pkt_hash, hash, MAX_HASH_SIZE);
+  memcpy(slot->dest_hash, src_hash, PATH_HASH_SIZE);
+  memcpy(slot->secret, secret, PUB_KEY_SIZE);
+  slot->send_route_enc = send_route_len;
+  memcpy(slot->send_route, send_route, route_byte_len);
+  slot->best_path_enc = pkt->path_len;
+  memcpy(slot->best_path, pkt->path, path_byte_len);
+  slot->best_hops = pkt->getPathHashCount();
+  slot->best_snr = pkt->_snr;
+  slot->deadline = futureMillis(_bestofn_window_ms);
+  return true;   // pending entry created => caller must NOT send immediately
+}
+
+void Mesh::bofnObserveDuplicate(const Packet* pkt) {
+  if (!_bestofn_enable) return;
+  if (!pkt->isRouteFlood()) return;                  // only flood copies accumulate a path worth comparing
+  if (pkt->getPayloadType() != PAYLOAD_TYPE_PATH) return;  // we only defer PATH-discovery returns
+
+  uint8_t hash[MAX_HASH_SIZE];
+  pkt->calculatePacketHash(hash);
+
+  for (int i = 0; i < MHR_BOFN_TABLE_SIZE; i++) {
+    BestOfNEntry* e = &_bofn[i];
+    if (!e->in_use) continue;
+    if (memcmp(e->pkt_hash, hash, MAX_HASH_SIZE) != 0) continue;
+
+    // matching pending discovery found — compare this duplicate's path: fewer hops wins; on a tie, higher SNR.
+    uint8_t hops = pkt->getPathHashCount();
+    bool better = (hops < e->best_hops) ||
+                  (hops == e->best_hops && pkt->_snr > e->best_snr);
+    if (better) {
+      uint8_t path_byte_len = pkt->getPathByteLen();
+      if (path_byte_len <= MAX_PATH_SIZE) {
+        e->best_path_enc = pkt->path_len;
+        memcpy(e->best_path, pkt->path, path_byte_len);
+        e->best_hops = hops;
+        e->best_snr = pkt->_snr;
+      }
+    }
+    return;   // at most one matching entry
+  }
+}
+
+void Mesh::bofnFlushExpired() {
+  if (!_bestofn_enable) return;
+  for (int i = 0; i < MHR_BOFN_TABLE_SIZE; i++) {
+    BestOfNEntry* e = &_bofn[i];
+    if (!e->in_use) continue;
+    if (!millisHasNowPassed(e->deadline)) continue;
+
+    // window over — emit ONE reciprocal path-return with the best path collected, along the peer's route.
+    Packet* rp = createPathReturn(e->dest_hash, e->secret, e->best_path, e->best_path_enc, 0, NULL, 0);
+    if (rp) sendDirect(rp, e->send_route, e->send_route_enc, 500);
+    e->in_use = false;
+  }
 }
 
 Packet* Mesh::createDatagram(uint8_t type, const Identity& dest, const uint8_t* secret, const uint8_t* data, size_t data_len) {

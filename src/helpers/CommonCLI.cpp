@@ -95,7 +95,9 @@ void CommonCLI::loadPrefsInt(FILESYSTEM* fs, const char* filename) {
     file.read((uint8_t *)&_prefs->supp_k_cover, sizeof(_prefs->supp_k_cover));                    // 301 (MHR)
     file.read((uint8_t *)&_prefs->supp_snr_floor, sizeof(_prefs->supp_snr_floor));                // 302 (MHR)
     file.read((uint8_t *)&_prefs->supp_prob, sizeof(_prefs->supp_prob));                          // 303 (MHR)
-    // next: 304
+    file.read((uint8_t *)&_prefs->bofn_enable, sizeof(_prefs->bofn_enable));                      // 304 (MHR Best-of-N; old files leave default)
+    file.read((uint8_t *)&_prefs->bofn_window_ms, sizeof(_prefs->bofn_window_ms));                // 305 (MHR)
+    // next: 307
 
     // sanitise bad pref values
     _prefs->rx_delay_base = constrain(_prefs->rx_delay_base, 0, 20.0f);
@@ -121,6 +123,11 @@ void CommonCLI::loadPrefsInt(FILESYSTEM* fs, const char* filename) {
     _prefs->supp_snr_floor = constrain(_prefs->supp_snr_floor, -30, 30);
     if (_prefs->supp_prob == 0) _prefs->supp_prob = 80;            // 0 => restore default (G5 never fully 0)
     _prefs->supp_prob = constrain(_prefs->supp_prob, 1, 100);
+    // MHR Best-of-N: sanitise. bofn_enable is a genuine 0/1 toggle (default ON), so DON'T resurrect 0.
+    //   bofn_window_ms==0 means an old/zeroed file => restore the safe default window.
+    _prefs->bofn_enable = constrain(_prefs->bofn_enable, 0, 1);
+    if (_prefs->bofn_window_ms == 0) _prefs->bofn_window_ms = 1500; // 0 => restore default window
+    _prefs->bofn_window_ms = constrain(_prefs->bofn_window_ms, 100, 8000);
 
     // sanitise bad bridge pref values
     _prefs->bridge_enabled = constrain(_prefs->bridge_enabled, 0, 1);
@@ -204,7 +211,9 @@ void CommonCLI::savePrefs(FILESYSTEM* fs) {
     file.write((uint8_t *)&_prefs->supp_k_cover, sizeof(_prefs->supp_k_cover));                    // 301 (MHR)
     file.write((uint8_t *)&_prefs->supp_snr_floor, sizeof(_prefs->supp_snr_floor));                // 302 (MHR)
     file.write((uint8_t *)&_prefs->supp_prob, sizeof(_prefs->supp_prob));                          // 303 (MHR)
-    // next: 304
+    file.write((uint8_t *)&_prefs->bofn_enable, sizeof(_prefs->bofn_enable));                      // 304 (MHR Best-of-N)
+    file.write((uint8_t *)&_prefs->bofn_window_ms, sizeof(_prefs->bofn_window_ms));                // 305 (MHR)
+    // next: 307
 
     file.close();
   }
@@ -684,6 +693,24 @@ void CommonCLI::handleSetCmd(uint32_t sender_timestamp, char* command, char* rep
     } else {
       strcpy(reply, "Error, must be 1..100 (percent)");
     }
+  } else if (memcmp(config, "bofn.enable ", 12) == 0) {   // MHR Best-of-N
+    int v = atoi(&config[12]);
+    if (v == 0 || v == 1) {
+      _prefs->bofn_enable = (uint8_t)v;
+      savePrefs();
+      strcpy(reply, "OK");
+    } else {
+      strcpy(reply, "Error, must be 0 or 1");
+    }
+  } else if (memcmp(config, "bofn.window ", 12) == 0) {   // MHR Best-of-N (window ms)
+    int v = atoi(&config[12]);
+    if (v >= 100 && v <= 8000) {
+      _prefs->bofn_window_ms = (uint16_t)v;
+      savePrefs();
+      strcpy(reply, "OK");
+    } else {
+      strcpy(reply, "Error, must be 100..8000 ms");
+    }
   } else if (memcmp(config, "flood.max ", 10) == 0) {
     uint8_t m = atoi(&config[10]);
     if (m <= 64) {
@@ -879,6 +906,10 @@ void CommonCLI::handleGetCmd(uint32_t sender_timestamp, char* command, char* rep
     sprintf(reply, "> %d", (uint32_t)_prefs->supp_prob);
   } else if (memcmp(config, "supp.enable", 11) == 0) {   // MHR Stufe B
     sprintf(reply, "> %d", (uint32_t)_prefs->supp_enable);
+  } else if (memcmp(config, "bofn.window", 11) == 0) {   // MHR Best-of-N
+    sprintf(reply, "> %d", (uint32_t)_prefs->bofn_window_ms);
+  } else if (memcmp(config, "bofn.enable", 11) == 0) {   // MHR Best-of-N
+    sprintf(reply, "> %d", (uint32_t)_prefs->bofn_enable);
   } else if (memcmp(config, "txdelay", 7) == 0) {
     sprintf(reply, "> %s", StrHelper::ftoa(_prefs->tx_delay_factor));
   } else if (memcmp(config, "flood.max", 9) == 0) {

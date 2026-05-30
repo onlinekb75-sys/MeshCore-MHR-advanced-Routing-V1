@@ -98,6 +98,21 @@ Bench-Test per CLI aktivieren (`set supp.enable 1`). Design + Validierung:
   GESAMTEN Adoptions-Sweep, −12…15 % Airtime bei hoher Adoption. Bench-Test offen (Cover-Timing in
   HW, 2-Hop-Konvergenz, Frische-Gating).
 
+## Best-of-N am Ziel — hop-/SNR-beste Pfadwahl statt „first wins" (im Code)
+
+### Patch 8 — Sammelfenster am Ziel, kürzesten Pfad zurückmelden
+- Dateien: `src/Mesh.{h,cpp}` (gemeinsame Basis → greift für Companion/Room/Repeater-Ziele),
+  `src/helpers/CommonCLI.{h,cpp}`, Default-Aktivierung in `examples/simple_repeater/MyMesh.cpp`.
+- Statt sofort den *zuerst* eingetroffenen Flood-Pfad per `createPathReturn` zurückzumelden, sammelt
+  das Ziel kurz mehrere Kopien (fixe Tabelle `_bofn[8]`) und meldet den **kürzesten Pfad (Hops, dann
+  SNR als Tiebreaker)** zurück. v4-belegt: Hop dominiert, SNR ist guter Reliability-Tiebreak.
+- **Dedup-sicher (adversarial reviewt, kein Blocker):** die Payload wird weiterhin GENAU EINMAL im
+  Erstempfang zugestellt; `hasSeen()`/Dedup unverändert; nur der reziproke Path-Return wird um EIN
+  Fenster (Default 1500 ms, einmalig je Pfadaufbau) verzögert. Bei einer Kopie identisch zu first-wins.
+- Mixed-firmware-safe: kein Paketformat-Eingriff (Standard-`PAYLOAD_TYPE_PATH`-Return). Prefs
+  `bofn_enable`(Default 1 im Repeater), `bofn_window_ms`(1500) @304/305, CLI `set/get bofn.enable|window`.
+  In der Basis default-AUS (andere Builds unverändert). ~0,9 KB fixe Tabelle.
+
 ## Adaptiver Selbst-Regler — geprüft und VERWORFEN (NO-GO)
 Ein langsamer (1–2 h) Regler, der `supp_prob` an die lokale Umgebung anpasst, wurde entworfen und
 simuliert (`docs/MHR/study/Adaptive_Controller_Design.md`). Ergebnis: oszilliert nicht, bringt aber
@@ -105,10 +120,11 @@ nur **+0,76 pp** Airtime über den statischen sicheren Satz (< 2 pp Schwelle) un
 strikt-safe → **nicht codiert** (Qualität/Stabilität vor letzter Optimierung). Der statische sichere
 Satz ist die Empfehlung.
 
-## Bewusst NICHT geändert
-- Kein neues Paketformat, keine Metrik im Paket, kein Backbone, kein echtes Best-of-N am Ziel —
-  Letzteres würde die `hasSeen()`-Dedup aufbohren (Risiko von Nachrichten-Duplikaten) und gehört
-  in eine eigene, gründlich getestete Stufe (siehe Studie Stufe A „Best-of-N am Ziel").
+## Bewusst NICHT geändert / noch offen
+- Kein neues Paketformat, keine Metrik im Paket. Der proaktive **Backbone (Phase 2)** ist als
+  konkretes Design + Validierungs-Gate vorhanden (`docs/MHR/study/Phase2_Backbone_Design.md`), aber
+  **design-first**: er wird erst codiert, nachdem die zeitaufgelöste Konvergenz/Schleifenfreiheit
+  simulativ bestätigt ist (Routing-Loops in einem Live-Mesh wären sonst das Risiko).
 
 ## Validierung (Simulation)
 - `docs/MHR/sim/mhr_sim_v2.py` — Stress-Szenarien auf der realen 25-Knoten-Topologie:

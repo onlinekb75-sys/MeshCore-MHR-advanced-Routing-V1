@@ -79,6 +79,18 @@ struct NodePrefs { // persisted to file
   uint8_t supp_k_cover;    // G2: required number of distinct qualified cover senders heard in the backoff
   int8_t  supp_snr_floor;  // G4: minimum EWMA-SNR (dB) of a cover sender to count it
   uint8_t supp_prob;       // G5: suppress probability in percent (0..100); a fraction always still sends
+  // MHR: Best-of-N path discovery AT THE DESTINATION. When we are the target of a flood path-discovery,
+  //      upstream sends the reciprocal path-return immediately using the FIRST copy heard ("first packet
+  //      wins" — often a detour). Best-of-N instead opens a short collection window: the payload is still
+  //      processed EXACTLY ONCE on the first copy (dedup unchanged), but the path-return is deferred and
+  //      the BEST path (fewest hops, then strongest SNR) seen among all duplicate copies within the window
+  //      is returned. Purely LOCAL, no packet-format change → mixed-firmware safe; stock peers just receive
+  //      the same path-return type, maybe a window later and via a shorter path. Fields appended at the
+  //      STRUCT END for forward/backward-compatible persistence; old config files keep these defaults.
+  //      bofn_enable=1 (DEFAULT ON) is safe because the window only changes WHICH path is reported, never
+  //      whether/how often the payload is delivered. Reversible per CLI: set bofn.enable 0.
+  uint8_t  bofn_enable;     // 0 = off (= Stufe A first-wins); 1 = Best-of-N at destination (default)
+  uint16_t bofn_window_ms;  // collection window in ms (0 from old file => restore default)
 };
 
 class CommonCLICallbacks {

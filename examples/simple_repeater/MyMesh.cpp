@@ -1161,6 +1161,12 @@ MyMesh::MyMesh(mesh::MainBoard &board, mesh::Radio &radio, mesh::MillisecondCloc
   _prefs.supp_k_cover = 2;       // G2: need >=2 distinct qualified cover senders
   _prefs.supp_snr_floor = -6;    // G4: cover senders must have EWMA-SNR >= -6 dB
   _prefs.supp_prob = 80;         // G5: suppress with 80% probability (a fraction always still sends)
+  // MHR Best-of-N at destination: DEFAULT ON. Safe because the collection window only changes WHICH
+  //   reciprocal path is returned (fewest hops, then best SNR), never whether/how often the payload is
+  //   delivered (that stays exactly-once on the first copy). With one heard copy it is identical to
+  //   first-wins. Reversible per CLI: set bofn.enable 0.
+  _prefs.bofn_enable = 1;        // ON by default
+  _prefs.bofn_window_ms = 1500;  // collection window (~1-2x typical multi-hop flood spread); set bofn.window <ms>
   StrHelper::strncpy(_prefs.node_name, ADVERT_NAME, sizeof(_prefs.node_name));
   _prefs.node_lat = ADVERT_LAT;
   _prefs.node_lon = ADVERT_LON;
@@ -1213,6 +1219,8 @@ void MyMesh::begin(FILESYSTEM *fs) {
   _fs = fs;
   // load persisted prefs
   _cli.loadPrefs(_fs);
+  // MHR: wire Best-of-N path discovery from prefs into the Mesh base machinery.
+  setBestOfN(_prefs.bofn_enable != 0, _prefs.bofn_window_ms);
   acl.load(_fs, self_id);
   // TODO: key_store.begin();
   region_map.load(_fs);
@@ -1552,6 +1560,9 @@ void MyMesh::loop() {
 #endif
 
   mesh::Mesh::loop();
+
+  // MHR: keep Best-of-N config in sync with prefs (so CLI `set bofn.*` applies without a reboot).
+  setBestOfN(_prefs.bofn_enable != 0, _prefs.bofn_window_ms);
 
   if (next_flood_advert && millisHasNowPassed(next_flood_advert)) {
     mesh::Packet *pkt = createSelfAdvert();

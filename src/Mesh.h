@@ -33,6 +33,49 @@ class Mesh : public Dispatcher {
   //void routeRecvAcks(Packet* packet, uint32_t delay_millis);
   DispatcherAction forwardMultipartDirect(Packet* pkt);
 
+  // MHR: Best-of-N path discovery AT THE DESTINATION. ----------------------------------------------
+  //   Upstream sends the reciprocal path-return for a flood path-discovery immediately, using the FIRST
+  //   copy heard ("first packet wins" — often a detour). Best-of-N instead opens a short collection window
+  //   per discovery: the PAYLOAD is still processed EXACTLY ONCE (on the first, !hasSeen copy — dedup is
+  //   untouched), but instead of sending the path-return right away we record a pending entry and keep the
+  //   best path seen. Duplicate copies (which hasSeen() would normally just drop) have their path inspected
+  //   ONLY (never re-decrypted, never re-delivered) and update the candidate when strictly better. When the
+  //   window expires, loop() emits ONE path-return with the best path. Fixed table, no dynamic allocation.
+  //   Purely local + no packet-format change => mixed-firmware safe. Disabled by default in this base class
+  //   (_bestofn_enable=0 => behaviour identical to upstream first-wins); a build opts in via setBestOfN().
+  #define MHR_BOFN_TABLE_SIZE  8   // pending discoveries tracked concurrently (LRU eviction)
+
+  struct BestOfNEntry {
+    bool      in_use;
+    uint8_t   pkt_hash[MAX_HASH_SIZE];          // links duplicate copies to this entry (path-independent)
+    uint8_t   dest_hash[PATH_HASH_SIZE];        // = src_hash of the discovery = dest of the path-return
+    uint8_t   secret[PUB_KEY_SIZE];             // shared-secret for createPathReturn()
+    // route ALONG which the path-return is sent (the peer's advertised route to itself, from the decrypted
+    //   payload). Identical for every copy of this discovery (same payload), so captured once on first copy.
+    uint8_t   send_route[MAX_PATH_SIZE];
+    uint8_t   send_route_enc;                   // its encoded path_len byte
+    // best accumulated FLOOD path heard so far (this becomes the reciprocal path in the return PAYLOAD).
+    //   Differs per copy → updated by duplicates when strictly better.
+    uint8_t   best_path[MAX_PATH_SIZE];         // raw bytes of the best flood path
+    uint8_t   best_path_enc;                    // encoded path_len (count in low 6 bits, hash-size in top 2)
+    uint8_t   best_hops;                        // getPathHashCount() of best_path (selection key #1, lower better)
+    int8_t    best_snr;                         // SNR*4 of best copy's last hop (tiebreak #2, higher better)
+    unsigned long deadline;                     // millis() at which to emit the path-return
+  };
+  BestOfNEntry _bofn[MHR_BOFN_TABLE_SIZE];
+  uint8_t   _bestofn_enable;       // 0 = upstream first-wins; 1 = Best-of-N at destination
+  uint16_t  _bestofn_window_ms;    // collection window length
+
+  // record the first (decrypted, !hasSeen) discovery copy as a pending entry instead of replying now.
+  //   send_route/send_route_len = the peer's route to send the return along (from decrypted payload).
+  // returns true if a pending entry was created (caller then must NOT send immediately).
+  bool bofnBeginPending(const uint8_t* src_hash, const uint8_t* secret, const Packet* pkt,
+                        const uint8_t* send_route, uint8_t send_route_len);
+  // inspect a DUPLICATE copy's path (no payload processing) and update the best candidate if strictly better.
+  void bofnObserveDuplicate(const Packet* pkt);
+  // emit path-returns for any pending entries whose window has expired (called from loop()).
+  void bofnFlushExpired();
+
 protected:
   DispatcherAction onRecvPacket(Packet* pkt) override;
 
@@ -168,6 +211,10 @@ protected:
   Mesh(Radio& radio, MillisecondClock& ms, RNG& rng, RTCClock& rtc, PacketManager& mgr, MeshTables& tables)
     : Dispatcher(radio, ms, mgr), _rng(&rng), _rtc(&rtc), _tables(&tables)
   {
+    // MHR: Best-of-N defaults OFF in the base class (= upstream first-wins). A build opts in via setBestOfN().
+    memset(_bofn, 0, sizeof(_bofn));
+    _bestofn_enable = 0;
+    _bestofn_window_ms = 1500;
   }
 
   MeshTables* getTables() const { return _tables; }
@@ -180,6 +227,15 @@ public:
 
   RNG* getRNG() const { return _rng; }
   RTCClock* getRTCClock() const { return _rtc; }
+
+  // MHR: configure Best-of-N path discovery (wire from NodePrefs in the build's loop()/begin()).
+  //   enable=false => exact upstream first-wins behaviour. window_ms is clamped to a sane range.
+  void setBestOfN(bool enable, uint16_t window_ms) {
+    _bestofn_enable = enable ? 1 : 0;
+    if (window_ms < 100) window_ms = 100;
+    if (window_ms > 8000) window_ms = 8000;
+    _bestofn_window_ms = window_ms;
+  }
 
   Packet* createAdvert(const LocalIdentity& id, const uint8_t* app_data=NULL, size_t app_data_len=0);
   Packet* createDatagram(uint8_t type, const Identity& dest, const uint8_t* secret, const uint8_t* data, size_t len);
