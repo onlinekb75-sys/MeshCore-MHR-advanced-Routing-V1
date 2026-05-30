@@ -1114,6 +1114,88 @@ void MyMesh::sendNodeDiscoverReq() {
   }
 }
 
+// ====================== MHR Phase 2: proactive region backbone (DV control-plane) ==================
+//  Every entry point below is gated on _prefs.bb_enable. With bb_enable=0 NONE of these run, so the
+//  send/receive path is bit-identical to today. The only on-air effect when enabled is the periodic /
+//  trigger-on-change ZERO-HOP PAYLOAD_TYPE_DV packet, which stock nodes ignore (no reflood).
+//
+//  SCOPE NOTE (deliberately deferred — Design "Realismus" clause):
+//   This cut implements the COMPLETE proactive control-plane: DV table, Babel-feasibility + seqno,
+//   feasible-successor backup, trigger-on-change (rate-limited), hold-down + route poisoning, and the
+//   origin-independent aggregate feasible-distance (Design §3a.1/.2/.3). The route-lookup API
+//   (Backbone::lookupRoute) is implemented and gated, ready for the data-path short-circuit.
+//   What is NOT yet wired here is the actual DATA-PLANE short-circuit (Backbone-Unicast -> Discovery
+//   short-circuit -> Flood). Reason: a repeater forwards OPAQUE encrypted datagrams keyed only by a
+//   hash prefix in the path — it has no destination IDENTITY at the forwarding point to look up, and
+//   it relays by appending its hash and re-flooding (Mesh::routeRecvPacket, shared by all builds). The
+//   "use the backbone if better, else flood" decision belongs at the ORIGINATING endpoint
+//   (companion/client build) and would require touching the dedup/path semantics — exactly the
+//   high-risk change the project roadmap defers (see CLAUDE.md, Best-of-N dedup caveat). Wiring it
+//   speculatively into the shared routeRecvPacket would risk the existing flood-and-cache path, which
+//   the hard requirements forbid. Until that endpoint integration lands, lookupRoute() is a pure,
+//   side-effect-free query: enabling bb_enable changes ONLY the DV control-plane, never data routing,
+//   so "never worse" holds trivially (data always uses today's flood-and-cache).
+
+// Our home region id (the cluster boundary for H1 aggregation). 0 = unknown/none (e.g. no regions set).
+uint16_t MyMesh::bbSelfRegionId() const {
+  const RegionEntry* r = const_cast<RegionMap&>(region_map).getHomeRegion();
+  if (r == NULL) r = const_cast<RegionMap&>(region_map).getDefaultRegion();
+  return (r == NULL) ? 0 : r->id;
+}
+
+// Build and zero-hop-send one DV update packet (periodic or triggered). No-op unless bb_enable=1.
+void MyMesh::bbSendUpdate(bool triggered) {
+  if (!_prefs.bb_enable) return;                       // gated: inert when off
+  if (_prefs.disable_fwd) return;                      // a non-forwarding node has no backbone role
+
+  uint8_t self_hash[BB_HASH_LEN];
+  self_id.copyHashTo(self_hash, BB_HASH_LEN);
+
+  // A repeater that knows more than its single home region acts as an Area Border Router (H1).
+  bool is_border = (region_map.getCount() > 1);
+
+  // MHR B1: seqno is now PER-DEST, not per-announce. originateSelf() advances the generation of OUR OWN
+  //   (self-owned) dests; learned routes keep their origin's seqno verbatim. There is therefore no longer
+  //   a single per-node announce counter here — the old static `self_seqno` was exactly the per-announcer
+  //   value that wrongly stamped every relayed entry and defeated the Babel feasibility gate.
+  uint32_t now_secs = getRTCClock()->getCurrentTime();
+  _backbone.originateSelf(self_hash, bbSelfRegionId(), is_border, now_secs);
+
+  uint8_t payload[MAX_PACKET_PAYLOAD];
+  int len = _backbone.buildDVPayload(payload, self_hash, is_border);
+  if (len <= 0) return;                                // nothing to advertise yet
+
+  mesh::Packet* pkt = createDVData(payload, len);
+  if (pkt) {
+    // zero-hop: only direct neighbours process it; never reflooded (mixed-firmware safe). Use a small
+    //   independent random delay to de-correlate simultaneous senders; deliberately NOT
+    //   getRetransmitDelay() (that path is flood-rebroadcast specific and would tangle with the Stufe-B
+    //   suppression bookkeeping for an outbound DV).
+    uint32_t delay = getRNG()->nextInt(0, 500);
+    sendZeroHop(pkt, delay);
+    _backbone.clearDirty();                            // triggered changes have now been propagated
+  }
+  (void)triggered;
+}
+
+void MyMesh::onDVDataRecv(mesh::Packet* packet) {
+  if (!_prefs.bb_enable) return;                       // gated: inert when off (default) — discard silently
+
+  uint8_t self_hash[BB_HASH_LEN];
+  self_id.copyHashTo(self_hash, BB_HASH_LEN);
+  uint32_t now_secs = getRTCClock()->getCurrentTime();
+  int rx_snr_x4 = (int)packet->_snr;                   // inbound SNR (x4) as link-quality sample
+
+  bool changed = _backbone.onDVReceived(packet, self_hash, rx_snr_x4, now_secs, _prefs.bb_holddown_s);
+
+  // §3a.1 trigger-on-change (rate-limited): a metric/next-hop change schedules an immediate announce,
+  //   but only if the per-node trigger limiter allows; otherwise the change stays "dirty" and rides the
+  //   next periodic announce or the next free trigger slot.
+  if (changed && bb_trigger_limiter.allow(now_secs)) {
+    bbSendUpdate(true);
+  }
+}
+
 MyMesh::MyMesh(mesh::MainBoard &board, mesh::Radio &radio, mesh::MillisecondClock &ms, mesh::RNG &rng,
                mesh::RTCClock &rtc, mesh::MeshTables &tables)
     : mesh::Mesh(radio, ms, rng, rtc, *new StaticPoolPacketManager(32), tables),
@@ -1121,7 +1203,10 @@ MyMesh::MyMesh(mesh::MainBoard &board, mesh::Radio &radio, mesh::MillisecondCloc
       _cli(board, rtc, sensors, region_map, acl, &_prefs, this),
       telemetry(MAX_PACKET_PAYLOAD - 4),
       discover_limiter(4, 120),  // max 4 every 2 minutes
-      anon_limiter(4, 180)   // max 4 every 3 minutes
+      anon_limiter(4, 180),   // max 4 every 3 minutes
+      // MHR Phase 2 §3a.1: rate-limit for trigger-on-change DV announces — max 2 triggered updates per
+      //   60 s per node (Sim: >= 2 ticks/60 s). Overflow stays "dirty" and fires in the next free slot.
+      bb_trigger_limiter(2, 60)
 #if defined(WITH_RS232_BRIDGE)
       , bridge(&_prefs, WITH_RS232_BRIDGE, _mgr, &rtc)
 #endif
@@ -1145,6 +1230,10 @@ MyMesh::MyMesh(mesh::MainBoard &board, mesh::Radio &radio, mesh::MillisecondCloc
   memset(supp_pending, 0, sizeof(supp_pending));
   memset(supp_twohop, 0, sizeof(supp_twohop));
 
+  // MHR Phase 2: backbone tables are cleared by Backbone's own ctor; timer not scheduled until begin()
+  //   AND only while bb_enable=1. With bb_enable=0 the backbone is never armed -> inert.
+  next_bb_announce = 0;
+
   // defaults
   memset(&_prefs, 0, sizeof(_prefs));
   _prefs.airtime_factor = 1.0;
@@ -1167,6 +1256,12 @@ MyMesh::MyMesh(mesh::MainBoard &board, mesh::Radio &radio, mesh::MillisecondCloc
   //   first-wins. Reversible per CLI: set bofn.enable 0.
   _prefs.bofn_enable = 1;        // ON by default
   _prefs.bofn_window_ms = 1500;  // collection window (~1-2x typical multi-hop flood spread); set bofn.window <ms>
+  // MHR Phase 2: proactive region backbone (DV control-plane). DEFAULT OFF (bb_enable=0) => fully inert:
+  //   no DV sent, no DV processed, routing path bit-identical to today. Enable per CLI only after bench
+  //   validation: set bb.enable 1. Period floored at 300 s (Design §3). See Phase2_Backbone_Design.md.
+  _prefs.bb_enable = 0;          // OFF by default — feature dormant
+  _prefs.bb_period_s = 600;      // periodic DV announce interval (Design default 600 s, min 300)
+  _prefs.bb_holddown_s = 1200;   // hold-down after a route loss/poison (~2 announce periods)
   StrHelper::strncpy(_prefs.node_name, ADVERT_NAME, sizeof(_prefs.node_name));
   _prefs.node_lat = ADVERT_LAT;
   _prefs.node_lon = ADVERT_LON;
@@ -1221,6 +1316,12 @@ void MyMesh::begin(FILESYSTEM *fs) {
   _cli.loadPrefs(_fs);
   // MHR: wire Best-of-N path discovery from prefs into the Mesh base machinery.
   setBestOfN(_prefs.bofn_enable != 0, _prefs.bofn_window_ms);
+  // MHR Phase 2: arm the periodic DV announce ONLY when the backbone is enabled. While bb_enable=0 the
+  //   timer stays 0 and is never serviced -> no DV is ever sent (fully inert). First announce is offset
+  //   by one period so it never races the boot advert.
+  if (_prefs.bb_enable) {
+    next_bb_announce = futureMillis((uint32_t)_prefs.bb_period_s * 1000UL);
+  }
   acl.load(_fs, self_id);
   // TODO: key_store.begin();
   region_map.load(_fs);
@@ -1563,6 +1664,34 @@ void MyMesh::loop() {
 
   // MHR: keep Best-of-N config in sync with prefs (so CLI `set bofn.*` applies without a reboot).
   setBestOfN(_prefs.bofn_enable != 0, _prefs.bofn_window_ms);
+
+  // MHR Phase 2: proactive backbone control-plane. ENTIRELY gated on bb_enable — when off, this whole
+  //   block is skipped and nothing about the send/receive path changes (bit-identical to today).
+  if (_prefs.bb_enable) {
+    // arm the timer the first time the feature is switched on at runtime (set bb.enable 1)
+    if (next_bb_announce == 0) {
+      next_bb_announce = futureMillis((uint32_t)_prefs.bb_period_s * 1000UL);
+    }
+    uint32_t now_secs = getRTCClock()->getCurrentTime();
+
+    // periodic announce (Design §3: period >= 300 s, enforced by the pref constrain)
+    if (millisHasNowPassed(next_bb_announce)) {
+      bbSendUpdate(false);
+      next_bb_announce = futureMillis((uint32_t)_prefs.bb_period_s * 1000UL);
+    }
+
+    // maintenance: expire stale neighbours, fail over to backups, poison + hold-down lost routes.
+    //   A route loss schedules a triggered (rate-limited) retraction announce (§3a.1/§3a.2).
+    if (_backbone.maintenance(now_secs, _prefs.bb_holddown_s)) {
+      if (bb_trigger_limiter.allow(now_secs)) bbSendUpdate(true);
+    }
+    // flush any still-dirty (rate-limit-deferred) triggered changes when a slot frees up (§3a.1)
+    else if (_backbone.hasDirty() && bb_trigger_limiter.allow(now_secs)) {
+      bbSendUpdate(true);
+    }
+  } else {
+    next_bb_announce = 0;   // feature off -> keep timer disarmed (re-arms cleanly if re-enabled)
+  }
 
   if (next_flood_advert && millisHasNowPassed(next_flood_advert)) {
     mesh::Packet *pkt = createSelfAdvert();

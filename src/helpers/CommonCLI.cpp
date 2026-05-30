@@ -97,7 +97,10 @@ void CommonCLI::loadPrefsInt(FILESYSTEM* fs, const char* filename) {
     file.read((uint8_t *)&_prefs->supp_prob, sizeof(_prefs->supp_prob));                          // 303 (MHR)
     file.read((uint8_t *)&_prefs->bofn_enable, sizeof(_prefs->bofn_enable));                      // 304 (MHR Best-of-N; old files leave default)
     file.read((uint8_t *)&_prefs->bofn_window_ms, sizeof(_prefs->bofn_window_ms));                // 305 (MHR)
-    // next: 307
+    file.read((uint8_t *)&_prefs->bb_enable, sizeof(_prefs->bb_enable));                          // 307 (MHR Phase 2 backbone; old files leave default 0 = off)
+    file.read((uint8_t *)&_prefs->bb_period_s, sizeof(_prefs->bb_period_s));                      // 308 (MHR Phase 2)
+    file.read((uint8_t *)&_prefs->bb_holddown_s, sizeof(_prefs->bb_holddown_s));                  // 310 (MHR Phase 2)
+    // next: 312
 
     // sanitise bad pref values
     _prefs->rx_delay_base = constrain(_prefs->rx_delay_base, 0, 20.0f);
@@ -128,6 +131,14 @@ void CommonCLI::loadPrefsInt(FILESYSTEM* fs, const char* filename) {
     _prefs->bofn_enable = constrain(_prefs->bofn_enable, 0, 1);
     if (_prefs->bofn_window_ms == 0) _prefs->bofn_window_ms = 1500; // 0 => restore default window
     _prefs->bofn_window_ms = constrain(_prefs->bofn_window_ms, 100, 8000);
+    // MHR Phase 2: sanitise backbone prefs. bb_enable is a genuine 0/1 toggle (DEFAULT 0 = off), so a
+    //   zeroed/old config stays safely OFF — fully inert. Period is floored at 300 s (Design §3: below
+    //   that the control traffic eats the benefit). Hold-down defaults to ~2 announce periods.
+    _prefs->bb_enable = constrain(_prefs->bb_enable, 0, 1);
+    if (_prefs->bb_period_s == 0) _prefs->bb_period_s = 600;        // 0 from old/zeroed file => restore default
+    _prefs->bb_period_s = constrain(_prefs->bb_period_s, 300, 3600);
+    if (_prefs->bb_holddown_s == 0) _prefs->bb_holddown_s = 1200;   // 0 => restore default (~2 periods)
+    _prefs->bb_holddown_s = constrain(_prefs->bb_holddown_s, 60, 7200);
 
     // sanitise bad bridge pref values
     _prefs->bridge_enabled = constrain(_prefs->bridge_enabled, 0, 1);
@@ -213,7 +224,10 @@ void CommonCLI::savePrefs(FILESYSTEM* fs) {
     file.write((uint8_t *)&_prefs->supp_prob, sizeof(_prefs->supp_prob));                          // 303 (MHR)
     file.write((uint8_t *)&_prefs->bofn_enable, sizeof(_prefs->bofn_enable));                      // 304 (MHR Best-of-N)
     file.write((uint8_t *)&_prefs->bofn_window_ms, sizeof(_prefs->bofn_window_ms));                // 305 (MHR)
-    // next: 307
+    file.write((uint8_t *)&_prefs->bb_enable, sizeof(_prefs->bb_enable));                          // 307 (MHR Phase 2 backbone)
+    file.write((uint8_t *)&_prefs->bb_period_s, sizeof(_prefs->bb_period_s));                      // 308 (MHR Phase 2)
+    file.write((uint8_t *)&_prefs->bb_holddown_s, sizeof(_prefs->bb_holddown_s));                  // 310 (MHR Phase 2)
+    // next: 312
 
     file.close();
   }
@@ -711,6 +725,33 @@ void CommonCLI::handleSetCmd(uint32_t sender_timestamp, char* command, char* rep
     } else {
       strcpy(reply, "Error, must be 100..8000 ms");
     }
+  } else if (memcmp(config, "bb.enable ", 10) == 0) {     // MHR Phase 2 backbone
+    int v = atoi(&config[10]);
+    if (v == 0 || v == 1) {
+      _prefs->bb_enable = (uint8_t)v;
+      savePrefs();
+      strcpy(reply, "OK");
+    } else {
+      strcpy(reply, "Error, must be 0 or 1");
+    }
+  } else if (memcmp(config, "bb.period ", 10) == 0) {     // MHR Phase 2 (DV announce period, seconds)
+    int v = atoi(&config[10]);
+    if (v >= 300 && v <= 3600) {
+      _prefs->bb_period_s = (uint16_t)v;
+      savePrefs();
+      strcpy(reply, "OK");
+    } else {
+      strcpy(reply, "Error, must be 300..3600 s");
+    }
+  } else if (memcmp(config, "bb.holddown ", 12) == 0) {   // MHR Phase 2 (hold-down after loss, seconds)
+    int v = atoi(&config[12]);
+    if (v >= 60 && v <= 7200) {
+      _prefs->bb_holddown_s = (uint16_t)v;
+      savePrefs();
+      strcpy(reply, "OK");
+    } else {
+      strcpy(reply, "Error, must be 60..7200 s");
+    }
   } else if (memcmp(config, "flood.max ", 10) == 0) {
     uint8_t m = atoi(&config[10]);
     if (m <= 64) {
@@ -910,6 +951,12 @@ void CommonCLI::handleGetCmd(uint32_t sender_timestamp, char* command, char* rep
     sprintf(reply, "> %d", (uint32_t)_prefs->bofn_window_ms);
   } else if (memcmp(config, "bofn.enable", 11) == 0) {   // MHR Best-of-N
     sprintf(reply, "> %d", (uint32_t)_prefs->bofn_enable);
+  } else if (memcmp(config, "bb.enable", 9) == 0) {      // MHR Phase 2 backbone
+    sprintf(reply, "> %d", (uint32_t)_prefs->bb_enable);
+  } else if (memcmp(config, "bb.period", 9) == 0) {      // MHR Phase 2
+    sprintf(reply, "> %d", (uint32_t)_prefs->bb_period_s);
+  } else if (memcmp(config, "bb.holddown", 11) == 0) {   // MHR Phase 2
+    sprintf(reply, "> %d", (uint32_t)_prefs->bb_holddown_s);
   } else if (memcmp(config, "txdelay", 7) == 0) {
     sprintf(reply, "> %s", StrHelper::ftoa(_prefs->tx_delay_factor));
   } else if (memcmp(config, "flood.max", 9) == 0) {

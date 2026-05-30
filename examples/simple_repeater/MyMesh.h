@@ -34,6 +34,7 @@
 #include <helpers/TxtDataHelpers.h>
 #include <helpers/RegionMap.h>
 #include "RateLimiter.h"
+#include "Backbone.h"   // MHR Phase 2: proactive region backbone (DV control-plane)
 
 #ifdef WITH_BRIDGE
 extern AbstractBridge* bridge;
@@ -148,6 +149,11 @@ class MyMesh : public mesh::Mesh, public CommonCLICallbacks {
   // MHR Stufe B: suppression state (fixed tables, zeroed in begin()/ctor; only used when supp_enable=1)
   SuppPending supp_pending[MHR_SUPP_PENDING];
   SuppTwoHop  supp_twohop[MHR_SUPP_TWOHOP];
+  // MHR Phase 2: proactive region backbone state (fixed tables in Backbone; ONLY used when bb_enable=1).
+  //   When bb_enable=0 none of this is ever touched (every entry point is gated) -> fully inert.
+  Backbone     _backbone;
+  RateLimiter  bb_trigger_limiter;     // §3a.1 rate-limit for trigger-on-change DV announces
+  unsigned long next_bb_announce;      // next periodic DV announce (millis); 0 = not scheduled
   CayenneLPP telemetry;
   unsigned long set_radio_at, revert_radio_at;
   float pending_freq;
@@ -171,6 +177,10 @@ class MyMesh : public mesh::Mesh, public CommonCLICallbacks {
   bool suppNodeKnowsNeighbour(const uint8_t* node_hash, const uint8_t* nb_hash, uint32_t now_secs) const; // G3 lookup (fresh)
   void suppTwoHopAdd(const uint8_t* node_hash, const uint8_t* nb_hash, uint32_t now_secs);
   void suppClearPending(SuppPending* p);                           // free a pending slot after a decision
+
+  // MHR Phase 2 helpers (all no-ops/unreached unless _prefs.bb_enable == 1)
+  void bbSendUpdate(bool triggered);                               // build + zero-hop send a DV packet
+  uint16_t bbSelfRegionId() const;                                 // our home region id (0 if none)
   uint8_t handleLoginReq(const mesh::Identity& sender, const uint8_t* secret, uint32_t sender_timestamp, const uint8_t* data, bool is_flood);
   uint8_t handleAnonRegionsReq(const mesh::Identity& sender, uint32_t sender_timestamp, const uint8_t* data);
   uint8_t handleAnonOwnerReq(const mesh::Identity& sender, uint32_t sender_timestamp, const uint8_t* data);
@@ -226,6 +236,7 @@ protected:
   void onPeerDataRecv(mesh::Packet* packet, uint8_t type, int sender_idx, const uint8_t* secret, uint8_t* data, size_t len) override;
   bool onPeerPathRecv(mesh::Packet* packet, int sender_idx, const uint8_t* secret, uint8_t* path, uint8_t path_len, uint8_t extra_type, uint8_t* extra, uint8_t extra_len) override;
   void onControlDataRecv(mesh::Packet* packet) override;
+  void onDVDataRecv(mesh::Packet* packet) override;   // MHR Phase 2: ignorable zero-hop DV update
 
   void sendFloodReply(mesh::Packet* packet, unsigned long delay_millis, uint8_t path_hash_size);
 

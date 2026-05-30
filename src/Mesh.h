@@ -187,6 +187,12 @@ protected:
   */
   virtual void onRawDataRecv(Packet* packet) { }
 
+  // MHR Phase 2: a zero-hop PAYLOAD_TYPE_DV (distance-vector) packet has been received from a direct
+  //   neighbour. Default is a NO-OP so non-backbone builds (companion/room/sensor) are completely
+  //   unaffected — for them this is indistinguishable from today's "unknown payload type -> discard".
+  //   Only the repeater build overrides it, and even there it does nothing unless bb_enable==1.
+  virtual void onDVDataRecv(Packet* packet) { }
+
   /**
    * \brief  Perform search of local DB of matching GroupChannels.
    * \param  channels  OUT - store matching channels in this array, up to max_matches
@@ -248,6 +254,9 @@ public:
   Packet* createRawData(const uint8_t* data, size_t len);
   Packet* createTrace(uint32_t tag, uint32_t auth_code, uint8_t flags = 0);
   Packet* createControlData(const uint8_t* data, size_t len);
+  // MHR Phase 2: build a PAYLOAD_TYPE_DV packet (sent zero-hop). Factory only; non-backbone builds
+  //   never call it, so it has zero effect on them.
+  Packet* createDVData(const uint8_t* data, size_t len);
 
   /**
    * \brief  send a locally-generated Packet with flood routing

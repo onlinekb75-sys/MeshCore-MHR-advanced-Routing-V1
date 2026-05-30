@@ -91,6 +91,15 @@ struct NodePrefs { // persisted to file
   //      whether/how often the payload is delivered. Reversible per CLI: set bofn.enable 0.
   uint8_t  bofn_enable;     // 0 = off (= Stufe A first-wins); 1 = Best-of-N at destination (default)
   uint16_t bofn_window_ms;  // collection window in ms (0 from old file => restore default)
+  // MHR Phase 2 — proactive region backbone (distance-vector control-plane). All fields appended at the
+  //   STRUCT END for forward/backward-compatible persistence (offsets 307+); old config files keep these
+  //   defaults. bb_enable=0 (DEFAULT) => the entire feature is dormant: NO DV is sent, NO DV is processed,
+  //   NO routing lookup changes, NO new table is active — the send/receive path is bit-identical to
+  //   today. The feature stays off until deliberately enabled per CLI (set bb.enable 1) after bench
+  //   validation. See docs/MHR/study/Phase2_Backbone_Design.md.
+  uint8_t  bb_enable;       // 0 = off (default, fully inert); 1 = backbone DV active
+  uint16_t bb_period_s;     // periodic DV announce interval in seconds (>=300, default 600)
+  uint16_t bb_holddown_s;   // hold-down time after a route loss/poison, in seconds (default ~2 periods)
 };
 
 class CommonCLICallbacks {

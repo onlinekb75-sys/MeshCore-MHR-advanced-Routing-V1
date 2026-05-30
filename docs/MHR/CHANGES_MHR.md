@@ -120,11 +120,33 @@ nur **+0,76 pp** Airtime über den statischen sicheren Satz (< 2 pp Schwelle) un
 strikt-safe → **nicht codiert** (Qualität/Stabilität vor letzter Optimierung). Der statische sichere
 Satz ist die Empfehlung.
 
+## Phase 2 — proaktiver Regions-Backbone (im Code, **default-AUS**, Bench-gegated)
+
+Konvergenz-Gate bestanden (`docs/MHR/study/Phase2_Convergence_Validation.md`: GO), danach codiert.
+
+### Patch 9 — DV-Control-Plane (Backbone)
+- Dateien: neu `examples/simple_repeater/Backbone.{h,cpp}`; `src/Packet.h` (`PAYLOAD_TYPE_DV=0x0C`);
+  `src/Mesh.{h,cpp}` (virtueller `onDVDataRecv` + zero-hop DV-Dispatch + `createDVData`);
+  `src/helpers/CommonCLI.{h,cpp}` (Prefs); `examples/simple_repeater/MyMesh.{h,cpp}` (Verdrahtung).
+- Verteiltes DV: per-Ziel-Seqno + **origin-unabhängige Babel-Feasibility** (Loop-Breaker),
+  Feasible-Successor-Backup, Hold-down + Route-Poisoning, Trigger-on-change (rate-limitiert),
+  periodische Zero-Hop-Annonce. ETX aus EWMA-SNR. Region aus `region_map`.
+- **Mixed-firmware-safe:** DV ist ein **ignorierbarer, zero-hop** Payload-Typ (0x0C) → Stock-Knoten
+  verwerfen ihn ohne Reflood. Kein bestehender Typ/Format berührt.
+- **default-AUS = bit-identisch inert** (`bb_enable=0`): kein DV-Versand/-Empfang, kein Timer, keine
+  Routenänderung. Prefs `bb_enable`(0), `bb_period_s`(600), `bb_holddown_s`(1200) @307/308/310,
+  CLI `set/get bb.enable|bb.period|bb.holddown`. ~1,25 KB fixe Tabellen.
+- Adversarial reviewt: Auslieferungszustand sicher; ein gefundener Loop-BLOCKER (Seqno pro-Annoncierer
+  statt pro-Ziel) + 2 WARNs **gefixt** (B1/W1/W2), Build grün auf repeater/room_server/companion.
+- **Zurückgestellt (bewusst):** das Daten-Plane-Short-Circuit (Backbone-Unicast statt Flood) ist NICHT
+  verdrahtet — es gehört an den Endpunkt und würde Dedup/Pfad-Semantik berühren (Hochrisiko). Aktiviert
+  man `bb_enable`, ändert sich daher NUR der Control-Plane; Daten laufen weiter über Flood-and-cache →
+  „nie schlechter" gilt. `lookupRoute()` ist bereit für diese spätere Integration.
+- ⚠️ `bb.enable 1` erst nach **Bench-Test** (`docs/MHR/BENCH_TEST_PLAN.md` §4).
+
 ## Bewusst NICHT geändert / noch offen
-- Kein neues Paketformat, keine Metrik im Paket. Der proaktive **Backbone (Phase 2)** ist als
-  konkretes Design + Validierungs-Gate vorhanden (`docs/MHR/study/Phase2_Backbone_Design.md`), aber
-  **design-first**: er wird erst codiert, nachdem die zeitaufgelöste Konvergenz/Schleifenfreiheit
-  simulativ bestätigt ist (Routing-Loops in einem Live-Mesh wären sonst das Risiko).
+- Kein neues Paketformat bei bestehenden Typen, keine Metrik im bestehenden Paket.
+- Phase-2 **Daten-Plane-Short-Circuit** (Endpunkt-Integration) — eigene, getestete Stufe (Dedup-Risiko).
 
 ## Validierung (Simulation)
 - `docs/MHR/sim/mhr_sim_v2.py` — Stress-Szenarien auf der realen 25-Knoten-Topologie:

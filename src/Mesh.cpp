@@ -75,6 +75,18 @@ DispatcherAction Mesh::onRecvPacket(Packet* pkt) {
     return ACTION_RELEASE;
   }
 
+  // MHR Phase 2: ignorable zero-hop Distance-Vector update (backbone control-plane). Handled EXACTLY
+  //   like the zero-hop CONTROL subset above: dispatch to a virtual hook on a direct zero-hop packet,
+  //   then RELEASE — never reflood (mixed-firmware safe, the key against control-airtime explosion).
+  //   onDVDataRecv() is a no-op in the base class, so non-backbone builds behave as before. The
+  //   repeater override itself does nothing unless bb_enable==1. Default-OFF stays fully inert.
+  if (pkt->isRouteDirect() && pkt->getPayloadType() == PAYLOAD_TYPE_DV) {
+    if (pkt->getPathHashCount() == 0) {
+      onDVDataRecv(pkt);
+    }
+    return ACTION_RELEASE;   // zero-hop only; do NOT flood-route DV packets
+  }
+
   if (pkt->isRouteDirect() && pkt->getPathHashCount() > 0) {
     // check for 'early received' ACK
     if (pkt->getPayloadType() == PAYLOAD_TYPE_ACK) {
@@ -729,6 +741,23 @@ Packet* Mesh::createControlData(const uint8_t* data, size_t len) {
     return NULL;
   }
   packet->header = (PAYLOAD_TYPE_CONTROL << PH_TYPE_SHIFT);  // ROUTE_TYPE_* set later
+
+  memcpy(packet->payload, data, len);
+  packet->payload_len = len;
+
+  return packet;
+}
+
+// MHR Phase 2: a distance-vector update packet (always sent zero-hop; ignorable by stock nodes).
+Packet* Mesh::createDVData(const uint8_t* data, size_t len) {
+  if (len > sizeof(Packet::payload)) return NULL;  // invalid arg
+
+  Packet* packet = obtainNewPacket();
+  if (packet == NULL) {
+    MESH_DEBUG_PRINTLN("%s Mesh::createDVData(): error, packet pool empty", getLogDateTime());
+    return NULL;
+  }
+  packet->header = (PAYLOAD_TYPE_DV << PH_TYPE_SHIFT);  // ROUTE_TYPE_* set later (zero-hop)
 
   memcpy(packet->payload, data, len);
   packet->payload_len = len;

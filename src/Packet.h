@@ -28,6 +28,12 @@ namespace mesh {
 #define PAYLOAD_TYPE_TRACE       0x09    // trace a path, collecting SNI for each hop
 #define PAYLOAD_TYPE_MULTIPART   0x0A    // packet is one of a set of packets
 #define PAYLOAD_TYPE_CONTROL     0x0B    // a control/discovery packet
+// MHR Phase 2 (proactive region backbone): an ignorable, zero-hop Distance-Vector update payload.
+//   0x0C was reserved/free. Old/stock nodes that hear a DV packet hit the `default:` case in
+//   Mesh::onRecvPacket() ("don't flood-route unknown payload types") and discard it harmlessly — no
+//   reflood, no behaviour change. Backbone-aware repeaters process it ONLY when bb_enable==1.
+//   See docs/MHR/study/Phase2_Backbone_Design.md (§2 wire format, mixed-firmware safe).
+#define PAYLOAD_TYPE_DV          0x0C    // MHR: distance-vector update (zero-hop, ignorable by stock nodes)
 //...
 #define PAYLOAD_TYPE_RAW_CUSTOM   0x0F    // custom packet as raw bytes, for applications with custom encryption, payloads, etc
 
