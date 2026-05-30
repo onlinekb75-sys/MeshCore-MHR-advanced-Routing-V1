@@ -1,60 +1,60 @@
-# MeshCore-NHR-advanced Routing V1
+# MeshCore-MHR-advanced Routing V1
 
 Ein **Fork von [meshcore-dev/MeshCore](https://github.com/meshcore-dev/MeshCore)** (MIT) V1.15 mit dem Ziel, die Pfadfindung robuster zu machen und die durch zufällige Flood-Umwege verursachte Airtime-Last zu senken.
 
-> ⚠️ **Experimentell & auf Hardware ungetestet.** Umgesetzt sind **Phase 0 + Phase 1** (konservativ, reversibel). Flashe **zuerst auf ein Ersatz-/Bench-Gerät**, nicht auf produktive Repeater. Das weitergehende proaktive Backbone-Redesign (Phase 2, „NHR v2") ist in `docs/NHR/` als **Design** beschrieben, aber **noch nicht** im Code.
+> ⚠️ **Experimentell & auf Hardware ungetestet.** Umgesetzt sind **Phase 0 + Phase 1** (konservativ, reversibel). Flashe **zuerst auf ein Ersatz-/Bench-Gerät**, nicht auf produktive Repeater. Das weitergehende proaktive Backbone-Redesign (Phase 2, „MHR v2") ist in `docs/MHR/` als **Design** beschrieben, aber **noch nicht** im Code.
 
 ---
 
 ## 🇩🇪 Kernvorteile
 
-### Was ist NHR-MeshCore?
+### Was ist MHR-MeshCore?
 Ein Fork von **[meshcore-dev/MeshCore](https://github.com/meshcore-dev/MeshCore)** (MIT), der die **Pfadfindung** im LoRa-Mesh robuster macht und die durch zufällige Flood-Umwege verursachte **Airtime-Last** senkt. MeshCore ist ein hybrides Mesh-Routing-Protokoll für LoRa-Funkgeräte (ESP32/nRF52, C++/PlatformIO).
 
 ### Das Problem
 MeshCore nutzt **kein** metrik-basiertes Routing. Die erste Nachricht an einen Kontakt wird geflutet, der dabei entstehende Pfad wird gecacht, und **alle weiteren Pakete laufen fest über genau diesen einen Pfad**. Entscheidend: Es gewinnt **nicht der kürzeste oder beste Pfad, sondern derjenige, dessen Flood-Kopie zufällig zuerst beim Ziel ankommt** („first packet wins"). Die signalqualitäts-gewichtete Ausbreitung ist per Default abgeschaltet. Folge: In der Analyse echter Netzdaten landeten **~60 % der Pfadaufbauten auf einem Umweg** — das frisst Airtime, den eigentlichen Engpass im geteilten Halbduplex-Funkkanal.
 
 ### Die Lösung
-NHR richtet die Flood-Ausbreitung an der **Linkqualität (SNR)** aus — an beiden Stufen:
+MHR richtet die Flood-Ausbreitung an der **Linkqualität (SNR)** aus — an beiden Stufen:
 - **RX-Seite:** Knoten mit starkem Empfang leiten zuerst weiter und unterdrücken redundante Umweg-Kopien (per Default aktiviert).
 - **TX-Seite:** Eine Kopie mit starkem SNR (meist ein kurzer, direkter Link) zieht ihre zufällige Sendeverzögerung aus einem zu null hin geschrumpften Fenster → sie sendet früher und „gewinnt" den Pfad.
 - **Pfad-Adoption:** Ein später eintreffender **längerer** Umweg überschreibt einen guten kurzen Pfad nicht mehr.
 - **EWMA-Link-Sensing:** geglättete Nachbar-SNR als stabile Linkqualitäts-Schätzung — Fundament für eine spätere ETX-Metrik.
 
 ### Warum es sicher ist
-Alle Eingriffe sind **lokal, additiv und reversibel** (zur Laufzeit per CLI ab-/zuschaltbar, ohne Reflash). **Kein Paketformat-Eingriff, keine Änderung der Duplikat-Erkennung** → NHR läuft im **gemischten Netz neben unveränderten Upstream-Knoten** und ist **nie schlechter als das Original** (bei abgeschalteten Parametern bit-identisch zu Upstream).
+Alle Eingriffe sind **lokal, additiv und reversibel** (zur Laufzeit per CLI ab-/zuschaltbar, ohne Reflash). **Kein Paketformat-Eingriff, keine Änderung der Duplikat-Erkennung** → MHR läuft im **gemischten Netz neben unveränderten Upstream-Knoten** und ist **nie schlechter als das Original** (bei abgeschalteten Parametern bit-identisch zu Upstream).
 
 ### Belege
-Simulation auf **echter 25-Knoten-Topologie**: **−82 % Airtime**, Umwege deutlich reduziert. Unter Störung bleibt der Gewinn stabil — Pfad-Flattern **78 % → 17 %**, Re-Discovery bei Linkausfall **≤ 1,6 % statt bis 49,5 %**, bei Netz-Partition **−98 % Airtime** statt Endlos-Flood. Build verifiziert; GitHub Actions baut die flashbare **Heltec-V4-Firmware (.bin)** automatisch. Details & Belege in `docs/NHR/`.
+Simulation auf **echter 25-Knoten-Topologie**: **−82 % Airtime**, Umwege deutlich reduziert. Unter Störung bleibt der Gewinn stabil — Pfad-Flattern **78 % → 17 %**, Re-Discovery bei Linkausfall **≤ 1,6 % statt bis 49,5 %**, bei Netz-Partition **−98 % Airtime** statt Endlos-Flood. Build verifiziert; GitHub Actions baut die flashbare **Heltec-V4-Firmware (.bin)** automatisch. Details & Belege in `docs/MHR/`.
 
 ---
 
 ## 🇬🇧 Core advantages
 
-### What is NHR-MeshCore?
+### What is MHR-MeshCore?
 A fork of **[meshcore-dev/MeshCore](https://github.com/meshcore-dev/MeshCore)** (MIT) that makes **path-finding** in the LoRa mesh more robust and cuts the **airtime** wasted on random flood detours. MeshCore is a hybrid mesh-routing protocol for LoRa radios (ESP32/nRF52, C++/PlatformIO).
 
 ### The problem
 MeshCore uses **no** metric-based routing. The first message to a contact is flooded, the resulting path is cached, and **every following packet is pinned to that one path**. Crucially, the winner is **not the shortest or best path, but whichever flood copy happens to reach the destination first** ("first packet wins"), while signal-quality-weighted propagation is off by default. From analysis of real network data: **~60 % of path setups end up on a detour** — burning airtime, the real bottleneck on a shared half-duplex radio channel.
 
 ### The solution
-NHR aligns flood propagation with **link quality (SNR)** at both stages:
+MHR aligns flood propagation with **link quality (SNR)** at both stages:
 - **RX side:** nodes with strong reception rebroadcast first, suppressing redundant detour copies (on by default).
 - **TX side:** a copy with strong SNR (usually a short, direct link) draws its random backoff from a window shrunk toward zero → it rebroadcasts earlier and "wins" the path.
 - **Path adoption:** a later-arriving **longer** detour no longer overwrites a good short path.
 - **EWMA link sensing:** smoothed neighbour SNR as a stable link-quality estimate — the foundation for a future ETX metric.
 
 ### Why it's safe
-All changes are **local, additive and reversible** (toggle at runtime via CLI, no reflash). **No packet-format change, no change to duplicate detection** → NHR runs in a **mixed network alongside unmodified upstream nodes** and is **never worse than the original** (with the parameters disabled it behaves bit-identically to upstream).
+All changes are **local, additive and reversible** (toggle at runtime via CLI, no reflash). **No packet-format change, no change to duplicate detection** → MHR runs in a **mixed network alongside unmodified upstream nodes** and is **never worse than the original** (with the parameters disabled it behaves bit-identically to upstream).
 
 ### Evidence
-Simulation on a **real 25-node topology**: **−82 % airtime**, detours markedly reduced. The gains hold under stress — path-flapping **78 % → 17 %**, link-failure re-discovery **≤ 1.6 % vs. up to 49.5 %**, network-partition airtime **−98 %** instead of endless flooding. Build verified; GitHub Actions builds the flashable **Heltec V4 firmware (.bin)** automatically. Details & evidence in `docs/NHR/`.
+Simulation on a **real 25-node topology**: **−82 % airtime**, detours markedly reduced. The gains hold under stress — path-flapping **78 % → 17 %**, link-failure re-discovery **≤ 1.6 % vs. up to 49.5 %**, network-partition airtime **−98 %** instead of endless flooding. Build verified; GitHub Actions builds the flashable **Heltec V4 firmware (.bin)** automatically. Details & evidence in `docs/MHR/`.
 
 ---
 
 ## Was wurde geändert
 
-Minimale, rückwärts­kompatible, reversible Eingriffe — alle als `// NHR:` im Code markiert, kein Paketformat-Eingriff, keine Dedup-Änderung (mixed-firmware-safe). Build verifiziert (`pio run -e heltec_v4_repeater` → SUCCESS). Details in `docs/NHR/CHANGES_NHR.md`.
+Minimale, rückwärts­kompatible, reversible Eingriffe — alle als `// MHR:` im Code markiert, kein Paketformat-Eingriff, keine Dedup-Änderung (mixed-firmware-safe). Build verifiziert (`pio run -e heltec_v4_repeater` → SUCCESS). Details in `docs/MHR/CHANGES_MHR.md`.
 
 **Phase 0**
 1. **SNR-gewichtete Flutung als Default an** (`examples/simple_repeater/MyMesh.cpp`): `rx_delay_base` von `0.0` auf `10.0`. Starke (kurze) Links senden zuerst und unterdrücken Umweg-Kopien. **Reversibel:** `set rxdelay 0`.
@@ -69,7 +69,7 @@ Adversarial reviewt (Persistenz-Kompatibilität, Integer-Arithmetik, EWMA, CLI) 
 ## Firmware bauen
 
 ### Variante A — automatisch via GitHub Actions (empfohlen)
-Nach dem Push in dein privates Repo baut `.github/workflows/build.yml` die Firmware selbst. Unter **Actions → Build NHR firmware → Artifacts** liegt anschließend `heltec_v4_repeater-firmware.bin` (+ `-factory.bin`) zum Download. Weitere Ziele im Workflow einfach einkommentieren.
+Nach dem Push in dein privates Repo baut `.github/workflows/build.yml` die Firmware selbst. Unter **Actions → Build MHR firmware → Artifacts** liegt anschließend `heltec_v4_repeater-firmware.bin` (+ `-factory.bin`) zum Download. Weitere Ziele im Workflow einfach einkommentieren.
 
 ### Variante B — lokal mit PlatformIO
 ```bash
@@ -97,9 +97,9 @@ pio run -e heltec_v4_repeater
 ## Eigenes privates GitHub-Repo
 
 ```bash
-cd NHR-MeshCore
+cd MHR-MeshCore
 # (Git ist bereits initialisiert und committet)
-git remote add origin git@github.com:<DEIN-USER>/NHR-MeshCore.git
+git remote add origin git@github.com:<DEIN-USER>/MHR-MeshCore.git
 git branch -M main
 git push -u origin main
 ```
@@ -108,8 +108,8 @@ Lege das Repo auf GitHub vorher als **Private** an. (Ich kann das nicht für dic
 ## Roadmap
 
 - **Phase 0**: konservativer Patch (RX-SNR-Flutung + prefer-shorter) ✅
-- **Phase 1** (teilweise ✅): TX-SNR-Flutung + EWMA-Link-Sensing umgesetzt; Stress-Sim validiert (`docs/NHR/sim/nhr_sim_v2.py`). Noch offen: echtes Best-of-N am Ziel + ETX-Kostenmetrik → `docs/NHR/MeshCore_Hybrid_Routing_Entwurf.md`
-- **Phase 2**: proaktiver Regions-Backbone, gehärtet → `docs/NHR/MeshCore_Hybrid_Routing_v2_Robustheit.md`
+- **Phase 1** (teilweise ✅): TX-SNR-Flutung + EWMA-Link-Sensing umgesetzt; Stress-Sim validiert (`docs/MHR/sim/mhr_sim_v2.py`). Noch offen: echtes Best-of-N am Ziel + ETX-Kostenmetrik → `docs/MHR/MeshCore_Hybrid_Routing_Entwurf.md`
+- **Phase 2**: proaktiver Regions-Backbone, gehärtet → `docs/MHR/MeshCore_Hybrid_Routing_v2_Robustheit.md`
 
 ## Lizenz & Attribution
 

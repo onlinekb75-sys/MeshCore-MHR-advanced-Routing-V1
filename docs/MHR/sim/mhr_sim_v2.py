@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-NHR v2 — ROBUSTHEITS-VALIDIERUNG (Stoerszenarien) auf realer CoreScope-Topologie.
+MHR v2 — ROBUSTHEITS-VALIDIERUNG (Stoerszenarien) auf realer CoreScope-Topologie.
 
-Aufbauend auf nhr_sim_real.py (25 echte Knoten, Raum Bonn/Rhein-Sieg/Siebengebirge/
+Aufbauend auf mhr_sim_real.py (25 echte Knoten, Raum Bonn/Rhein-Sieg/Siebengebirge/
 Lohmar/Leverkusen). Dieses Skript ergaenzt den dokumentierten Validierungsschritt aus
   ../MeshCore_Hybrid_Routing_v2_Robustheit.md  (Abschnitt 5)
 und vergleicht die Robustheit von:
@@ -12,7 +12,7 @@ und vergleicht die Robustheit von:
       netzweiter Flood + "first packet wins" (zuerst eintreffende Kopie gewinnt,
       reines Zufalls-Timing pro Hop). Bei Stoerung: stures Re-Flood.
 
-  NHR      = NHR v2:
+  MHR      = MHR v2:
       SNR-/ETX-gewichtete Ausbreitung => im Flood gewinnt die Kopie mit dem besten
       kumulierten Pfad-SNR / den wenigsten Hops (NICHT zufaellig). Pfad-Adoption nur
       bei spuerbarer Verbesserung (Hysterese, H4) => weniger Flattern. Bei Linkausfall
@@ -26,7 +26,7 @@ Drei Szenarien:
   2) LINKFAIL  — X% der Backbone-Links fallen aus (0/10/20/30%). Misst Anteil
                  nicht-erreichbarer Paare, Re-Discovery-Haeufigkeit, Airtime, Lieferquote.
   3) PARTITION — isolierte Knoten (analog Leverkusen). Misst, ob Baseline in
-                 Endlos-Flood laeuft (Airtime explodiert) vs. NHR sauberer Fallback.
+                 Endlos-Flood laeuft (Airtime explodiert) vs. MHR sauberer Fallback.
 
 numpy / networkx / matplotlib, reproduzierbar mit Seed 42.
 Ausgabe: sim_results_v2.json  +  fig_v2_churn.png / fig_v2_linkfail.png / fig_v2_partition.png
@@ -46,7 +46,7 @@ SEED = 42
 rng = np.random.default_rng(SEED)
 
 # ===========================================================================
-# 1) TOPOLOGIE — 25 echte CoreScope-Knoten (identisch zu nhr_sim_real.py),
+# 1) TOPOLOGIE — 25 echte CoreScope-Knoten (identisch zu mhr_sim_real.py),
 #    erweitert um ein realistisches advert_count-Profil (real: 7 … 455).
 #    Hoher advert_count  => Knoten meldet sich oft  => stabil/verfuegbar.
 #    Niedriger advert_count => seltener gehoert     => instabil/flackernd.
@@ -91,7 +91,7 @@ clis = [i for i in range(N) if role[i] == "C"]
 
 # ===========================================================================
 # 2) FUNK-/LINK-MODELL — Log-Distance-Pfadverlust -> SNR -> Zustellwahrsch.
-#    (identische Parameter wie nhr_sim_real.py: SNR0=17, PLE=2.55, THR=-12)
+#    (identische Parameter wie mhr_sim_real.py: SNR0=17, PLE=2.55, THR=-12)
 # ===========================================================================
 SNR0 = 17.0
 PLE = 2.55
@@ -131,7 +131,7 @@ for i in range(N):
 
 # ===========================================================================
 # 3) BACKBONE-GRAPH — nur Repeater (Companions leiten nicht weiter).
-#    Kantengewicht ETX = 1/(p_ij*p_ji); zusaetzlich SNR-Summe fuer NHR-Scoring.
+#    Kantengewicht ETX = 1/(p_ij*p_ji); zusaetzlich SNR-Summe fuer MHR-Scoring.
 # ===========================================================================
 def build_backbone(dead_nodes=frozenset(), dead_edges=frozenset()):
     """
@@ -148,7 +148,7 @@ def build_backbone(dead_nodes=frozenset(), dead_edges=frozenset()):
                 if frozenset({a, b}) in dead_edges:
                     continue
                 etx = 1.0 / (P[a, b] * P[b, a])
-                # mittlere SNR der Kante (fuer NHR-Scoring, "bestes kum. Pfad-SNR")
+                # mittlere SNR der Kante (fuer MHR-Scoring, "bestes kum. Pfad-SNR")
                 msnr = 0.5 * (SNR[a, b] + SNR[b, a])
                 G.add_edge(a, b, etx=etx, phop=1, snr=msnr)
     return G
@@ -178,7 +178,7 @@ def attach_rep(c, G):
 # 4) PFAD-HELFER
 # ===========================================================================
 def best_path(G, a, b, weight="etx"):
-    """ETX-optimaler Pfad (NHR-Ziel) oder None bei keiner Verbindung."""
+    """ETX-optimaler Pfad (MHR-Ziel) oder None bei keiner Verbindung."""
     if a is None or b is None or a not in G or b not in G:
         return None
     try:
@@ -204,7 +204,7 @@ def path_rel(p):
 
 def path_snr_score(G, p):
     """
-    NHR-Scoring im Flood: hoeher = besser. Belohnt wenige Hops + hohe Pfad-SNR.
+    MHR-Scoring im Flood: hoeher = besser. Belohnt wenige Hops + hohe Pfad-SNR.
     (mittlere Pfad-SNR minus Hop-Strafe). Dient als Auswahlkriterium statt Zufall.
     """
     if len(p) < 2:
@@ -217,11 +217,11 @@ def path_snr_score(G, p):
 
 
 # ===========================================================================
-# 5) FLOOD-SIMULATION (Monte-Carlo) — gemeinsamer Kern fuer Baseline & NHR.
+# 5) FLOOD-SIMULATION (Monte-Carlo) — gemeinsamer Kern fuer Baseline & MHR.
 #    Unterschied:
 #      Baseline: "first packet wins" — die zuerst (zeitlich) eintreffende Kopie
 #                gewinnt; Timing ist reiner Zufall (rx_delay_base=0).
-#      NHR:      "best packet wins" — innerhalb eines kurzen Sammelfensters wird
+#      MHR:      "best packet wins" — innerhalb eines kurzen Sammelfensters wird
 #                aus allen am Ziel eintreffenden Kopien die mit dem besten
 #                SNR-/Hop-Score gewaehlt (SNR-gewichtete Ausbreitung, Best-of-N).
 #    Gibt (gewaehlter_pfad|None, n_tx) zurueck. n_tx = Sende-Ereignisse (Airtime-Proxy).
@@ -229,14 +229,14 @@ def path_snr_score(G, p):
 FLOOD_MAX = 8          # Hop-Limit
 BASE_AIR = 0.10        # s Grund-Airtime pro Paket (Proxy)
 PER_HOP_AIR = 0.012    # s zusaetzliche Airtime pro angehaengtem Pfad-Hash
-COLLECT_WINDOW = 0.30  # s Sammelfenster am Ziel (NHR Best-of-N)
+COLLECT_WINDOW = 0.30  # s Sammelfenster am Ziel (MHR Best-of-N)
 
 
 def simulate_flood(G, r_src, r_dst, mode):
     """
     Ein Flood-Durchlauf ueber Graph G.
     mode = "baseline": first-wins (erste Kopie).
-    mode = "nhr":      best-wins innerhalb COLLECT_WINDOW (bester SNR/Hop-Score).
+    mode = "mhr":      best-wins innerhalb COLLECT_WINDOW (bester SNR/Hop-Score).
     """
     if r_src is None or r_dst is None or r_src not in G or r_dst not in G:
         return None, 0
@@ -253,7 +253,7 @@ def simulate_flood(G, r_src, r_dst, mode):
                 # first packet wins: erste Ankunft gewinnt, fertig.
                 return path, n_tx
             else:
-                # NHR: Kopien bis Fensterende sammeln, beste behalten.
+                # MHR: Kopien bis Fensterende sammeln, beste behalten.
                 if first_time is None:
                     first_time = t
                 if t <= first_time + COLLECT_WINDOW:
@@ -280,13 +280,13 @@ def simulate_flood(G, r_src, r_dst, mode):
 
 
 # ===========================================================================
-# 6) NHR-ZUSTELLUNG mit Backup-Successor (H3) — vermeidet Re-Flood bei Linkausfall.
+# 6) MHR-ZUSTELLUNG mit Backup-Successor (H3) — vermeidet Re-Flood bei Linkausfall.
 #    Liefert (pfad|None, tx, did_reflood):
 #      - Primaerpfad (ETX-optimal) ueber G_live.
 #      - Faellt nichts: Backup ueber kantendisjunkten Alternativpfad (vorab validiert),
 #        wieder OHNE Flood (Unicast). Erst wenn auch das scheitert: genau EIN Re-Flood.
 # ===========================================================================
-def nhr_deliver(G_full_bb, G_live, ra, rb):
+def mhr_deliver(G_full_bb, G_live, ra, rb):
     """
     G_full_bb = ungestoerter Backbone (fuer vorab berechneten Backup).
     G_live    = aktuell gestoerter Backbone.
@@ -304,7 +304,7 @@ def nhr_deliver(G_full_bb, G_live, ra, rb):
     if backup is not None:
         return backup, max(len(backup) - 1, 1), False
     # Letzter Ausweg: genau EIN reaktiver Flood (kein Endlos-Flood).
-    p, tx = simulate_flood(G_live, ra, rb, "nhr")
+    p, tx = simulate_flood(G_live, ra, rb, "mhr")
     return p, tx, True
 
 
@@ -346,7 +346,7 @@ def client_pairs(G):
 #   Knoten gehen gemaess advert_count zufaellig an/aus. Niedriger advert_count
 #   => hoehere Ausfallwahrscheinlichkeit pro Runde. Ueber ROUNDS Runden wird je
 #   Paar der gewaehlte Pfad verfolgt; ein Pfadwechsel ggue. Vorrunde = "Flattern".
-#   NHR uebernimmt einen neuen Pfad nur bei spuerbarer Verbesserung (Hysterese),
+#   MHR uebernimmt einen neuen Pfad nur bei spuerbarer Verbesserung (Hysterese),
 #   Baseline uebernimmt jede neue first-wins-Kopie => flattert staerker.
 # ===========================================================================
 def churn_prob(adv):
@@ -357,18 +357,18 @@ def churn_prob(adv):
 
 
 CHURN_FAIL = {i: churn_prob(advert[i]) for i in range(N)}
-HYST = 0.15   # NHR uebernimmt neuen Pfad nur bei >=15% besserer (kleinerer) ETX (H4)
+HYST = 0.15   # MHR uebernimmt neuen Pfad nur bei >=15% besserer (kleinerer) ETX (H4)
 
 
 def run_churn(rounds=200):
-    """Gibt Kennzahlen-Dict (baseline + nhr) zurueck."""
+    """Gibt Kennzahlen-Dict (baseline + mhr) zurueck."""
     base_pairs = client_pairs(G_full)
     # letzter gewaehlter Pfad je Paar (als Tupel) fuer Flatter-Messung
     last_base = {}
-    last_nhr = {}
+    last_mhr = {}
     stats = {
         "baseline": dict(switch=0, samples=0, delivered=0, attempts=0, hops=[]),
-        "nhr": dict(switch=0, samples=0, delivered=0, attempts=0, hops=[]),
+        "mhr": dict(switch=0, samples=0, delivered=0, attempts=0, hops=[]),
     }
     for _ in range(rounds):
         # Knoten dieser Runde an/aus
@@ -393,16 +393,16 @@ def run_churn(rounds=200):
                         stats["baseline"]["switch"] += 1
                 last_base[key] = cur
 
-            # ---- NHR: ETX-optimal + Hysterese (Pfadwechsel nur bei deutl. besser) ----
-            stats["nhr"]["attempts"] += 1
+            # ---- MHR: ETX-optimal + Hysterese (Pfadwechsel nur bei deutl. besser) ----
+            stats["mhr"]["attempts"] += 1
             mp = best_path(G_live, ra, rb)
             if mp is not None and ra is not None and rb is not None and ra != rb:
-                stats["nhr"]["delivered"] += 1
+                stats["mhr"]["delivered"] += 1
                 new_etx = path_etx(G_live, mp)
                 cur = tuple(mp)
-                if key in last_nhr:
-                    stats["nhr"]["samples"] += 1
-                    old_path, old_etx = last_nhr[key]
+                if key in last_mhr:
+                    stats["mhr"]["samples"] += 1
+                    old_path, old_etx = last_mhr[key]
                     # alter Pfad noch tragfaehig?
                     old_alive = all(
                         (G_live.has_edge(old_path[k], old_path[k + 1]))
@@ -413,9 +413,9 @@ def run_churn(rounds=200):
                         cur = old_path
                         new_etx = old_etx
                     elif cur != old_path:
-                        stats["nhr"]["switch"] += 1
-                last_nhr[key] = (cur, new_etx)
-                stats["nhr"]["hops"].append(len(cur) - 1)
+                        stats["mhr"]["switch"] += 1
+                last_mhr[key] = (cur, new_etx)
+                stats["mhr"]["hops"].append(len(cur) - 1)
 
     def finalize(s):
         return dict(
@@ -428,7 +428,7 @@ def run_churn(rounds=200):
     return dict(
         rounds=rounds,
         baseline=finalize(stats["baseline"]),
-        nhr=finalize(stats["nhr"]),
+        mhr=finalize(stats["mhr"]),
     )
 
 
@@ -436,14 +436,14 @@ def run_churn(rounds=200):
 # SZENARIO 2 — LINKAUSFALL
 #   X% der Backbone-Kanten fallen aus. Pro Stufe TRIALS Monte-Carlo-Ziehungen.
 #   Baseline: bei Ausfall des gecachten Pfads -> Re-Flood (zaehlt als Re-Discovery,
-#             volle Flood-Airtime). NHR: Backup-Successor (H3) ohne Flood; nur wenn
+#             volle Flood-Airtime). MHR: Backup-Successor (H3) ohne Flood; nur wenn
 #             auch der tot ist -> EIN Re-Flood.
 #   Misst: unreachable-Anteil, Re-Discovery-Rate, Airtime (tx), Lieferquote.
 # ===========================================================================
 def run_linkfail(levels=(0.0, 0.10, 0.20, 0.30), trials=40):
     all_edges = [frozenset({a, b}) for a, b in G_full.edges()]
-    out = {"levels": [], "baseline": {}, "nhr": {}}
-    for key in ("baseline", "nhr"):
+    out = {"levels": [], "baseline": {}, "mhr": {}}
+    for key in ("baseline", "mhr"):
         out[key] = dict(unreachable=[], rediscovery=[], airtime=[], delivery=[])
     base_pairs = client_pairs(G_full)
 
@@ -491,8 +491,8 @@ def run_linkfail(levels=(0.0, 0.10, 0.20, 0.30), trials=40):
                     else:
                         b_un += 1
 
-                # ---- NHR: Primaer -> Backup-Successor -> (notfalls) 1 Flood ----
-                mp, mtx, reflood = nhr_deliver(G_full, G_live, ra, rb)
+                # ---- MHR: Primaer -> Backup-Successor -> (notfalls) 1 Flood ----
+                mp, mtx, reflood = mhr_deliver(G_full, G_live, ra, rb)
                 m_tx += mtx
                 if reflood:
                     m_red += 1
@@ -514,10 +514,10 @@ def run_linkfail(levels=(0.0, 0.10, 0.20, 0.30), trials=40):
         out["baseline"]["rediscovery"].append(mean(b_redisc))
         out["baseline"]["airtime"].append(mean(b_air))
         out["baseline"]["delivery"].append(mean(b_deliv))
-        out["nhr"]["unreachable"].append(mean(m_unreach))
-        out["nhr"]["rediscovery"].append(mean(m_redisc))
-        out["nhr"]["airtime"].append(mean(m_air))
-        out["nhr"]["delivery"].append(mean(m_deliv))
+        out["mhr"]["unreachable"].append(mean(m_unreach))
+        out["mhr"]["rediscovery"].append(mean(m_redisc))
+        out["mhr"]["airtime"].append(mean(m_air))
+        out["mhr"]["delivery"].append(mean(m_deliv))
     return out
 
 
@@ -526,7 +526,7 @@ def run_linkfail(levels=(0.0, 0.10, 0.20, 0.30), trials=40):
 #   Wir isolieren funkisolierte Knoten (analog Leverkusen: LEV-JO31MA, advert=23).
 #   Ziel: ein Paar, dessen Endpunkt-Repeater in einer ANDEREN Komponente liegt,
 #   ist prinzipiell unerreichbar. Baseline merkt das nicht und flutet bei JEDEM
-#   Sendeversuch erneut netzweit (Airtime explodiert ueber die Versuche). NHR
+#   Sendeversuch erneut netzweit (Airtime explodiert ueber die Versuche). MHR
 #   flutet GENAU EINMAL, erkennt "nicht erreichbar" und gibt auf (Reactive-Fallback).
 #   Misst kumulierte Airtime ueber ATTEMPTS Sendeversuche.
 # ===========================================================================
@@ -571,10 +571,10 @@ def run_partition(attempts=50):
 
     # Simuliere ATTEMPTS Sendeversuche auf ein partitioniertes Paar.
     base_air = 0.0
-    nhr_air = 0.0
+    mhr_air = 0.0
     base_floods = 0
-    nhr_floods = 0
-    nhr_gave_up_after = None
+    mhr_floods = 0
+    mhr_gave_up_after = None
     if partitioned:
         ca, cb, ra, rb = partitioned[0]
         for att in range(attempts):
@@ -584,14 +584,14 @@ def run_partition(attempts=50):
             base_air += ntx
             base_floods += 1
 
-            # NHR: erster Versuch flutet einmal, erkennt Unerreichbarkeit, gibt dann auf.
+            # MHR: erster Versuch flutet einmal, erkennt Unerreichbarkeit, gibt dann auf.
             if att == 0:
-                _, mtx = simulate_flood(G_live, ra, rb, "nhr")
-                nhr_air += mtx
-                nhr_floods += 1
-                nhr_gave_up_after = 1   # ab jetzt: reactive-fallback, kein Flood mehr
+                _, mtx = simulate_flood(G_live, ra, rb, "mhr")
+                mhr_air += mtx
+                mhr_floods += 1
+                mhr_gave_up_after = 1   # ab jetzt: reactive-fallback, kein Flood mehr
             else:
-                # NHR: Ziel als unerreichbar markiert -> kein weiterer Flood (0 Airtime).
+                # MHR: Ziel als unerreichbar markiert -> kein weiterer Flood (0 Airtime).
                 pass
     return dict(
         isolated_node=iso_name,
@@ -601,10 +601,10 @@ def run_partition(attempts=50):
         attempts=attempts,
         baseline=dict(total_airtime=float(base_air), floods=base_floods,
                       airtime_per_attempt=float(base_air / attempts) if attempts else 0.0),
-        nhr=dict(total_airtime=float(nhr_air), floods=nhr_floods,
-                 gave_up_after_floods=nhr_gave_up_after,
-                 airtime_per_attempt=float(nhr_air / attempts) if attempts else 0.0),
-        airtime_reduction_pct=float((1 - nhr_air / base_air) * 100) if base_air > 0 else 0.0,
+        mhr=dict(total_airtime=float(mhr_air), floods=mhr_floods,
+                 gave_up_after_floods=mhr_gave_up_after,
+                 airtime_per_attempt=float(mhr_air / attempts) if attempts else 0.0),
+        airtime_reduction_pct=float((1 - mhr_air / base_air) * 100) if base_air > 0 else 0.0,
     )
 
 
@@ -612,7 +612,7 @@ def run_partition(attempts=50):
 # 7) AUSFUEHRUNG ALLER SZENARIEN + JSON
 # ===========================================================================
 def main():
-    print("=== NHR v2 Robustheits-Validierung (Seed %d) ===" % SEED)
+    print("=== MHR v2 Robustheits-Validierung (Seed %d) ===" % SEED)
 
     # Kurzer Topologie-Check
     comps_full = list(nx.connected_components(G_full))
@@ -666,15 +666,15 @@ def main():
 def make_plots(churn, linkfail, partition):
     plt.rcParams.update({"font.size": 10, "figure.dpi": 130})
     C_BASE = "#c0392b"
-    C_NHR = "#2e7d32"
+    C_MHR = "#2e7d32"
 
     # --- Churn: Flatter-Rate + Lieferquote ---
     try:
         fig, axes = plt.subplots(1, 2, figsize=(9.5, 4))
-        b, m = churn["baseline"], churn["nhr"]
+        b, m = churn["baseline"], churn["mhr"]
         ax = axes[0]
         vals = [b["flap_rate"] * 100, m["flap_rate"] * 100]
-        bars = ax.bar(["MeshCore\n(first-wins)", "NHR\n(Hysterese)"], vals, color=[C_BASE, C_NHR])
+        bars = ax.bar(["MeshCore\n(first-wins)", "MHR\n(Hysterese)"], vals, color=[C_BASE, C_MHR])
         for bb, vv in zip(bars, vals):
             ax.text(bb.get_x() + bb.get_width() / 2, vv + 0.3, f"{vv:.1f}%", ha="center")
         ax.set_ylabel("Pfadwechsel-Rate ('Flattern') [%]")
@@ -683,7 +683,7 @@ def make_plots(churn, linkfail, partition):
 
         ax = axes[1]
         vals = [b["delivery_ratio"] * 100, m["delivery_ratio"] * 100]
-        bars = ax.bar(["MeshCore", "NHR"], vals, color=[C_BASE, C_NHR])
+        bars = ax.bar(["MeshCore", "MHR"], vals, color=[C_BASE, C_MHR])
         for bb, vv in zip(bars, vals):
             ax.text(bb.get_x() + bb.get_width() / 2, vv + 0.5, f"{vv:.1f}%", ha="center")
         ax.set_ylabel("Lieferquote [%]")
@@ -700,19 +700,19 @@ def make_plots(churn, linkfail, partition):
         fig, axes = plt.subplots(1, 3, figsize=(13, 4))
         ax = axes[0]
         ax.plot(lv, [x * 100 for x in linkfail["baseline"]["unreachable"]], "-o", color=C_BASE, label="MeshCore")
-        ax.plot(lv, [x * 100 for x in linkfail["nhr"]["unreachable"]], "-s", color=C_NHR, label="NHR")
+        ax.plot(lv, [x * 100 for x in linkfail["mhr"]["unreachable"]], "-s", color=C_MHR, label="MHR")
         ax.set_xlabel("Link-Ausfallrate [%]"); ax.set_ylabel("nicht erreichbare Paare [%]")
         ax.set_title("Linkausfall: Erreichbarkeit"); ax.legend(); ax.grid(alpha=0.2)
 
         ax = axes[1]
         ax.plot(lv, linkfail["baseline"]["airtime"], "-o", color=C_BASE, label="MeshCore")
-        ax.plot(lv, linkfail["nhr"]["airtime"], "-s", color=C_NHR, label="NHR")
+        ax.plot(lv, linkfail["mhr"]["airtime"], "-s", color=C_MHR, label="MHR")
         ax.set_xlabel("Link-Ausfallrate [%]"); ax.set_ylabel("Ø Sende-Ereignisse / Paar (Airtime)")
         ax.set_title("Linkausfall: Airtime"); ax.legend(); ax.grid(alpha=0.2)
 
         ax = axes[2]
         ax.plot(lv, [x * 100 for x in linkfail["baseline"]["rediscovery"]], "-o", color=C_BASE, label="MeshCore (Re-Flood)")
-        ax.plot(lv, [x * 100 for x in linkfail["nhr"]["rediscovery"]], "-s", color=C_NHR, label="NHR (nach Backup)")
+        ax.plot(lv, [x * 100 for x in linkfail["mhr"]["rediscovery"]], "-s", color=C_MHR, label="MHR (nach Backup)")
         ax.set_xlabel("Link-Ausfallrate [%]"); ax.set_ylabel("Re-Discovery-Rate [%]")
         ax.set_title("Linkausfall: Re-Discovery"); ax.legend(); ax.grid(alpha=0.2)
         fig.tight_layout(); fig.savefig("fig_v2_linkfail.png"); plt.close(fig)
@@ -725,17 +725,17 @@ def make_plots(churn, linkfail, partition):
         att = partition["attempts"]
         # Baseline: linear wachsende Airtime (flutet jedes Mal)
         base_per = partition["baseline"]["airtime_per_attempt"]
-        nhr_total = partition["nhr"]["total_airtime"]
+        mhr_total = partition["mhr"]["total_airtime"]
         xs = list(range(1, att + 1))
         base_cum = [base_per * k for k in xs]
-        nhr_cum = [nhr_total] * att   # flach nach erstem Versuch
+        mhr_cum = [mhr_total] * att   # flach nach erstem Versuch
         ax.plot(xs, base_cum, "-", color=C_BASE, lw=2.2,
                 label=f"MeshCore: Endlos-Flood ({base_per:.1f} tx/Versuch)")
-        ax.plot(xs, nhr_cum, "-", color=C_NHR, lw=2.2,
-                label=f"NHR: 1 Flood, dann Fallback ({nhr_total:.0f} tx gesamt)")
+        ax.plot(xs, mhr_cum, "-", color=C_MHR, lw=2.2,
+                label=f"MHR: 1 Flood, dann Fallback ({mhr_total:.0f} tx gesamt)")
         ax.set_xlabel("Sendeversuch an partitioniertes Ziel")
         ax.set_ylabel("kumulierte Airtime (Sende-Ereignisse)")
-        ax.set_title("Partition (isoliert: %s)\nBaseline-Airtime explodiert, NHR gibt sauber auf (-%.0f%%)"
+        ax.set_title("Partition (isoliert: %s)\nBaseline-Airtime explodiert, MHR gibt sauber auf (-%.0f%%)"
                      % (partition["isolated_node"], partition["airtime_reduction_pct"]))
         ax.legend(loc="upper left"); ax.grid(alpha=0.2)
         fig.tight_layout(); fig.savefig("fig_v2_partition.png"); plt.close(fig)

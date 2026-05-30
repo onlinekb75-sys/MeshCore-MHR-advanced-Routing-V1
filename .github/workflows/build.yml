@@ -1,8 +1,8 @@
-name: Build NHR firmware
+name: Build MHR firmware
 
 on:
   push:
-    branches: [ main, nhr ]
+    branches: [ main, mhr ]
   workflow_dispatch:
 
 jobs:

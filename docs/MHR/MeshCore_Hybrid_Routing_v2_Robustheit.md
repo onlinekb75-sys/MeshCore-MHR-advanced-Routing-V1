@@ -1,6 +1,6 @@
-# NHR v2 – Härtung für Robustheit & Stabilität (aus Realdaten)
+# MHR v2 – Härtung für Robustheit & Stabilität (aus Realdaten)
 
-Überarbeitung des NHR-Entwurfs auf Basis der **echten CoreScope-Beobachtungen** (Live-Abruf Raum Bonn–Rhein-Sieg–Siebengebirge–Lohmar–Leverkusen). Die Realität weicht an mehreren Stellen von den Annahmen der v1 ab – v2 schließt genau diese Lücken.
+Überarbeitung des MHR-Entwurfs auf Basis der **echten CoreScope-Beobachtungen** (Live-Abruf Raum Bonn–Rhein-Sieg–Siebengebirge–Lohmar–Leverkusen). Die Realität weicht an mehreren Stellen von den Annahmen der v1 ab – v2 schließt genau diese Lücken.
 
 ---
 
@@ -16,7 +16,7 @@
 | Doubletten (Lohmar #17 ×2), „Pending", **2-Byte-Hashes**, multi-byte-Status gemischt | sauberes, homogenes Netz | **Mixed-Firmware-Koexistenz** + Müll-/Doublettenhärtung als Erstklasse-Anforderung |
 | Deployment nutzt **Regionen** (de-nw, rheinland, bonn, koeln, eifel, leverkusen) zum Scoping | Regionen ignoriert | Regionen als **fertige Cluster-Grenzen** wiederverwenden |
 
-Kernbefund der Sim (echte Topologie): **60 % der Pfadaufbauten** liefen auf Umwege, **−82 % Airtime** mit NHR – der Gewinn ist real groß, aber v1 wäre in diesem großen, lossy, heterogenen Netz **instabil** geworden (DV-Last, Flattern, Schleifen). v2 priorisiert daher Stabilität über letzte Optimalität.
+Kernbefund der Sim (echte Topologie): **60 % der Pfadaufbauten** liefen auf Umwege, **−82 % Airtime** mit MHR – der Gewinn ist real groß, aber v1 wäre in diesem großen, lossy, heterogenen Netz **instabil** geworden (DV-Last, Flattern, Schleifen). v2 priorisiert daher Stabilität über letzte Optimalität.
 
 ---
 
@@ -50,7 +50,7 @@ Best-of-N wählt nicht nur „beste Metrik", sondern verwirft Pfade unter einer 
 Real laufen verschiedene Firmware-Stände und Hash-Größen nebeneinander. v2 fordert:
 
 - DV-/Backbone-Pakete als **eigener, ignorierbarer Payload-Typ** → Alt-Knoten verwerfen sie wirkungslos.
-- Wo NHR-Knoten fehlen oder die Region keine Backbone-Route hat, **automatischer Rückfall auf das heutige Flood-and-cache**. NHR darf das bestehende Verhalten **nie** verschlechtern, nur ergänzen.
+- Wo MHR-Knoten fehlen oder die Region keine Backbone-Route hat, **automatischer Rückfall auf das heutige Flood-and-cache**. MHR darf das bestehende Verhalten **nie** verschlechtern, nur ergänzen.
 - Respektiere die vorhandene **Hash-Size-Migration** (1/2/3-Byte) und Loop-Detection.
 
 ### H7 – Müll-, Doubletten- & Missbrauchshärtung *(messy reality)*
@@ -94,7 +94,7 @@ Leitprinzip v2: **Stabilität vor letzter Optimalität.** Lieber ein leicht subo
 
 v2 zielt nicht auf bessere Bestwerte als v1, sondern auf **gehaltene Gewinne unter realen Störungen**: die ~82 % Airtime-Ersparnis und die Umweg-Reduktion sollen auch bei Knoten-Churn, Linkausfällen und gemischter Firmware *stabil* bleiben, statt in Flattern/Schleifen zu kippen.
 
-**Validierungsplan (nächster Schritt):** die bestehende Real-Daten-Sim (`sim/nhr_sim_real.py`) um Störszenarien erweitern und v1 vs. v2 vergleichen:
+**Validierungsplan (nächster Schritt):** die bestehende Real-Daten-Sim (`sim/mhr_sim_real.py`) um Störszenarien erweitern und v1 vs. v2 vergleichen:
 
 - **Churn:** Knoten gemäß ihrem realen advert_count-Profil zufällig an/abschalten → Routen-Wechselrate (Flattern) und Lieferquote messen.
 - **Linkausfall:** zufällige Links/Hochlast-Knoten ausfallen lassen → Re-Discovery-Häufigkeit (v1) vs. Backup-Umschaltung (v2).

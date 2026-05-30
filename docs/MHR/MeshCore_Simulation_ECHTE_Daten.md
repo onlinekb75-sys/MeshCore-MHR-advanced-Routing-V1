@@ -10,7 +10,7 @@ Reale Knoten u. a.: Oelberg IGFS (Siebengebirge), Bonn-Duisdorf FGZ, DTAG-Tower-
 
 ## Ergebnisse (19 cluster-übergreifende Client-Paare, 200 Monte-Carlo-Floods je Paar)
 
-| Kennzahl | MeshCore (heute) | NHR | 
+| Kennzahl | MeshCore (heute) | MHR | 
 |---|---|---|
 | Ø Backbone-Hops je Zustellung | **2,21** | 1,79 (Optimum) |
 | schlechtester Pfad | **8 Hops** | – |
@@ -18,14 +18,14 @@ Reale Knoten u. a.: Oelberg IGFS (Siebengebirge), Bonn-Duisdorf FGZ, DTAG-Tower-
 | **Umweg-Trefferquote** | **60,2 %** der Floods | – |
 | Paare, die je Umwege erleben | **100 %** | – |
 | Airtime je Discovery (Sende-Ereignisse) | **15,3** | 2,8 |
-| **Airtime-Ersparnis NHR** | – | **≈ 82 %** |
+| **Airtime-Ersparnis MHR** | – | **≈ 82 %** |
 | Ø Ende-zu-Ende-Zuverlässigkeit (1 Versuch) | 0,58 | **0,66** |
 
 **Das ist deutlich drastischer als im synthetischen Modell** — und realistischer. Im echten, über ~50 km gestreckten Netz mit vielen Alternativpfaden:
 
 - **Über die Hälfte (60 %) aller Pfadaufbauten landet auf einem Umweg.** „First packet wins" + Zufalls-Timing trifft hier viel häufiger daneben, weil es mehr konkurrierende Wege gibt.
 - Einzelne Pfade explodieren auf **bis zu 8 Hops**, wo optimal 2 reichen — exakt das Phänomen, das du beobachtest.
-- Der netzweite Flood kostet im Schnitt **15,3 Sende-Ereignisse** pro Erstkontakt; NHR braucht **2,8** (lokaler Flood bis zum nächsten Repeater + Backbone-Unicast) → **~82 % weniger Airtime**.
+- Der netzweite Flood kostet im Schnitt **15,3 Sende-Ereignisse** pro Erstkontakt; MHR braucht **2,8** (lokaler Flood bis zum nächsten Repeater + Backbone-Unicast) → **~82 % weniger Airtime**.
 - Die Zuverlässigkeit steigt von 0,58 auf 0,66 — und das ist nur *ein* Sendeversuch; mit den realen 3 Retries bestraft jeder Zusatz-Hop den Umweg-Pfad zusätzlich (deckt sich mit den Community-Berichten „~45 % unzuverlässig bei Pfadlänge ≥ 2").
 
 ---
@@ -48,7 +48,7 @@ Reale Knoten u. a.: Oelberg IGFS (Siebengebirge), Bonn-Duisdorf FGZ, DTAG-Tower-
 
 ![Airtime](sim/fig_real_airtime.png)
 
-**Konkretes Beispiel** — Ulli/p → Marcus-E: NHR nimmt MakiAlfter→Pending-Bonn→SU-SGB (2 Hops), MeshCore schwenkt über Ruengsdorf/Oberkassel nach Süden (3 Hops):
+**Konkretes Beispiel** — Ulli/p → Marcus-E: MHR nimmt MakiAlfter→Pending-Bonn→SU-SGB (2 Hops), MeshCore schwenkt über Ruengsdorf/Oberkassel nach Süden (3 Hops):
 
 ![Beispiel](sim/fig_real_example.png)
 
@@ -56,8 +56,8 @@ Reale Knoten u. a.: Oelberg IGFS (Siebengebirge), Bonn-Duisdorf FGZ, DTAG-Tower-
 
 ## Bewertung
 
-Mit echten Knotenpositionen bestätigt sich der NHR-Vorteil **stärker** als im idealisierten Modell: Je realer (gestreckter, redundanter) die Topologie, desto häufiger die zufälligen Umwege und desto größer der Airtime-Gewinn durch Backbone-Routing statt netzweitem Flood. Die Größenordnungen (60 % Umwege, ~82 % Airtime, +8 Pp Zuverlässigkeit) sind belastbar; die exakten Werte hängen vom Link-Modell ab.
+Mit echten Knotenpositionen bestätigt sich der MHR-Vorteil **stärker** als im idealisierten Modell: Je realer (gestreckter, redundanter) die Topologie, desto häufiger die zufälligen Umwege und desto größer der Airtime-Gewinn durch Backbone-Routing statt netzweitem Flood. Die Größenordnungen (60 % Umwege, ~82 % Airtime, +8 Pp Zuverlässigkeit) sind belastbar; die exakten Werte hängen vom Link-Modell ab.
 
 **Noch realer ginge es so:** CoreScope kennt aus den Paketpfaden die tatsächlich beobachteten Hop-Folgen und SNR-Werte. Diese ließen sich aus der Packets-/Tools-Ansicht extrahieren, um die modellierten Links durch **gemessene** zu ersetzen. Sag Bescheid, wenn ich das angehen soll.
 
-*Datenabruf: CoreScope `/api/nodes` (live, 2026-05-29). Skript: `sim/nhr_sim_real.py` (Seed 42, reproduzierbar). Vgl. `MeshCore_Simulation_25Knoten.md` (synthetische Variante), `MeshCore_Hybrid_Routing_Entwurf.md`.*
+*Datenabruf: CoreScope `/api/nodes` (live, 2026-05-29). Skript: `sim/mhr_sim_real.py` (Seed 42, reproduzierbar). Vgl. `MeshCore_Simulation_25Knoten.md` (synthetische Variante), `MeshCore_Hybrid_Routing_Entwurf.md`.*

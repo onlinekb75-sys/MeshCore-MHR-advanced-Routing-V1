@@ -85,7 +85,7 @@ void MyMesh::putNeighbour(const mesh::Identity &id, uint32_t timestamp, float sn
   neighbour->id = id;
   neighbour->advert_timestamp = timestamp;
   neighbour->heard_timestamp = getRTCClock()->getCurrentTime();
-  // NHR: EWMA-smooth the link SNR (alpha = 1/4) for a stable link-quality estimate (L0 link sensing),
+  // MHR: EWMA-smooth the link SNR (alpha = 1/4) for a stable link-quality estimate (L0 link sensing),
   //      rather than overwriting with the last raw sample. A fresh/evicted slot is seeded with the sample.
   int8_t sample = (int8_t)(snr * 4);
   neighbour->snr = existing ? (int8_t)(((int)neighbour->snr * 3 + sample) / 4) : sample;
@@ -544,7 +544,7 @@ int MyMesh::calcRxDelay(float score, uint32_t air_time) const {
 uint32_t MyMesh::getRetransmitDelay(const mesh::Packet *packet) {
   uint32_t t = (_radio->getEstAirtimeFor(packet->getPathByteLen() + packet->payload_len + 2) * _prefs.tx_delay_factor);
   uint32_t window = 5*t + 1;
-  // NHR: SNR-weighted rebroadcast. A reception with strong SNR (usually a short, direct link) draws its
+  // MHR: SNR-weighted rebroadcast. A reception with strong SNR (usually a short, direct link) draws its
   //      random backoff from a window shrunk toward 0, so it rebroadcasts earlier and its copy suppresses
   //      slower detour copies downstream via hasSeen() dedup. Randomness within the window is kept to avoid
   //      synchronised collisions among equally-strong neighbours, and the window never shrinks below t+1.
@@ -888,10 +888,10 @@ MyMesh::MyMesh(mesh::MainBoard &board, mesh::Radio &radio, mesh::MillisecondCloc
   // defaults
   memset(&_prefs, 0, sizeof(_prefs));
   _prefs.airtime_factor = 1.0;
-  _prefs.rx_delay_base = 10.0f;  // NHR: SNR-weighted flood rebroadcast ON by default (revert at runtime via CLI: set rxdelay 0)
+  _prefs.rx_delay_base = 10.0f;  // MHR: SNR-weighted flood rebroadcast ON by default (revert at runtime via CLI: set rxdelay 0)
   _prefs.tx_delay_factor = 0.5f; // was 0.25f
   _prefs.direct_tx_delay_factor = 0.3f; // was 0.2
-  _prefs.tx_snr_weight = 0.5f;   // NHR: bias strong-SNR receptions to rebroadcast earlier (revert at runtime: set txsnrweight 0)
+  _prefs.tx_snr_weight = 0.5f;   // MHR: bias strong-SNR receptions to rebroadcast earlier (revert at runtime: set txsnrweight 0)
   StrHelper::strncpy(_prefs.node_name, ADVERT_NAME, sizeof(_prefs.node_name));
   _prefs.node_lat = ADVERT_LAT;
   _prefs.node_lon = ADVERT_LON;

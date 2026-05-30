@@ -1,4 +1,4 @@
-# MeshCore Hybrid Routing (NHR) – ein fusionierter Routing-Entwurf für 10 % Duty-Cycle
+# MeshCore Hybrid Routing (MHR) – ein fusionierter Routing-Entwurf für 10 % Duty-Cycle
 
 Entwurf für einen MeshCore-Fork. Baut auf der Code-Analyse von `meshcore-dev/MeshCore` (`main`) auf und fusioniert mehrere Routing-Theorien zu einem Verfahren, das gezielt das 10 %-Duty-Cycle-Budget (Sub-Band 869.4–869.65 MHz) ausnutzt und die heutigen Umwege beseitigt.
 
@@ -13,7 +13,7 @@ Der entscheidende Hebel ist eine Eigenschaft, die MeshCore bisher **nicht** ausn
 
 Heute behandelt MeshCore beide gleich: jede Erstverbindung wird **netzweit geflutet**, und der zuerst eintreffende (zufällige) Pfad wird eingefroren. Genau das erzeugt Umwege *und* den größten Airtime-Verbrauch.
 
-**NHR-Kernidee:** Die 10 %-Headroom wird *bewusst investiert*, um auf dem **stabilen Repeater-Backbone** ein sparsames, **proaktives, metrik-basiertes** Routing laufen zu lassen. Sobald der Backbone seine eigene Topologie kennt, kollabiert die teure netzweite Flutung zu „flute nur bis zum nächsten Repeater – ab da routet der Backbone gezielt". Clients bleiben **reaktiv** und damit schlaf-/mobilfreundlich.
+**MHR-Kernidee:** Die 10 %-Headroom wird *bewusst investiert*, um auf dem **stabilen Repeater-Backbone** ein sparsames, **proaktives, metrik-basiertes** Routing laufen zu lassen. Sobald der Backbone seine eigene Topologie kennt, kollabiert die teure netzweite Flutung zu „flute nur bis zum nächsten Repeater – ab da routet der Backbone gezielt". Clients bleiben **reaktiv** und damit schlaf-/mobilfreundlich.
 
 Das ist – theoretisch sauber eingeordnet – ein **Zone Routing Protocol (ZRP)**, aber statt nach Radius wird nach **Knotenklasse** getrennt: proaktiv im Backbone, reaktiv an der Kante.
 
@@ -23,7 +23,7 @@ Wichtig: Der zusätzliche Kontroll-Traffic des Backbones ist **kleiner** als die
 
 ## 2. Welche Ansätze fusioniert werden
 
-| Theorie / Verfahren | Was übernommen wird | Wohin in NHR |
+| Theorie / Verfahren | Was übernommen wird | Wohin in MHR |
 |---|---|---|
 | **ZRP** (Zone Routing) | Hybrid proaktiv-innen / reaktiv-außen | Trennung Backbone ↔ Client |
 | **BATMAN / DSDV** (Distance-Vector) | Hop-für-Hop Vektoraustausch, kein Voll-Topologie-Bild | Backbone-Routing (L1) |
@@ -33,7 +33,7 @@ Wichtig: Der zusätzliche Kontroll-Traffic des Backbones ist **kleiner** als die
 | **Connected Dominating Set / Backbone** | Repeater als tragendes Gerüst | Klassendefinition |
 | **Geo-Routing (GPSR)** | Richtungs-Bias der Discovery | optionale Scoped-Discovery |
 
-NHR erfindet nichts Exotisches – es kombiniert bewährte Bausteine entlang der MeshCore-Realität.
+MHR erfindet nichts Exotisches – es kombiniert bewährte Bausteine entlang der MeshCore-Realität.
 
 ---
 
@@ -87,11 +87,11 @@ Das ersetzt das heutige „first packet wins" (`Mesh.cpp:138`) und „Pfad ungep
 
 ---
 
-## 5. Ablauf einer Nachricht – heute vs. NHR
+## 5. Ablauf einer Nachricht – heute vs. MHR
 
 **Heute:** A flutet B netzweit (bis zu 64 Hops). Dutzende Repeater rebroadcasten zufällig verzögert. B nimmt die *erste* Kopie → evtl. 4-Hop-Umweg statt 2-Hop-Direktweg. Dieser Umweg wird eingefroren, bis er 3× ausfällt.
 
-**Mit NHR:**
+**Mit MHR:**
 1. A flutet lokal (klein, SNR-gepruned) → erreicht Repeater R1.
 2. R1 kennt aus dem Backbone-DV den günstigsten Weg zu B's Home-Repeater R4: `R1→R2→R4` (Kostenminimum). Flutung endet bei R1.
 3. Discovery läuft als Backbone-Unicast `R1→R2→R4→B`.
@@ -108,7 +108,7 @@ Das Budget wird an **genau zwei** Stellen investiert:
 - **Backbone-DV-Zyklus:** ein kleiner Zero-Hop-Broadcast je Repeater alle 1–3 min. Last ist **lokal** und **konstant**, skaliert nicht mit Netzgröße, nur mit Nachbardichte.
 - **Best-of-N-Sammelfenster** am Ziel (ein paar Airtimes Wartezeit, einmalig je Pfadaufbau).
 
-Gespart wird der teuerste Posten von heute: **netzweite Discovery-Floods** (jeder Erstkontakt, jeder Pfad-Reset, jede Heilung). Bei einem Netz mit vielen Erstkontakten/Resets dominiert dieser Posten – sein Wegfall überkompensiert den DV-Overhead deutlich. Die 10 % sind dabei **Sicherheitsmarge**, nicht Dauerlast: NHR zielt darauf, die *durchschnittliche* Kanalauslastung zu senken und Lastspitzen (Flood-Stürme) zu glätten.
+Gespart wird der teuerste Posten von heute: **netzweite Discovery-Floods** (jeder Erstkontakt, jeder Pfad-Reset, jede Heilung). Bei einem Netz mit vielen Erstkontakten/Resets dominiert dieser Posten – sein Wegfall überkompensiert den DV-Overhead deutlich. Die 10 % sind dabei **Sicherheitsmarge**, nicht Dauerlast: MHR zielt darauf, die *durchschnittliche* Kanalauslastung zu senken und Lastspitzen (Flood-Stürme) zu glätten.
 
 Hinweis Aggregat-Kanal: Da L1 nur Zero-Hop sendet, belastet es **nicht** das gesamte geteilte Medium netzweit, sondern nur die jeweilige Funkzelle – das ist der Grund, warum dieser proaktive Anteil trotz geteiltem Halbduplex-Kanal skaliert.
 
@@ -116,7 +116,7 @@ Hinweis Aggregat-Kanal: Da L1 nur Zero-Hop sendet, belastet es **nicht** das ges
 
 ## 7. Konkrete Eingriffe im MeshCore-Code
 
-| NHR-Element | Code-Ankerpunkt | Änderung |
+| MHR-Element | Code-Ankerpunkt | Änderung |
 |---|---|---|
 | Link-Metrik (L0) | `putNeighbour()`, Neighbour-Struct | SNR-EWMA + Advert-Empfangsrate ergänzen |
 | Backbone-DV (L1) | neuer `PAYLOAD_TYPE_*` (Repeater-only) oder erweitertes Advert; neue Routing-Tabelle | Zero-Hop-Vektor senden/integrieren (Bellman-Ford, seqno) |
@@ -133,21 +133,21 @@ Hinweis Aggregat-Kanal: Da L1 nur Zero-Hop sendet, belastet es **nicht** das ges
 
 - **Phase 0 – reine Konfig (sofort, rückwärtskompatibel):** `rxdelay` aktivieren, `flood.max` senken, Loop-Detect an. Bringt bereits messbar weniger Umwege.
 - **Phase 1 – Metrik + Best-of-N:** Pfadauswahl am Ziel + Upgrade beim Sender. Lokale Änderung, interoperiert mit Stock-Firmware (schlechtere Knoten verhalten sich nur wie bisher).
-- **Phase 2 – Backbone-DV:** proaktives L1 zwischen NHR-Repeatern. Stock-Repeater nehmen nicht teil, brechen aber nichts (DV-Pakete sind für sie unbekannter Typ → ignoriert).
-- **Phase 3 – Discovery-Short-Circuit + Geo-Bias:** der eigentliche Airtime-Sprung; setzt kritische Masse an NHR-Repeatern voraus.
+- **Phase 2 – Backbone-DV:** proaktives L1 zwischen MHR-Repeatern. Stock-Repeater nehmen nicht teil, brechen aber nichts (DV-Pakete sind für sie unbekannter Typ → ignoriert).
+- **Phase 3 – Discovery-Short-Circuit + Geo-Bias:** der eigentliche Airtime-Sprung; setzt kritische Masse an MHR-Repeatern voraus.
 
-Interoperabilität ist Leitplanke: In einem gemischten Netz muss NHR **graceful degradieren** auf das heutige Flood-and-cache, sobald keine Backbone-Route verfügbar ist.
+Interoperabilität ist Leitplanke: In einem gemischten Netz muss MHR **graceful degradieren** auf das heutige Flood-and-cache, sobald keine Backbone-Route verfügbar ist.
 
 ---
 
 ## 9. Fehlermodi & Risiken (ehrlich)
 
 - **DV-Schleifen / Count-to-Infinity:** durch Sequenznummern + Split-Horizon/Poisoned-Reverse beherrschbar, aber sorgfältig zu implementieren.
-- **Konvergenzzeit:** nach Topologieänderung braucht der Backbone einige Zyklen; in der Lücke fällt NHR auf Flood zurück.
+- **Konvergenzzeit:** nach Topologieänderung braucht der Backbone einige Zyklen; in der Lücke fällt MHR auf Flood zurück.
 - **Asymmetrische Links:** beidseitige ETX-Messung nötig; reine SNR-Metrik wäre fehleranfällig.
 - **Client-State-Explosion:** Host-Routes für sehr viele Clients können Backbone-Tabellen sprengen → nur aktive/kürzlich gehörte Clients announcen, Rest über (billigen) Repeater-only-Flood.
 - **Backbone-Partition:** getrennte Repeater-Inseln müssen sauber auf reaktiv zurückfallen.
-- **Mixed-Firmware-Netz:** ohne kritische NHR-Masse bleibt der Gewinn klein.
+- **Mixed-Firmware-Netz:** ohne kritische MHR-Masse bleibt der Gewinn klein.
 - **Fehl-getunte Metrik:** ETX/SNR-Gewichte sind netzabhängig und müssen empirisch kalibriert werden.
 
 ---
@@ -162,6 +162,6 @@ Interoperabilität ist Leitplanke: In einem gemischten Netz muss NHR **graceful 
 
 ## 11. Fazit
 
-NHR ist kein Bruch mit MeshCore, sondern dessen konsequente Weiterentwicklung: das bestehende reaktive DSR bleibt das Fundament, bekommt aber eine **echte Metrik**, eine **Best-Path-Auswahl** und – ermöglicht durch die 10 %-Marge – einen **sparsamen proaktiven Backbone**, der die teuren netzweiten Floods überflüssig macht. Die Knotenklassen-Trennung (ZRP-Prinzip) ist der Trick, der proaktiv und reaktiv jeweils dort einsetzt, wo sie billig sind. Erwartetes Ergebnis: kürzere, deterministische Pfade und **trotz** zusätzlichem Kontroll-Traffic eine **niedrigere** Gesamt-Airtime.
+MHR ist kein Bruch mit MeshCore, sondern dessen konsequente Weiterentwicklung: das bestehende reaktive DSR bleibt das Fundament, bekommt aber eine **echte Metrik**, eine **Best-Path-Auswahl** und – ermöglicht durch die 10 %-Marge – einen **sparsamen proaktiven Backbone**, der die teuren netzweiten Floods überflüssig macht. Die Knotenklassen-Trennung (ZRP-Prinzip) ist der Trick, der proaktiv und reaktiv jeweils dort einsetzt, wo sie billig sind. Erwartetes Ergebnis: kürzere, deterministische Pfade und **trotz** zusätzlichem Kontroll-Traffic eine **niedrigere** Gesamt-Airtime.
 
 *Verwandtes Dokument: `MeshCore_Routing_Analyse_und_Optimierung.md` (Ursachenanalyse + Stufen A–D).*

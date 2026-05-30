@@ -61,7 +61,7 @@ struct NodePrefs { // persisted to file
   uint8_t rx_boosted_gain; // power settings
   uint8_t path_hash_mode;   // which path mode to use when sending
   uint8_t loop_detect;
-  // NHR: SNR weighting for flood-rebroadcast timing. 0.0 = upstream behaviour (pure random backoff);
+  // MHR: SNR weighting for flood-rebroadcast timing. 0.0 = upstream behaviour (pure random backoff);
   //      >0 biases strong-SNR receptions to rebroadcast earlier so quality links lead the flood.
   //      Appended at end of struct for forward-compatible persistence. Reversible: set txsnrweight 0.
   float tx_snr_weight;

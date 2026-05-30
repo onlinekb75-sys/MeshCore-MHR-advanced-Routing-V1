@@ -1,6 +1,6 @@
-# NHR – Änderungen gegenüber Upstream (Phase 0 + Phase 1)
+# MHR – Änderungen gegenüber Upstream (Phase 0 + Phase 1)
 
-Konservativ, reversibel, rückwärtskompatibel. Alle Stellen im Code mit `// NHR:` markiert.
+Konservativ, reversibel, rückwärtskompatibel. Alle Stellen im Code mit `// MHR:` markiert.
 Build verifiziert: `pio run -e heltec_v4_repeater` → SUCCESS (RAM 3,4 %, Flash 18,1 %).
 
 ## Phase 0
@@ -57,8 +57,8 @@ Lokale, additive Verbesserungen — weiterhin **kein** Paketformat-Eingriff, **k
   in eine eigene, gründlich getestete Stufe. Siehe Design-Dokumente (Phase 2).
 
 ## Validierung (Simulation)
-- `docs/NHR/sim/nhr_sim_v2.py` — Stress-Szenarien auf der realen 25-Knoten-Topologie:
+- `docs/MHR/sim/mhr_sim_v2.py` — Stress-Szenarien auf der realen 25-Knoten-Topologie:
   - **Churn**: Pfad-Flattern 78 % → 17 %, bessere Lieferquote, kürzere Pfade.
   - **Linkausfall (0–30 %)**: Re-Discovery ≤ 1,6 % statt bis 49,5 %, Airtime nahezu flach.
-  - **Partition**: −98 % Airtime (Baseline läuft in Endlos-Flood, NHR flutet einmal + Fallback).
+  - **Partition**: −98 % Airtime (Baseline läuft in Endlos-Flood, MHR flutet einmal + Fallback).
   - Ergebnisse in `sim/sim_results_v2.json`, Plots `fig_v2_*.png`. Reproduzierbar (Seed 42).
