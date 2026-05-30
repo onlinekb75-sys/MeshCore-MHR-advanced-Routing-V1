@@ -6,3 +6,6 @@ __pycache__/
 *.bin
 *.uf2
 platformio.local.ini
+
+# macOS
+.DS_Store
