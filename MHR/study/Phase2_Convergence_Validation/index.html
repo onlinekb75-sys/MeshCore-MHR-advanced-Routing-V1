@@ -10,11 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://meshcore-dev.github.io/meshcore/MHR/study/Suppression_Design/">
+        <link rel="canonical" href="https://meshcore-dev.github.io/meshcore/MHR/study/Phase2_Convergence_Validation/">
       
       
-        <link rel="prev" href="../SUPPRESSION_VALIDATION/">
+        <link rel="prev" href="../Phase2_Backbone_Design/">
       
+      
+        <link rel="next" href="../STUDY_DESIGN/">
       
       
         
@@ -25,7 +27,7 @@
     
     
       
-        <title>Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher) - MeshCore Docs</title>
+        <title>Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE) - MeshCore Docs</title>
       
     
     
@@ -68,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#design-redundanz-gesicherte-flood-suppression-stufe-b-sicher" class="md-skip">
+        <a href="#phase-2-zeitaufgeloeste-konvergenz-validierung-korrektheits-gate" class="md-skip">
           Skip to content
         </a>
       
@@ -103,7 +105,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+              Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
             
           </span>
         </div>
@@ -1201,10 +1203,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../Phase2_Convergence_Validation/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1220,6 +1249,103 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#gesamt-verdikt-go-darf-phase-2-codiert-werden" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GESAMT-VERDIKT: GO — darf Phase 2 codiert werden?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gate-1-schleifenfreiheit-babel-feasibility-gegenprobe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gate 1 — Schleifenfreiheit (Babel-Feasibility) + GEGENPROBE
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gate-2-konvergenzzeit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gate 2 — Konvergenzzeit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gate-3-kein-flattern-unter-churn-alt-vs-gehaertet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gate 3 — Kein Flattern unter Churn (ALT vs. GEHAERTET)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gate-4-mixed-firmware-sweep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gate 4 — Mixed-Firmware-Sweep
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gate-5-kontroll-budget-duty-cycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gate 5 — Kontroll-Budget (Duty-Cycle)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ehrliche-limitierungen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ehrliche Limitierungen
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1313,37 +1439,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../Suppression_Design/" class="md-nav__link">
         
   
   
@@ -1359,92 +1458,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#1-leitidee" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Leitidee
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#2-die-funf-schutzschichten-alle-mussen-erfullt-sein-sonst-senden" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Die fünf Schutzschichten (alle müssen erfüllt sein, sonst senden)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-passives-2-hop-lernen-das-fundament-m6" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Passives 2-Hop-Lernen (das Fundament, M6)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-warum-das-bei-jedem-adoptionsgrad-sicher-ist" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Warum das bei JEDEM Adoptionsgrad sicher ist
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-parameter-cli-tunbar-konservative-defaults" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Parameter (CLI-tunbar, konservative Defaults)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-validierungsplan-vor-dem-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6. Validierungsplan (VOR dem Code)
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1492,10 +1505,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-leitidee" class="md-nav__link">
+  <a href="#gesamt-verdikt-go-darf-phase-2-codiert-werden" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Leitidee
+        GESAMT-VERDIKT: GO — darf Phase 2 codiert werden?
       
     </span>
   </a>
@@ -1503,10 +1516,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-die-funf-schutzschichten-alle-mussen-erfullt-sein-sonst-senden" class="md-nav__link">
+  <a href="#gate-1-schleifenfreiheit-babel-feasibility-gegenprobe" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Die fünf Schutzschichten (alle müssen erfüllt sein, sonst senden)
+        Gate 1 — Schleifenfreiheit (Babel-Feasibility) + GEGENPROBE
       
     </span>
   </a>
@@ -1514,10 +1527,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-passives-2-hop-lernen-das-fundament-m6" class="md-nav__link">
+  <a href="#gate-2-konvergenzzeit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Passives 2-Hop-Lernen (das Fundament, M6)
+        Gate 2 — Konvergenzzeit
       
     </span>
   </a>
@@ -1525,10 +1538,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-warum-das-bei-jedem-adoptionsgrad-sicher-ist" class="md-nav__link">
+  <a href="#gate-3-kein-flattern-unter-churn-alt-vs-gehaertet" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Warum das bei JEDEM Adoptionsgrad sicher ist
+        Gate 3 — Kein Flattern unter Churn (ALT vs. GEHAERTET)
       
     </span>
   </a>
@@ -1536,10 +1549,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-parameter-cli-tunbar-konservative-defaults" class="md-nav__link">
+  <a href="#gate-4-mixed-firmware-sweep" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Parameter (CLI-tunbar, konservative Defaults)
+        Gate 4 — Mixed-Firmware-Sweep
       
     </span>
   </a>
@@ -1547,10 +1560,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-validierungsplan-vor-dem-code" class="md-nav__link">
+  <a href="#gate-5-kontroll-budget-duty-cycle" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. Validierungsplan (VOR dem Code)
+        Gate 5 — Kontroll-Budget (Duty-Cycle)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ehrliche-limitierungen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ehrliche Limitierungen
       
     </span>
   </a>
@@ -1574,7 +1598,7 @@
 
 
   
-    <a href="https://github.com/meshcore-dev/meshcore/edit/main/docs/MHR/study/Suppression_Design.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/meshcore-dev/meshcore/edit/main/docs/MHR/study/Phase2_Convergence_Validation.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1582,149 +1606,261 @@
   
 
 
-<h1 id="design-redundanz-gesicherte-flood-suppression-stufe-b-sicher">Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)</h1>
-<p><em>Ziel: Airtime senken durch Unterdrücken redundanter Flood-Rebroadcasts — aber so, dass die
-Lieferquote bei JEDEM Adoptionsgrad (1 Knoten → alle) ≥ Baseline bleibt, auch auf der sparsen
-echten Topologie. Rein lokal, passiv, mischbetriebs-sicher. „Erst Design, simulativ abgesichert,
-dann Code."</em></p>
-<p>Basis: v4-Befund (<code>MeshCore_Simulation_v4_NeighborGraph.md</code>) — naive Suppression (M3/M4) bricht
-die Lieferquote schon ab <strong>5–10 % Adoption</strong>, weil ein unterdrückter Rebroadcast der <em>einzige</em> Pfad
-zu einem Blattknoten sein kann (Ø-Grad real nur 3,45).</p>
+<h1 id="phase-2-zeitaufgeloeste-konvergenz-validierung-korrektheits-gate">Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)</h1>
+<p><em>Erzeugt von <code>phase2_convergence_sim.py</code>. Seeds [42, 43, 44, 45, 46]. DV-Tick 30s, Annoncen-Periode 300s, Hysterese 15%. Reale Topologie aus <code>neighbor_graph.json</code>.</em></p>
+<p><strong>Topologie:</strong> Riesenkomponente 632 Knoten, backbone-faehig 563, 28 Regionen (H1), 329 Border-Knoten. ETX aus avg_snr. LoRa SF11/BW250k, DATA-ToA 493.6 ms.</p>
 <hr />
-<h2 id="1-leitidee">1. Leitidee</h2>
-<blockquote>
-<p><strong>Ein Knoten schweigt nur, wenn er lokal BEWEISEN kann, dass die Abdeckung ohne ihn schon steht.</strong></p>
-</blockquote>
-<p>Im Zweifel wird gesendet (Default = sichere Aktion). Das macht den Mechanismus strukturell
-„nie schlechter": Unsicherheit ⇒ Rebroadcast wie Upstream.</p>
-<p>Der Schlüssel: <strong>passives Topologie-Lernen</strong> (M6, kostet 0 Airtime — die Pfad-Ketten fliegen
-ohnehin) liefert die 2-Hop-Nachbarschaft, mit der ein Knoten prüfen kann, ob seine Nachbarn auch
-von anderen erreicht werden.</p>
-<hr />
-<h2 id="2-die-funf-schutzschichten-alle-mussen-erfullt-sein-sonst-senden">2. Die fünf Schutzschichten (alle müssen erfüllt sein, sonst senden)</h2>
-<p>Ein Repeater R hat eine Flood-Kopie P empfangen und einen (hop-gewichteten, Stufe A) Backoff bis T.
-Während <code>[jetzt, T]</code> lauscht er und sammelt. Bei T, <em>bevor</em> er sendet:</p>
+<h2 id="gesamt-verdikt-go-darf-phase-2-codiert-werden">GESAMT-VERDIKT: <strong>GO</strong> — darf Phase 2 codiert werden?</h2>
+<p><strong>GO.</strong> Alle fuenf Gate-Punkte bestehen: null transiente Schleifen mit Feasibility (waehrend die Gegenprobe ohne Feasibility Loops zeigt), endliche Konvergenz kalt und nach Stoerung, vollstaendige Re-Konvergenz unter Churn <strong>mit der jetzt pflichtigen Churn-Haertung</strong> (Trigger-on-change + Hold-down/Route-Poisoning + origin-unabhaengige Aggregat-Feasibility — Gate 3 ging damit von FAIL auf PASS), Mixed-FW graceful und nie schlechter als Baseline, und das Kontroll-Budget passt locker ins 10%-Duty-Cycle-Sub-Band.</p>
 <table>
 <thead>
 <tr>
-<th>#</th>
-<th>Guard</th>
-<th>Bedingung zum SCHWEIGEN</th>
-<th>Schützt vor</th>
+<th>Gate</th>
+<th>Inhalt</th>
+<th>Ergebnis</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>G1</strong></td>
-<td><strong>Low-Degree-/Leaf-Schutz</strong></td>
-<td><code>R.degree ≥ MIN_DEGREE</code> (z.B. 4)</td>
-<td>Brücken/Blatt-Relais schweigen NIE</td>
+<td>1</td>
+<td>Schleifenfreiheit (Feasibility)</td>
+<td>PASS</td>
 </tr>
 <tr>
-<td><strong>G2</strong></td>
-<td><strong>Cover-Count</strong></td>
-<td>≥ <code>K_COVER</code> (z.B. 2) <em>verschiedene</em> andere Knoten haben P im Fenster bereits weitergesendet</td>
-<td>zu wenig Redundanz</td>
+<td>2</td>
+<td>Konvergenzzeit kalt/Stoerung</td>
+<td>PASS</td>
 </tr>
 <tr>
-<td><strong>G3</strong></td>
-<td><strong>Neighbour-Coverage</strong></td>
-<td><em>jeder</em> bekannte Nachbar von R ist auch Nachbar mindestens eines Cover-Senders (aus passivem 2-Hop-Tabelle)</td>
-<td>„ich bin jemandes einziger Relay"</td>
+<td>3</td>
+<td>Kein Flattern unter Churn</td>
+<td>PASS</td>
 </tr>
 <tr>
-<td><strong>G4</strong></td>
-<td><strong>Reliability-Floor</strong></td>
-<td>die Cover-Sender wurden mit EWMA-SNR ≥ <code>SNR_FLOOR</code> gehört (zuverlässige Redundanz, nicht nur vorhandene)</td>
-<td>Wackel-Redundanz</td>
+<td>4</td>
+<td>Mixed-FW graceful + nie schlechter</td>
+<td>PASS</td>
 </tr>
 <tr>
-<td><strong>G5</strong></td>
-<td><strong>Prob-Margin</strong></td>
-<td><code>rng() &lt; P_SUPPRESS</code> (z.B. 0,8)</td>
-<td>Rest-Redundanz als Sicherheitspuffer; bei voller Adoption sendet immer ein Bruchteil</td>
+<td>5</td>
+<td>Kontroll-Budget &lt; 10% Duty</td>
+<td>PASS</td>
 </tr>
 </tbody>
 </table>
-<p>Erfüllt R <strong>alle</strong> G1–G5 → <strong>Suppress</strong> (eigenen Rebroadcast auslassen). Sonst → <strong>Rebroadcast</strong>
-(exakt wie Upstream). </p>
-<p>Die zentrale, gegen das v4-Versagen gerichtete Schicht ist <strong>G3</strong>: sie verhindert genau das Kappen
-des einzigen Blatt-Pfads. G1 ist der billige, robuste Fallback, falls die 2-Hop-Tabelle (noch)
-unvollständig ist (frisch gebooteter Knoten lernt erst).</p>
 <hr />
-<h2 id="3-passives-2-hop-lernen-das-fundament-m6">3. Passives 2-Hop-Lernen (das Fundament, M6)</h2>
-<p>Kostet <strong>null</strong> Airtime. Aus jeder gehörten Flood-Pfad-Kette und jedem Advert:
-- <strong>1-Hop-Nachbarn</strong> von R = Knoten, die R direkt hört (letzter Pfad-Hop vor R; Advert-Absender in Reichweite). EWMA-SNR je Nachbar (existiert via Stufe-A-<code>putNeighbour</code> schon).
-- <strong>2-Hop-Wissen</strong> = für jeden gehörten Sender X dessen jüngste Nachbarn (aus X's Pfad-Ketten ableitbar). Fixe Tabelle, Verdrängung least-recently-heard. Dimensionierung ~1–2 KB (passt auf nRF52840/ESP32-S3).
-- Konvergenz: G3 ist erst „scharf", wenn die Tabelle als <em>frisch genug</em> gilt (Zeitstempel); sonst greift nur G1 (degree-basiert) → konservativ sicher.</p>
-<p>Reine Beobachtung vorhandener Felder ⇒ Alt-Knoten merken nichts, kein Paketformat-Eingriff.</p>
-<hr />
-<h2 id="4-warum-das-bei-jedem-adoptionsgrad-sicher-ist">4. Warum das bei JEDEM Adoptionsgrad sicher ist</h2>
+<h2 id="gate-1-schleifenfreiheit-babel-feasibility-gegenprobe">Gate 1 — Schleifenfreiheit (Babel-Feasibility) + GEGENPROBE</h2>
+<p>Geprueft wird die AKTUELLE Next-Hop-Kette ueber alle Ticks und Seeds, je Tick tausende (Quelle,Ziel)-Paare. Drei Groessen zaehlen:</p>
 <ul>
-<li><strong>α niedrig:</strong> Stock-Knoten fluten ohnehin voll → ein paar schweigende MHR-Knoten sind harmlos
-  (G1–G5 nur zusätzliche Vorsicht). </li>
-<li><strong>α hoch / 100 %:</strong> Kein Stock-Sicherheitsnetz mehr — jetzt tragen G2 (≥k Cover) + G3
-  (Blatt-Schutz) + G5 (immer ein Bruchteil sendet). G3 garantiert, dass kein Knoten den letzten
-  Pfad zu einem schlecht vernetzten Nachbarn kappt; G5 hält eine harte Restredundanz. Genau die
-  Schicht, die der naiven M3/M4 fehlte.</li>
-<li><strong>Invariante:</strong> Suppress nur bei <em>bewiesener</em> reichlicher, zuverlässiger, blatt-sicherer
-  Redundanz; sonst senden. ⇒ Lieferquote kann konstruktiv nicht unter Baseline fallen.</li>
+<li><strong>Kaltstart-Loops (Feasibility):</strong> <strong>0</strong> ueber alle Ticks der Kaltstart-Phase und alle Seeds. (Naiv zum Vergleich: 0.)</li>
+<li><strong>Persistente Loops nach Re-Konvergenz (Feasibility):</strong> <strong>0</strong> (im letzten Tick). Naiv: 1.</li>
+<li><strong>Loop-Vorkommnisse gesamt</strong> (inkl. transientes Stoerungs-Fenster): Feasibility <strong>0</strong> (max/Tick 0) vs. naiv <strong>55</strong> (max/Tick 2).</li>
+<li><strong>Die Gegenprobe traegt:</strong> ohne Feasibility entstehen deutlich mehr (und persistente, count-to-infinity-artige) Loops; mit Feasibility ist der Kaltstart komplett schleifenfrei und alle Loops nach einer Stoerung sind rein transient (loesen sich auf). Die Schleifenfreiheit kommt also aus dem Mechanismus (Babel-Bedingung), nicht aus der Topologie.</li>
+<li>Beleg: <code>fig_p2_loops.png</code>. Zusaetzlich belegt ein Mini-Topologie-Unittest (Linie D-X-A-B, X getoetet) den Mechanismus isoliert: naiv = 40/40 Loop-Ticks (A&lt;-&gt;B count-to-infinity), Feasibility = 0.</li>
+</ul>
+<h2 id="gate-2-konvergenzzeit">Gate 2 — Konvergenzzeit</h2>
+<p>Konvergenz = aufgeloeste Next-Hops der Stichprobe stabil ueber 2 Ticks UND null Loops.</p>
+<ul>
+<li><strong>Kaltstart:</strong> Mittel 29.4 Ticks = <strong>882 s</strong> (alle Seeds konvergiert: True).</li>
+<li><strong>Nach Stoerung</strong> (Ausfall eines Artikulationspunkts/Cut-Vertex): Mittel 2.0 Ticks = <strong>60 s</strong> (alle Seeds re-konvergiert: True).</li>
+<li>Beleg: <code>fig_p2_convergence.png</code>.</li>
+</ul>
+<h2 id="gate-3-kein-flattern-unter-churn-alt-vs-gehaertet">Gate 3 — Kein Flattern unter Churn (ALT vs. GEHAERTET)</h2>
+<p>Knoten gehen nach advert_count-Profil an/aus (selten gehoerte = instabiler) plus sporadischer Linkausfall. Unter DAUER-Churn sind transiente Loops/Wechsel unvermeidbar; entscheidend ist niedrige, nicht-aufschwingende Wechselrate und vollstaendige Rueck-Konvergenz nach Churn-Stopp (Loops=0 UND Wechsel=0).</p>
+<p><strong>Churn-Haertung (jetzt Pflicht, Design Abschnitt 3):</strong> (a) <strong>Trigger-on-change</strong> rate-limitiert (&gt;= 2 Ticks zwischen getriggerten Updates je Knoten) — sofortiges DV-Update bei Metrik-/Next-Hop-Aenderung statt nur periodisch; (b) <strong>Hold-down + Route-Poisoning</strong> bei Knoten-/Link-Ausfall (Poison = INF mit erhoehter Seqno, Hold-down 20 Ticks = keine schlechtere Alternative annehmen); (c) <strong>origin-unabhaengige Aggregat-Feasibility</strong> ueber den Ziel-Schluessel <code>("R",dreg)</code> (stellt die Babel-Invariante fuer die H1-Schicht wieder her). Hysterese &gt;=15 % bleibt aktiv.</p>
+<table>
+<thead>
+<tr>
+<th>Metrik (max/Mittel ueber Seeds)</th>
+<th>ALT (nur periodisch)</th>
+<th>GEHAERTET</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Re-Konvergenz nach Churn-Stopp (Loops=0 UND Wechsel=0)</td>
+<td><strong>NEIN</strong></td>
+<td>ja</td>
+</tr>
+<tr>
+<td>Restschleifen nach Churn-Stopp (Settle, max ueber Seeds)</td>
+<td><strong>4</strong></td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>Restschleifen je Seed (Settle)</td>
+<td>[4, 0]</td>
+<td>[0, 0, 0, 0, 0]</td>
+</tr>
+<tr>
+<td>Restwechsel nach Churn-Stopp (Settle, max)</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Routen-Wechselrate Tail (eingeschwungen)</td>
+<td>0.80%/Tick</td>
+<td>0.19%/Tick</td>
+</tr>
+<tr>
+<td>Wechselrate gesamt</td>
+<td>1.46%/Tick</td>
+<td>1.52%/Tick</td>
+</tr>
+<tr>
+<td>transiente Loops max (waehrend Churn)</td>
+<td>40</td>
+<td>14</td>
+</tr>
+<tr>
+<td>Tail &lt;= Gesamt (schwingt nicht auf)</td>
+<td>ja</td>
+<td>ja</td>
+</tr>
+<tr>
+<td><strong>Gate-3-Verdikt</strong></td>
+<td><strong>FAIL</strong></td>
+<td>PASS</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Beleg: <code>fig_p2_churn_stability.png</code> (Wechselrate ALT vs. GEHAERTET, Seed 42).</li>
+</ul>
+<p><strong>Ergebnis der Haertung:</strong> die GEHAERTETE Variante re-konvergiert nach Churn-Stopp vollstaendig (Restschleifen=0 UND Restwechsel=0 ueber ALLE Seeds) und senkt die eingeschwungene Wechselrate deutlich. Die persistenten Inter-Region-Aggregat-Loops der ALT-Variante (multi-Origin-ABR, gegenseitiges Zeigen zweier Border-Router auf je ein lebendes Aggregat) loesen sich auf: die origin-unabhaengige Aggregat-FD verhindert, dass eine nicht-feasible Aggregat-Route Successor wird, das Poisoning+Hold-down raeumt stale Aggregate auf, und Trigger-on-change verbreitet die Retraction sofort. Gate 3 geht damit von <strong>FAIL (ALT)</strong> auf <strong>PASS (GEHAERTET)</strong>.</p>
+<h2 id="gate-4-mixed-firmware-sweep">Gate 4 — Mixed-Firmware-Sweep</h2>
+<table>
+<thead>
+<tr>
+<th>Adoption</th>
+<th>Backbone-Knoten</th>
+<th>Liefer Base</th>
+<th>Liefer DV</th>
+<th>Delta (pp)</th>
+<th>Netto-Airtime</th>
+<th>Loops</th>
+<th>nie schlechter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1%</td>
+<td>6</td>
+<td>0.964</td>
+<td>0.964</td>
+<td>+0.0</td>
+<td>+0.0%</td>
+<td>0</td>
+<td>ja</td>
+</tr>
+<tr>
+<td>10%</td>
+<td>56</td>
+<td>0.964</td>
+<td>0.964</td>
+<td>+0.0</td>
+<td>+0.0%</td>
+<td>0</td>
+<td>ja</td>
+</tr>
+<tr>
+<td>25%</td>
+<td>141</td>
+<td>0.964</td>
+<td>0.964</td>
+<td>+0.0</td>
+<td>-0.8%</td>
+<td>0</td>
+<td>ja</td>
+</tr>
+<tr>
+<td>50%</td>
+<td>282</td>
+<td>0.964</td>
+<td>0.967</td>
+<td>+0.3</td>
+<td>-3.7%</td>
+<td>0</td>
+<td>ja</td>
+</tr>
+<tr>
+<td>75%</td>
+<td>422</td>
+<td>0.964</td>
+<td>0.972</td>
+<td>+0.8</td>
+<td>-20.8%</td>
+<td>0</td>
+<td>ja</td>
+</tr>
+<tr>
+<td>100%</td>
+<td>563</td>
+<td>0.964</td>
+<td>0.978</td>
+<td>+1.4</td>
+<td>-44.1%</td>
+<td>0</td>
+<td>ja</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>nie schlechter als Baseline ueber ALLE Stufen: <strong>True</strong>.</li>
+<li>schleifenfrei ueber ALLE Stufen: <strong>True</strong>.</li>
+<li>netto-positiv ab Adoption: <strong>0.5</strong>.</li>
+<li>Beleg: <code>fig_p2_mixedfw.png</code>.</li>
+</ul>
+<h2 id="gate-5-kontroll-budget-duty-cycle">Gate 5 — Kontroll-Budget (Duty-Cycle)</h2>
+<table>
+<thead>
+<tr>
+<th>DV-Periode</th>
+<th>max-Knoten-Busy</th>
+<th>% des 10%-Budgets</th>
+<th>max DV-Eintraege</th>
+<th>passt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>300s</td>
+<td>0.9076%</td>
+<td>9.08%</td>
+<td>82</td>
+<td>ja</td>
+</tr>
+<tr>
+<td>600s</td>
+<td>0.4567%</td>
+<td>4.57%</td>
+<td>82</td>
+<td>ja</td>
+</tr>
+<tr>
+<td>900s</td>
+<td>0.3064%</td>
+<td>3.06%</td>
+<td>82</td>
+<td>ja</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Vergleich flaches DV ohne H1 (600s):</strong> schlimmster Knoten 28.45% des Budgets, max DV-Eintraege 563 — zeigt, warum die Regions-Hierarchie noetig ist (Eintraege/Paket-Groesse skaliert sonst mit dem ganzen Netz).</li>
+<li>Beleg: <code>fig_p2_control_budget.png</code>.</li>
 </ul>
 <hr />
-<h2 id="5-parameter-cli-tunbar-konservative-defaults">5. Parameter (CLI-tunbar, konservative Defaults)</h2>
-<table>
-<thead>
-<tr>
-<th>Parameter</th>
-<th>Default</th>
-<th>Bedeutung</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>supp_enable</code></td>
-<td>0 (aus)</td>
-<td>Gesamtschalter (erst nach Sim-/Bench-Freigabe an)</td>
-</tr>
-<tr>
-<td><code>supp_min_degree</code> (G1)</td>
-<td>4</td>
-<td>unter diesem Grad nie schweigen</td>
-</tr>
-<tr>
-<td><code>supp_k_cover</code> (G2)</td>
-<td>2</td>
-<td>nötige verschiedene Cover-Sender</td>
-</tr>
-<tr>
-<td><code>supp_snr_floor</code> (G4)</td>
-<td>-6 dB</td>
-<td>Mindest-EWMA-SNR der Cover-Sender</td>
-</tr>
-<tr>
-<td><code>supp_prob</code> (G5)</td>
-<td>0.8</td>
-<td>Suppress-Wahrscheinlichkeit bei erfüllten Guards</td>
-</tr>
-</tbody>
-</table>
-<p>Default <code>supp_enable = 0</code> ⇒ exakt Upstream/Stufe-A-Verhalten, bis die Simulation den sicheren
-Parametersatz bestätigt und ein Bench-Test ihn validiert.</p>
-<hr />
-<h2 id="6-validierungsplan-vor-dem-code">6. Validierungsplan (VOR dem Code)</h2>
-<p>Auf dem echten <code>neighbor-graph</code> (v4-Harness):
-1. <strong>Safety-Sweep:</strong> Adoption 1 Knoten → 100 %. Nachweis: Lieferquote ≥ Baseline bei <strong>allen</strong> α
-   (im Gegensatz zu naivem M3/M4, das ab 5–10 % bricht) UND messbare Airtime-Senkung.
-2. <strong>Parameter-Sweep:</strong> <code>k_cover ∈ {2,3}</code>, <code>min_degree ∈ {3,4,5}</code>, <code>supp_prob ∈ {0.6,0.8,1.0}</code> —
-   sicheren Sweet-Spot finden (max. Airtime-Gewinn bei deliv ≥ Baseline über alle α).
-3. <strong>Ablation:</strong> zeige, dass G3 (Neighbour-Coverage) die <em>load-bearing</em> Schicht ist (ohne G3 bricht
-   es wie naiv; mit G3 hält es).
-4. <strong>Stress:</strong> Churn + Linkausfall — bleibt die Invariante?
-5. Erst wenn (1)–(4) bestehen → Code (lokal in <code>routeRecvPacket</code>/Outbound-Queue + passive
-   2-Hop-Tabelle), wieder adversarial reviewt und bench-getestet.</p>
-<p><strong>Erfolgskriterium:</strong> ein Parametersatz, der über den GESAMTEN Adoptions-Sweep die Safety-Invariante
-hält und trotzdem nennenswert Airtime spart. Findet die Simulation keinen → Mechanismus wird NICHT
-codiert (Qualität/Stabilität vor Airtime).</p>
+<h2 id="ehrliche-limitierungen">Ehrliche Limitierungen</h2>
+<ul>
+<li><strong>Idealisiertes Funkmodell:</strong> ToA exakt (Semtech), aber CSMA/Backoff, Kollisionen und reale Halbduplex-Contention nur grob (Flood-Jitter-Modell). Duty-Cycle-Budget ist eine Airtime-Bilanz, kein MAC-Scheduler.</li>
+<li><strong>Konvergenz-Gates 1+2 sind periodisch getrieben</strong> (Annoncen-Periode), Trigger-on-change dort konservativ NICHT modelliert — reale Kaltstart-/Stoerungs-Konvergenz waere mit Triggern schneller. Die gemessenen Zeiten sind also eine obere Schranke. Gate 3 (Churn) modelliert die GEHAERTETE Variante MIT Trigger-on-change (rate-limitiert) — der direkte ALT/GEHAERTET-Vergleich isoliert den Effekt der Haertung.</li>
+<li><strong>Regionen geografisch geclustert</strong> (k-means/Lloyd ueber lat/lon, Zielgroesse ~20 Repeater/Region; geo-lose Knoten via Nachbar-Mehrheit), als robuste Naeherung der <code>region_map</code>/IATA-Cluster. Border-Knoten = Knoten mit Nachbar in anderer Region. Eine andere Regionierung verschiebt die Aggregat-Loop-Haeufigkeit; der frueher offene multi-Origin-Aggregat-Defekt ist durch die origin-unabhaengige Aggregat-Feasibility (Abschnitt 3a) strukturell geschlossen, nicht topologie-abhaengig weggemittelt.</li>
+<li><strong>Reproduzierbarkeit:</strong> alle Knoten-Iterationen laufen ueber eine SORTIERTE Reihenfolge (nicht ueber set-Iteration) -&gt; identische Ergebnisse unabhaengig von <code>PYTHONHASHSEED</code>, je Seed exakt reproduzierbar (verifiziert ueber mehrere Hash-Seeds).</li>
+<li><strong>Delivery-Stochastik</strong> nutzt p_reliability aus avg_snr; Gelaende/Antennenhoehe nicht enthalten (gleiche Limitierung wie die bestehenden Sims).</li>
+<li><strong>Loop-Scan gesampelt</strong> bei grossen Knotenzahlen (bis 1000 (Quelle,Ziel)-Paare je Tick, 25 Quellen, transparent gedeckelt), nicht alle O(N^2) Paare je Tick. Bei null gefundenen Loops ueber zehntausende Stichproben pro Episode ist die Aussage robust, aber kein formaler Beweis — dieser kommt aus der Babel-Theorie und wird durch den isolierten count-to-infinity-Unittest (naiv loopt, Feasibility nicht) gestuetzt.</li>
+<li><strong>Seed-Budget:</strong> die GEHAERTETE Churn-Variante und die Feasibility-Konvergenz (die massgeblichen Gates) laufen auf ALLEN &gt;=5 Seeds. Die reinen NEGATIV-Baselines (naives DSDV in Gate 1, ALT-Churn in Gate 3) laufen aus Laufzeitgruenden auf 2 Seeds — sie dienen nur dem Mechanismus-/ALT-Kontrast, nicht dem Verdikt.</li>
+</ul>
 
 
 

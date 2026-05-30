@@ -1,0 +1,343 @@
+{
+  "meta": {
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "tick_s": 30,
+    "adv_period_s": 300,
+    "hysteresis_pct": 15,
+    "n_giant": 632,
+    "n_backbone_capable": 563,
+    "n_regions": 28,
+    "n_border": 329,
+    "data_toa_ms": 493.568,
+    "lora": "SF11/BW250k",
+    "etx_scale": 1000
+  },
+  "gate1_loops": {
+    "unit_test_count_to_infinity": {
+      "feasibility": 0,
+      "naive": 40
+    },
+    "feasibility_cold_loops": 0,
+    "naive_cold_loops": 0,
+    "feasibility_total_loops_all_seeds": 0,
+    "naive_total_loops_all_seeds": 55,
+    "feasibility_persistent_loops_final": 0,
+    "naive_persistent_loops_final": 1,
+    "feasibility_max_loops_any_tick": 0,
+    "naive_max_loops_any_tick": 2,
+    "naive_mean_loops_after_disturb_tail": 0.6875,
+    "n_seeds_feasibility": 5,
+    "n_seeds_naive_gegenprobe": 2,
+    "disturb_tick": 60,
+    "verdict": "PASS",
+    "gegenprobe_proves_mechanism": true
+  },
+  "gate2_convergence": {
+    "cold_converge_ticks": [
+      28,
+      28,
+      29,
+      30,
+      32
+    ],
+    "cold_converge_ticks_mean": 29.4,
+    "cold_converge_s_mean": 882.0,
+    "after_disturb_converge_ticks": [
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "after_disturb_converge_ticks_mean": 2.0,
+    "after_disturb_converge_s_mean": 60.0,
+    "all_seeds_converged_cold": true,
+    "all_seeds_converged_after": true,
+    "verdict": "PASS"
+  },
+  "gate3_churn": {
+    "hardening": "trigger_on_change + holddown/poisoning + origin-independent aggregate FD",
+    "trigger_min_gap_ticks": 2,
+    "holddown_ticks": 20,
+    "alt": {
+      "max_loops_under_churn_transient": 40,
+      "settle_loops_final": 4,
+      "settle_flaps_final": 0,
+      "re_settles_after_churn": false,
+      "mean_flap_rate_tail": 0.007987500000000002,
+      "mean_flap_rate_all": 0.014604166666666666,
+      "tail_le_overall": true,
+      "flatter_stable": true,
+      "settle_loops_per_seed": [
+        4,
+        0
+      ],
+      "settle_flaps_per_seed": [
+        0,
+        0
+      ],
+      "verdict": "FAIL"
+    },
+    "hardened": {
+      "max_loops_under_churn_transient": 14,
+      "settle_loops_final": 0,
+      "settle_flaps_final": 0,
+      "re_settles_after_churn": true,
+      "mean_flap_rate_tail": 0.0018800000000000002,
+      "mean_flap_rate_all": 0.015175,
+      "tail_le_overall": true,
+      "flatter_stable": true,
+      "settle_loops_per_seed": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "settle_flaps_per_seed": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "verdict": "PASS"
+    },
+    "max_loops_under_churn_transient": 14,
+    "settle_loops_final": 0,
+    "settle_flaps_final": 0,
+    "re_settles_after_churn": true,
+    "mean_flap_rate_tail": 0.0018800000000000002,
+    "mean_flap_rate_all": 0.015175,
+    "tail_le_overall": true,
+    "flap_rate_pct_seed42_alt": [
+      0.0,
+      1.6,
+      2.4,
+      11.200000000000001,
+      9.4,
+      2.9000000000000004,
+      1.6,
+      5.4,
+      0.4,
+      0.4,
+      0.3,
+      0.7000000000000001,
+      0.0,
+      0.6,
+      0.1,
+      2.0,
+      0.0,
+      2.6,
+      0.6,
+      0.3,
+      0.3,
+      0.3,
+      0.7000000000000001,
+      0.7000000000000001,
+      0.3,
+      0.1,
+      0.7000000000000001,
+      2.9000000000000004,
+      0.0,
+      0.1,
+      0.3,
+      0.2,
+      0.4,
+      0.0,
+      0.2,
+      2.5,
+      0.7000000000000001,
+      1.9,
+      0.1,
+      0.3
+    ],
+    "flap_rate_pct_seed42_hard": [
+      0.0,
+      9.700000000000001,
+      5.6000000000000005,
+      13.600000000000001,
+      7.1,
+      2.9000000000000004,
+      1.6,
+      5.2,
+      0.6,
+      4.1000000000000005,
+      2.1999999999999997,
+      1.3,
+      0.2,
+      0.4,
+      0.2,
+      0.7000000000000001,
+      0.4,
+      0.1,
+      0.4,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.2,
+      0.0,
+      0.1,
+      0.7000000000000001,
+      0.3,
+      0.2,
+      0.0,
+      0.0,
+      0.0,
+      0.1,
+      0.1,
+      0.0,
+      1.9,
+      0.0,
+      0.1,
+      0.2,
+      0.0
+    ],
+    "track_pairs": 1000,
+    "verdict": "PASS"
+  },
+  "gate4_mixed_fw": {
+    "rows": [
+      {
+        "adoption": 0.01,
+        "n_backbone": 6,
+        "loops": 0,
+        "baseline_delivery": 0.9638888888888889,
+        "dv_delivery": 0.9638888888888889,
+        "net_air_delta_pct": 0.0,
+        "delivery_delta": 0.0,
+        "never_worse": true
+      },
+      {
+        "adoption": 0.1,
+        "n_backbone": 56,
+        "loops": 0,
+        "baseline_delivery": 0.9638888888888889,
+        "dv_delivery": 0.9638888888888889,
+        "net_air_delta_pct": 0.0,
+        "delivery_delta": 0.0,
+        "never_worse": true
+      },
+      {
+        "adoption": 0.25,
+        "n_backbone": 141,
+        "loops": 0,
+        "baseline_delivery": 0.9638888888888889,
+        "dv_delivery": 0.9638888888888889,
+        "net_air_delta_pct": -0.8323251374836272,
+        "delivery_delta": 0.0,
+        "never_worse": true
+      },
+      {
+        "adoption": 0.5,
+        "n_backbone": 282,
+        "loops": 0,
+        "baseline_delivery": 0.9638888888888889,
+        "dv_delivery": 0.9666666666666667,
+        "net_air_delta_pct": -3.6643877578808266,
+        "delivery_delta": 0.002777777777777768,
+        "never_worse": true
+      },
+      {
+        "adoption": 0.75,
+        "n_backbone": 422,
+        "loops": 0,
+        "baseline_delivery": 0.9638888888888889,
+        "dv_delivery": 0.9722222222222222,
+        "net_air_delta_pct": -20.760261718335784,
+        "delivery_delta": 0.008333333333333304,
+        "never_worse": true
+      },
+      {
+        "adoption": 1.0,
+        "n_backbone": 563,
+        "loops": 0,
+        "baseline_delivery": 0.9638888888888889,
+        "dv_delivery": 0.9777777777777777,
+        "net_air_delta_pct": -44.10562538069217,
+        "delivery_delta": 0.01388888888888884,
+        "never_worse": true
+      }
+    ],
+    "all_never_worse": true,
+    "all_loopfree": true,
+    "net_positive_from_adoption": 0.5,
+    "verdict": "PASS"
+  },
+  "gate5_budget": {
+    "rows": [
+      {
+        "dv_period_s": 300,
+        "n_backbone": 563,
+        "n_regions": 28,
+        "duty_budget": 0.1,
+        "max_node_busy_frac": 0.009075540317460317,
+        "mean_node_busy_frac": 0.00532906750119823,
+        "max_node_busy_pct_of_budget": 9.075540317460316,
+        "mean_node_busy_pct_of_budget": 5.32906750119823,
+        "max_dv_entries": 82,
+        "max_dv_toa_ms": 2705.408,
+        "fits": true
+      },
+      {
+        "dv_period_s": 600,
+        "n_backbone": 563,
+        "n_regions": 28,
+        "duty_budget": 0.1,
+        "max_node_busy_frac": 0.004566526984126984,
+        "mean_node_busy_frac": 0.00267089324424145,
+        "max_node_busy_pct_of_budget": 4.566526984126984,
+        "mean_node_busy_pct_of_budget": 2.6708932442414497,
+        "max_dv_entries": 82,
+        "max_dv_toa_ms": 2705.408,
+        "fits": true
+      },
+      {
+        "dv_period_s": 900,
+        "n_backbone": 563,
+        "n_regions": 28,
+        "duty_budget": 0.1,
+        "max_node_busy_frac": 0.0030635225396825395,
+        "mean_node_busy_frac": 0.0017848351585891906,
+        "max_node_busy_pct_of_budget": 3.0635225396825394,
+        "mean_node_busy_pct_of_budget": 1.7848351585891906,
+        "max_dv_entries": 82,
+        "max_dv_toa_ms": 2705.408,
+        "fits": true
+      }
+    ],
+    "flat_dv_600s": {
+      "dv_period_s": 600,
+      "n_backbone": 563,
+      "n_regions": 1,
+      "duty_budget": 0.1,
+      "max_node_busy_frac": 0.028448426666666665,
+      "mean_node_busy_frac": 0.028346798987284674,
+      "max_node_busy_pct_of_budget": 28.448426666666666,
+      "mean_node_busy_pct_of_budget": 28.34679898728467,
+      "max_dv_entries": 563,
+      "max_dv_toa_ms": 17000.448,
+      "fits": true
+    },
+    "default_period_s": 600,
+    "default_max_busy_pct_of_budget": 4.566526984126984,
+    "verdict": "PASS"
+  },
+  "overall": {
+    "gates": {
+      "1_loops": "PASS",
+      "2_convergence": "PASS",
+      "3_churn": "PASS",
+      "4_mixed_fw": "PASS",
+      "5_budget": "PASS"
+    },
+    "verdict": "GO"
+  }
+}

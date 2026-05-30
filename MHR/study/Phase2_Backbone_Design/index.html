@@ -16,7 +16,7 @@
         <link rel="prev" href="../Path_Reinforcement_Study/">
       
       
-        <link rel="next" href="../STUDY_DESIGN/">
+        <link rel="next" href="../Phase2_Convergence_Validation/">
       
       
         
@@ -1268,6 +1268,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="3. Protokoll-Regeln">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3a-churn-hartung-pflicht-durch-gate-3-belegt-notwendig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3a. Churn-Härtung (PFLICHT — durch Gate 3 belegt notwendig)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1318,6 +1335,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Phase2_Convergence_Validation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1507,6 +1552,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="3. Protokoll-Regeln">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3a-churn-hartung-pflicht-durch-gate-3-belegt-notwendig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3a. Churn-Härtung (PFLICHT — durch Gate 3 belegt notwendig)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1608,8 +1670,7 @@ Adoption ins Airtime-Minus. Regionen kommen aus dem vorhandenen <code>region_map
 </ul>
 <h2 id="3-protokoll-regeln">3. Protokoll-Regeln</h2>
 <ul>
-<li><strong>Periode ≥ 300 s</strong> (Sim: darunter frisst Kontroll-Traffic den Nutzen; Default 600 s, CLI-tunbar).
-  Trigger-on-change zusätzlich, aber rate-limitiert (<code>discover_limiter</code>-Stil).</li>
+<li><strong>Periode ≥ 300 s</strong> (Sim: darunter frisst Kontroll-Traffic den Nutzen; Default 600 s, CLI-tunbar).</li>
 <li><strong>Babel-Feasibility + Seqno (H2):</strong> ein Nachbar wird nur Next-Hop, wenn seine annoncierten Kosten
   <strong>echt kleiner</strong> als die zuletzt selbst erreichte feasible distance sind → Schleifenfreiheit
   <em>während</em> der Konvergenz, ohne globales Topologiebild. Pro Ziel Sequenznummer.</li>
@@ -1622,6 +1683,34 @@ Adoption ins Airtime-Minus. Regionen kommen aus dem vorhandenen <code>region_map
 <li><strong>Stabilitäts-Gating (H4):</strong> flatternde Knoten (advert_count-Profil) dürfen Endpunkt, aber nicht
   bevorzugter Transit sein.</li>
 </ul>
+<h3 id="3a-churn-hartung-pflicht-durch-gate-3-belegt-notwendig">3a. Churn-Härtung (PFLICHT — durch Gate 3 belegt notwendig)</h3>
+<p>Das rein periodische DV (nur Punkte oben) fiel im zeitaufgelösten Churn-Gate durch: nach Churn-Stopp
+blieben <strong>persistente Inter-Region-Aggregat-Loops</strong> (zwei Border-Router zeigten gegenseitig auf je ein
+noch lebendes Aggregat einer dritten Ziel-Region; die per-Origin geführte Babel-FD lehnte keinen der
+beiden ab). Folgende drei Mechanismen sind daher <strong>Teil der Spezifikation und nicht optional</strong> — sie
+bringen Gate 3 von FAIL (ALT) auf PASS (siehe <code>study/Phase2_Convergence_Validation.md</code>):</p>
+<ol>
+<li><strong>Trigger-on-change (rate-limitiert).</strong> Bei Metrik-/Next-Hop-Änderung sofort ein DV-Update senden
+   statt nur periodisch → schnellere Re-Konvergenz und sofortige Ausbreitung von Retractions.
+   <strong>Rate-Limit zwingend</strong> (<code>discover_limiter</code>-Stil): pro Knoten min. Abstand zwischen getriggerten
+   Updates (Sim: ≥ 2 Ticks/60 s) <strong>und</strong> netzweite Obergrenze getriggerter Sender je Zeitfenster →
+   kein Update-Sturm / keine Airtime-Explosion. Überzählige Trigger bleiben „dirty" und feuern im
+   nächsten freien Slot.</li>
+<li><strong>Hold-down + Route-Poisoning bei Knoten-/Link-Ausfall.</strong> Eine verlorene Route ohne lebenden
+   Feasible-Successor-Backup wird <strong>explizit mit erhöhter Seqno auf ∞ zurückgezogen (poison)</strong> — so
+   überschreibt die Retraction stale Aggregate beim Empfänger, statt von ihnen überstimmt zu werden.
+   Anschließend kurze <strong>Hold-down-Zeit</strong> (Sim: ~2 Annoncen-Perioden) für dieses Ziel, in der <strong>keine
+   schlechtere Alternative</strong> akzeptiert wird → verhindert das voreilige Annehmen einer Loop-Route
+   und damit die Restschleifen. (Aggregat-Retraction läuft trigger-on-change, s. Punkt 1.)</li>
+<li><strong>Origin-unabhängige Aggregat-Feasibility (Babel-Invariante für H1).</strong> Die feasible distance für
+   ein Region-Aggregat <code>("R", dreg)</code> wird <strong>pro Ziel-Region, nicht pro ABR-Origin</strong> geführt: ein
+   Aggregat darf nur Next-Hop werden, wenn seine Kosten <strong>echt kleiner</strong> als die zuletzt erreichte FD
+   für <em>diese</em> Ziel-Region sind — egal von welchem Border-Router/ABR es kommt. Das stellt den
+   „ein Seqno-Besitzer je Ziel"-Charakter der Babel-Bedingung für die aggregierte Hierarchie wieder
+   her und ist der Kern-Loop-Breaker; Hold-down/Poisoning räumen die stale Generation dazu auf.</li>
+</ol>
+<p>Hysterese (≥ 15 %, Punkt oben) bleibt zusätzlich aktiv. Speicher-Mehrbedarf: ein FD-Wert je
+Ziel-Region + ein Hold-down-Timer je betroffenem Ziel (vernachlässigbar gegenüber der DV-Tabelle).</p>
 <h2 id="4-mixed-firmware-nie-schlechter">4. Mixed-Firmware &amp; „nie schlechter"</h2>
 <ul>
 <li>DV-Pakete ignorierbar → Stock-Knoten unberührt. Backbone-Routen werden NUR genutzt, wenn vorhanden
@@ -1635,8 +1724,10 @@ nRF52840 (256 KB) und ESP32-S3 (512 KB). Tabellen fix dimensioniert, Verdrängun
 <p>Die Backbone-Sim lieferte die Airtime-Ökonomie, aber NICHT die Korrektheit über Zeit. Vor Code:
 1. <strong>Zeitaufgelöste Konvergenz:</strong> konvergiert das DV auf der realen Topologie? <strong>Null transiente
    Schleifen</strong> dank Feasibility? Konvergenzzeit messen.
-2. <strong>Churn/Flattern:</strong> unter Knoten-Churn (advert_count-Profil) — bleiben die Routen stabil
-   (Hysterese + Feasibility), oder flattern sie? Wechselrate quantifizieren.
+2. <strong>Churn/Flattern:</strong> unter Knoten-Churn (advert_count-Profil) — bleiben die Routen stabil und
+   re-konvergieren nach Churn-Stopp vollständig (Restschleifen=0, Restwechsel=0)? Erfordert die
+   Churn-Härtung aus Abschnitt 3a (Trigger-on-change + Hold-down/Poisoning + origin-unabhängige
+   Aggregat-FD); ohne sie bleiben persistente H1-Aggregat-Loops (FAIL). Wechselrate quantifizieren.
 3. <strong>Mixed-Firmware-Sweep:</strong> x % backbone-fähig, Rest Stock — graceful? ab wann netto-positiv? nie
    schlechter?
 4. <strong>Kontroll-Budget unter realen Advert-Intervallen/Duty-Cycle:</strong> passt der DV-Overhead neben dem
