@@ -831,6 +831,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#best-of-n-am-ziel-hop-snr-beste-pfadwahl-statt-first-wins-im-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best-of-N am Ziel — hop-/SNR-beste Pfadwahl statt „first wins" (im Code)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best-of-N am Ziel — hop-/SNR-beste Pfadwahl statt „first wins&#34; (im Code)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#patch-8-sammelfenster-am-ziel-kurzesten-pfad-zuruckmelden" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Patch 8 — Sammelfenster am Ziel, kürzesten Pfad zurückmelden
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#adaptiver-selbst-regler-gepruft-und-verworfen-no-go" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -842,10 +870,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#bewusst-nicht-geandert" class="md-nav__link">
+  <a href="#bewusst-nicht-geandert-noch-offen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Bewusst NICHT geändert
+        Bewusst NICHT geändert / noch offen
       
     </span>
   </a>
@@ -1401,6 +1429,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../study/Phase2_Backbone_Design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 — Proaktiver Regions-Backbone: Implementierungs-Design + Validierungsplan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../study/STUDY_DESIGN/" class="md-nav__link">
         
   
@@ -1693,6 +1749,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#best-of-n-am-ziel-hop-snr-beste-pfadwahl-statt-first-wins-im-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best-of-N am Ziel — hop-/SNR-beste Pfadwahl statt „first wins" (im Code)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best-of-N am Ziel — hop-/SNR-beste Pfadwahl statt „first wins&#34; (im Code)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#patch-8-sammelfenster-am-ziel-kurzesten-pfad-zuruckmelden" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Patch 8 — Sammelfenster am Ziel, kürzesten Pfad zurückmelden
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#adaptiver-selbst-regler-gepruft-und-verworfen-no-go" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1704,10 +1788,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#bewusst-nicht-geandert" class="md-nav__link">
+  <a href="#bewusst-nicht-geandert-noch-offen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Bewusst NICHT geändert
+        Bewusst NICHT geändert / noch offen
       
     </span>
   </a>
@@ -1848,17 +1932,33 @@ Bench-Test per CLI aktivieren (<code>set supp.enable 1</code>). Design + Validie
   GESAMTEN Adoptions-Sweep, −12…15 % Airtime bei hoher Adoption. Bench-Test offen (Cover-Timing in
   HW, 2-Hop-Konvergenz, Frische-Gating).</li>
 </ul>
+<h2 id="best-of-n-am-ziel-hop-snr-beste-pfadwahl-statt-first-wins-im-code">Best-of-N am Ziel — hop-/SNR-beste Pfadwahl statt „first wins" (im Code)</h2>
+<h3 id="patch-8-sammelfenster-am-ziel-kurzesten-pfad-zuruckmelden">Patch 8 — Sammelfenster am Ziel, kürzesten Pfad zurückmelden</h3>
+<ul>
+<li>Dateien: <code>src/Mesh.{h,cpp}</code> (gemeinsame Basis → greift für Companion/Room/Repeater-Ziele),
+  <code>src/helpers/CommonCLI.{h,cpp}</code>, Default-Aktivierung in <code>examples/simple_repeater/MyMesh.cpp</code>.</li>
+<li>Statt sofort den <em>zuerst</em> eingetroffenen Flood-Pfad per <code>createPathReturn</code> zurückzumelden, sammelt
+  das Ziel kurz mehrere Kopien (fixe Tabelle <code>_bofn[8]</code>) und meldet den <strong>kürzesten Pfad (Hops, dann
+  SNR als Tiebreaker)</strong> zurück. v4-belegt: Hop dominiert, SNR ist guter Reliability-Tiebreak.</li>
+<li><strong>Dedup-sicher (adversarial reviewt, kein Blocker):</strong> die Payload wird weiterhin GENAU EINMAL im
+  Erstempfang zugestellt; <code>hasSeen()</code>/Dedup unverändert; nur der reziproke Path-Return wird um EIN
+  Fenster (Default 1500 ms, einmalig je Pfadaufbau) verzögert. Bei einer Kopie identisch zu first-wins.</li>
+<li>Mixed-firmware-safe: kein Paketformat-Eingriff (Standard-<code>PAYLOAD_TYPE_PATH</code>-Return). Prefs
+  <code>bofn_enable</code>(Default 1 im Repeater), <code>bofn_window_ms</code>(1500) @304/305, CLI <code>set/get bofn.enable|window</code>.
+  In der Basis default-AUS (andere Builds unverändert). ~0,9 KB fixe Tabelle.</li>
+</ul>
 <h2 id="adaptiver-selbst-regler-gepruft-und-verworfen-no-go">Adaptiver Selbst-Regler — geprüft und VERWORFEN (NO-GO)</h2>
 <p>Ein langsamer (1–2 h) Regler, der <code>supp_prob</code> an die lokale Umgebung anpasst, wurde entworfen und
 simuliert (<code>docs/MHR/study/Adaptive_Controller_Design.md</code>). Ergebnis: oszilliert nicht, bringt aber
 nur <strong>+0,76 pp</strong> Airtime über den statischen sicheren Satz (&lt; 2 pp Schwelle) und ist minimal weniger
 strikt-safe → <strong>nicht codiert</strong> (Qualität/Stabilität vor letzter Optimierung). Der statische sichere
 Satz ist die Empfehlung.</p>
-<h2 id="bewusst-nicht-geandert">Bewusst NICHT geändert</h2>
+<h2 id="bewusst-nicht-geandert-noch-offen">Bewusst NICHT geändert / noch offen</h2>
 <ul>
-<li>Kein neues Paketformat, keine Metrik im Paket, kein Backbone, kein echtes Best-of-N am Ziel —
-  Letzteres würde die <code>hasSeen()</code>-Dedup aufbohren (Risiko von Nachrichten-Duplikaten) und gehört
-  in eine eigene, gründlich getestete Stufe (siehe Studie Stufe A „Best-of-N am Ziel").</li>
+<li>Kein neues Paketformat, keine Metrik im Paket. Der proaktive <strong>Backbone (Phase 2)</strong> ist als
+  konkretes Design + Validierungs-Gate vorhanden (<code>docs/MHR/study/Phase2_Backbone_Design.md</code>), aber
+  <strong>design-first</strong>: er wird erst codiert, nachdem die zeitaufgelöste Konvergenz/Schleifenfreiheit
+  simulativ bestätigt ist (Routing-Loops in einem Live-Mesh wären sonst das Risiko).</li>
 </ul>
 <h2 id="validierung-simulation">Validierung (Simulation)</h2>
 <ul>
