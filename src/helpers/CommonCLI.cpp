@@ -938,25 +938,25 @@ void CommonCLI::handleGetCmd(uint32_t sender_timestamp, char* command, char* rep
   } else if (memcmp(config, "txsnrweight", 11) == 0) {   // MHR
     sprintf(reply, "> %s", StrHelper::ftoa(_prefs->tx_snr_weight));
   } else if (memcmp(config, "supp.mindeg", 11) == 0) {   // MHR Stufe B (G1)
-    sprintf(reply, "> %d", (uint32_t)_prefs->supp_min_degree);
+    sprintf(reply, "> %u", (uint32_t)_prefs->supp_min_degree);
   } else if (memcmp(config, "supp.kcover", 11) == 0) {   // MHR Stufe B (G2)
-    sprintf(reply, "> %d", (uint32_t)_prefs->supp_k_cover);
+    sprintf(reply, "> %u", (uint32_t)_prefs->supp_k_cover);
   } else if (memcmp(config, "supp.snrfloor", 13) == 0) { // MHR Stufe B (G4)
     sprintf(reply, "> %d", (int)_prefs->supp_snr_floor);
   } else if (memcmp(config, "supp.prob", 9) == 0) {      // MHR Stufe B (G5)
-    sprintf(reply, "> %d", (uint32_t)_prefs->supp_prob);
+    sprintf(reply, "> %u", (uint32_t)_prefs->supp_prob);
   } else if (memcmp(config, "supp.enable", 11) == 0) {   // MHR Stufe B
-    sprintf(reply, "> %d", (uint32_t)_prefs->supp_enable);
+    sprintf(reply, "> %u", (uint32_t)_prefs->supp_enable);
   } else if (memcmp(config, "bofn.window", 11) == 0) {   // MHR Best-of-N
-    sprintf(reply, "> %d", (uint32_t)_prefs->bofn_window_ms);
+    sprintf(reply, "> %u", (uint32_t)_prefs->bofn_window_ms);
   } else if (memcmp(config, "bofn.enable", 11) == 0) {   // MHR Best-of-N
-    sprintf(reply, "> %d", (uint32_t)_prefs->bofn_enable);
+    sprintf(reply, "> %u", (uint32_t)_prefs->bofn_enable);
   } else if (memcmp(config, "bb.enable", 9) == 0) {      // MHR Phase 2 backbone
-    sprintf(reply, "> %d", (uint32_t)_prefs->bb_enable);
+    sprintf(reply, "> %u", (uint32_t)_prefs->bb_enable);
   } else if (memcmp(config, "bb.period", 9) == 0) {      // MHR Phase 2
-    sprintf(reply, "> %d", (uint32_t)_prefs->bb_period_s);
+    sprintf(reply, "> %u", (uint32_t)_prefs->bb_period_s);
   } else if (memcmp(config, "bb.holddown", 11) == 0) {   // MHR Phase 2
-    sprintf(reply, "> %d", (uint32_t)_prefs->bb_holddown_s);
+    sprintf(reply, "> %u", (uint32_t)_prefs->bb_holddown_s);
   } else if (memcmp(config, "txdelay", 7) == 0) {
     sprintf(reply, "> %s", StrHelper::ftoa(_prefs->tx_delay_factor));
   } else if (memcmp(config, "flood.max", 9) == 0) {

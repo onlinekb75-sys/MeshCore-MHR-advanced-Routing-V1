@@ -66,7 +66,13 @@ Minimale, rückwärts­kompatible, reversible Eingriffe — alle als `// MHR:` i
 3. **SNR-gewichtetes TX-Retransmit-Delay** (`getRetransmitDelay`): ergänzt Patch 1 um die Sendeseite — starke Empfänger senden Flood-Kopien früher (aus zufallserhaltendem, geschrumpftem Fenster), schwache später. Neuer reversibler Parameter `tx_snr_weight` (Default 0.5, `set txsnrweight 0` = Upstream).
 4. **EWMA-geglättete Nachbar-SNR** (`putNeighbour`): stabile Linkqualitäts-Schätzung (L0 Link-Sensing) statt verrauschtem Momentanwert — Fundament für ETX.
 
-Adversarial reviewt (Persistenz-Kompatibilität, Integer-Arithmetik, EWMA, CLI) — keine Bugs.
+**Stufe A+ / B / Phase 2** (alle adversarial reviewt)
+5. **Best-of-N am Ziel** (`src/Mesh.cpp`): kürzester Pfad (Hops, dann SNR) statt „first wins" — dedup-sicher (Payload genau 1×). `bofn.enable` (Repeater default an).
+6. **`flood.max` 64 → 15** (datenbelegt): kappt Fern-Umwege; rein lokales Forward-Limit.
+7. **Stufe B — guarded Suppression** (`supp.enable`, **default-AUS**): redundanz-gesicherte Rebroadcast-Unterdrückung (5 Guards + passives 2-Hop-Lernen).
+8. **Phase 2 — DV-Backbone** (`bb.enable`, **default-AUS**): proaktiver Control-Plane (Babel-Feasibility, Konvergenz-Gate GO); ignorierbarer zero-hop Payload-Typ.
+
+> Vollständiger Status (aktiv vs. default-aus) + Validierung → Abschnitt **„Stand der Optimierungs-Schicht"** unten. Komplette Patch-Liste 1–9: `docs/MHR/CHANGES_MHR.md`.
 
 ## Firmware bauen
 
