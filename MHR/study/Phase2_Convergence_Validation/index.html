@@ -1294,10 +1294,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#gesamt-verdikt-go-darf-phase-2-codiert-werden" class="md-nav__link">
+  <a href="#gesamt-verdikt-go-darf-phase-2-gefixte-logik-codiert-werden" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GESAMT-VERDIKT: GO — darf Phase 2 codiert werden?
+        GESAMT-VERDIKT: GO — darf Phase 2 (gefixte Logik) codiert werden?
       
     </span>
   </a>
@@ -1312,6 +1312,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Gate 1 — Schleifenfreiheit (Babel-Feasibility) + GEGENPROBE">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#b1-regression-pro-annoncierer-vs-pro-ziel-seqno-loop-blocker-b1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B1-Regression — pro-Annoncierer- vs. pro-Ziel-Seqno (Loop-BLOCKER B1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1533,10 +1550,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#gesamt-verdikt-go-darf-phase-2-codiert-werden" class="md-nav__link">
+  <a href="#gesamt-verdikt-go-darf-phase-2-gefixte-logik-codiert-werden" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GESAMT-VERDIKT: GO — darf Phase 2 codiert werden?
+        GESAMT-VERDIKT: GO — darf Phase 2 (gefixte Logik) codiert werden?
       
     </span>
   </a>
@@ -1551,6 +1568,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Gate 1 — Schleifenfreiheit (Babel-Feasibility) + GEGENPROBE">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#b1-regression-pro-annoncierer-vs-pro-ziel-seqno-loop-blocker-b1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B1-Regression — pro-Annoncierer- vs. pro-Ziel-Seqno (Loop-BLOCKER B1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1638,8 +1672,8 @@
 <p><em>Erzeugt von <code>phase2_convergence_sim.py</code>. Seeds [42, 43, 44, 45, 46]. DV-Tick 30s, Annoncen-Periode 300s, Hysterese 15%. Reale Topologie aus <code>neighbor_graph.json</code>.</em></p>
 <p><strong>Topologie:</strong> Riesenkomponente 632 Knoten, backbone-faehig 563, 28 Regionen (H1), 329 Border-Knoten. ETX aus avg_snr. LoRa SF11/BW250k, DATA-ToA 493.6 ms.</p>
 <hr />
-<h2 id="gesamt-verdikt-go-darf-phase-2-codiert-werden">GESAMT-VERDIKT: <strong>GO</strong> — darf Phase 2 codiert werden?</h2>
-<p><strong>GO.</strong> Alle fuenf Gate-Punkte bestehen: null transiente Schleifen mit Feasibility (waehrend die Gegenprobe ohne Feasibility Loops zeigt), endliche Konvergenz kalt und nach Stoerung, vollstaendige Re-Konvergenz unter Churn <strong>mit der jetzt pflichtigen Churn-Haertung</strong> (Trigger-on-change + Hold-down/Route-Poisoning + origin-unabhaengige Aggregat-Feasibility — Gate 3 ging damit von FAIL auf PASS), Mixed-FW graceful und nie schlechter als Baseline, und das Kontroll-Budget passt locker ins 10%-Duty-Cycle-Sub-Band.</p>
+<h2 id="gesamt-verdikt-go-darf-phase-2-gefixte-logik-codiert-werden">GESAMT-VERDIKT: <strong>GO</strong> — darf Phase 2 (gefixte Logik) codiert werden?</h2>
+<p><strong>GO fuer die GEFIXTE Logik (pro-Ziel-Seqno).</strong> Alle fuenf Gate-Punkte bestehen mit der gefixten Seqno-Variante: null transiente Schleifen mit Feasibility (waehrend Gegenprobe OHNE Feasibility und die <strong>B1-bug-Variante</strong> MIT pro-Annoncierer-Seqno Loops zeigen), endliche Konvergenz kalt und nach Stoerung, vollstaendige Re-Konvergenz unter Churn <strong>mit der jetzt pflichtigen Churn-Haertung</strong> (Trigger-on-change + Hold-down/Route-Poisoning + origin-unabhaengige Aggregat-Feasibility — Gate 3 ging damit von FAIL auf PASS), Mixed-FW graceful und nie schlechter als Baseline, und das Kontroll-Budget passt locker ins 10%-Duty-Cycle-Sub-Band. Die <strong>B1-Regression</strong> (Abschnitt unter Gate 1) belegt zusaetzlich: der behobene Loop-BLOCKER B1 (pro-Annoncierer-Seqno hebelt das Feasibility-Gate aus) loopt reproduzierbar, der Fix beseitigt ihn.</p>
 <table>
 <thead>
 <tr>
@@ -1686,6 +1720,77 @@
 <li><strong>Die Gegenprobe traegt:</strong> ohne Feasibility entstehen deutlich mehr (und persistente, count-to-infinity-artige) Loops; mit Feasibility ist der Kaltstart komplett schleifenfrei und alle Loops nach einer Stoerung sind rein transient (loesen sich auf). Die Schleifenfreiheit kommt also aus dem Mechanismus (Babel-Bedingung), nicht aus der Topologie.</li>
 <li>Beleg: <code>fig_p2_loops.png</code>. Zusaetzlich belegt ein Mini-Topologie-Unittest (Linie D-X-A-B, X getoetet) den Mechanismus isoliert: naiv = 40/40 Loop-Ticks (A&lt;-&gt;B count-to-infinity), Feasibility = 0.</li>
 </ul>
+<h3 id="b1-regression-pro-annoncierer-vs-pro-ziel-seqno-loop-blocker-b1">B1-Regression — pro-Annoncierer- vs. pro-Ziel-Seqno (Loop-BLOCKER B1)</h3>
+<p>Der Firmware-Review fand <strong>B1</strong>: die DV-Seqno war <strong>pro-Annoncierer</strong> (ein globaler Zaehler je Knoten, im Header fuer alle Entries, steigt bei jeder Annonce) statt <strong>pro-Ziel</strong>. Folge: <code>seqno_newer</code> ist fast immer wahr -&gt; das Babel-Feasibility-Gate <code>cand&lt;fd</code> wird umgangen -&gt; strikt schlechtere Loop-Routen werden feasibel. Der Fix (in der Firmware umgesetzt): <strong>pro-Ziel-Seqno</strong>, vom Origin erhoeht, vom Relay unveraendert propagiert. Hier validiert als Regression in drei Modi auf der realen Topologie (FIXED = Gate-Variante, alle Seeds; naiv/B1-bug = 2 Seeds, reiner Mechanismus-Beleg).</p>
+<table>
+<thead>
+<tr>
+<th>Modus</th>
+<th>Loops gesamt (real)</th>
+<th>max Loops/Tick</th>
+<th>persistent (Endtick)</th>
+<th>Kaltphase-Loops</th>
+<th>akzeptiert schlechte Route (§3a)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>naiv</strong> (kein Feasibility)</td>
+<td>55</td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+<td>ja</td>
+</tr>
+<tr>
+<td><strong>B1-bug</strong> (Feas.+pro-Annoncierer-Seqno)</td>
+<td>82142</td>
+<td>776</td>
+<td>244</td>
+<td>41969</td>
+<td>ja</td>
+</tr>
+<tr>
+<td><strong>fixed</strong> (Feas.+pro-Ziel-Seqno)</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>nein</td>
+</tr>
+</tbody>
+</table>
+<p><strong>§3a-Mini-Loop-Testfall</strong> (isolierte Topologie R-C-A-B, eine Region; Ziel R; die gute Kante C-A faellt aus, B reannonciert R mit hoeherer Metrik ueber den Loop zurueck an A):</p>
+<table>
+<thead>
+<tr>
+<th>Modus</th>
+<th>Loop-Ticks (40)</th>
+<th>akzeptiert B (schlechtere Loop-Route)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>naiv</td>
+<td>40</td>
+<td>ja</td>
+</tr>
+<tr>
+<td>B1-bug</td>
+<td>40</td>
+<td>ja</td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>0</td>
+<td>nein</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>B1-bug reproduziert den Review-Befund:</strong> die pro-Annoncierer-Seqno hebelt die Feasibility aus -&gt; B1-bug akzeptiert die strikt schlechtere Route (§3a) und loopt sowohl im Mini-Test als auch massiv auf der realen Topologie. <strong>fixed lehnt B ab</strong> (pro-Ziel-Seqno laesst das <code>cand&lt;fd</code>-Gate greifen) und bleibt schleifenfrei. Naiv loopt im Mini-Test ebenfalls, zeigt auf der grossen Topologie aber WENIGER Loops als B1-bug: B1 ist sogar schlimmer als gar keine Feasibility, weil es Feasibility VORTAEUSCHT, aber umgeht.</li>
+<li>Beleg: <code>fig_p2_b1_regression.png</code> (Loops/Tick naiv vs. B1-bug vs. fixed).</li>
+</ul>
 <h2 id="gate-2-konvergenzzeit">Gate 2 — Konvergenzzeit</h2>
 <p>Konvergenz = aufgeloeste Next-Hops der Stichprobe stabil ueber 2 Ticks UND null Loops.</p>
 <ul>
@@ -1701,59 +1806,62 @@
 <tr>
 <th>Metrik (max/Mittel ueber Seeds)</th>
 <th>ALT (nur periodisch)</th>
-<th>GEHAERTET</th>
+<th>B1-bug (gehaertet, pro-Annoncierer-Seqno)</th>
+<th>FIXED/GEHAERTET (pro-Ziel-Seqno)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Re-Konvergenz nach Churn-Stopp (Loops=0 UND Wechsel=0)</td>
 <td><strong>NEIN</strong></td>
+<td><strong>NEIN</strong></td>
 <td>ja</td>
 </tr>
 <tr>
 <td>Restschleifen nach Churn-Stopp (Settle, max ueber Seeds)</td>
 <td><strong>4</strong></td>
+<td><strong>25</strong></td>
 <td><strong>0</strong></td>
 </tr>
 <tr>
 <td>Restschleifen je Seed (Settle)</td>
 <td>[4, 0]</td>
+<td>[25, 21]</td>
 <td>[0, 0, 0, 0, 0]</td>
 </tr>
 <tr>
 <td>Restwechsel nach Churn-Stopp (Settle, max)</td>
 <td>0</td>
+<td>6</td>
 <td>0</td>
 </tr>
 <tr>
 <td>Routen-Wechselrate Tail (eingeschwungen)</td>
 <td>0.80%/Tick</td>
+<td>0.22%/Tick</td>
 <td>0.19%/Tick</td>
-</tr>
-<tr>
-<td>Wechselrate gesamt</td>
-<td>1.46%/Tick</td>
-<td>1.52%/Tick</td>
 </tr>
 <tr>
 <td>transiente Loops max (waehrend Churn)</td>
 <td>40</td>
+<td>108</td>
 <td>14</td>
 </tr>
 <tr>
-<td>Tail &lt;= Gesamt (schwingt nicht auf)</td>
-<td>ja</td>
-<td>ja</td>
-</tr>
-<tr>
 <td><strong>Gate-3-Verdikt</strong></td>
+<td><strong>FAIL</strong></td>
 <td><strong>FAIL</strong></td>
 <td>PASS</td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li>Beleg: <code>fig_p2_churn_stability.png</code> (Wechselrate ALT vs. GEHAERTET, Seed 42).</li>
+<li>
+<p>B1-bug laeuft mit der <strong>gleichen vollen Churn-Haertung</strong> wie FIXED, nur mit der fehlerhaften pro-Annoncierer-Seqno -&gt; isoliert: der Seqno-Bug ist der Loop-Treiber, nicht die fehlende Haertung. Selbst gehaertet faellt B1-bug durch.</p>
+</li>
+<li>
+<p>Beleg: <code>fig_p2_churn_stability.png</code> (Wechselrate ALT vs. GEHAERTET, Seed 42).</p>
+</li>
 </ul>
 <p><strong>Ergebnis der Haertung:</strong> die GEHAERTETE Variante re-konvergiert nach Churn-Stopp vollstaendig (Restschleifen=0 UND Restwechsel=0 ueber ALLE Seeds) und senkt die eingeschwungene Wechselrate deutlich. Die persistenten Inter-Region-Aggregat-Loops der ALT-Variante (multi-Origin-ABR, gegenseitiges Zeigen zweier Border-Router auf je ein lebendes Aggregat) loesen sich auf: die origin-unabhaengige Aggregat-FD verhindert, dass eine nicht-feasible Aggregat-Route Successor wird, das Poisoning+Hold-down raeumt stale Aggregate auf, und Trigger-on-change verbreitet die Retraction sofort. Gate 3 geht damit von <strong>FAIL (ALT)</strong> auf <strong>PASS (GEHAERTET)</strong>.</p>
 <h2 id="gate-4-mixed-firmware-sweep">Gate 4 — Mixed-Firmware-Sweep</h2>
