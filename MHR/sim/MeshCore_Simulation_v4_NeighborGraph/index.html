@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://meshcore-dev.github.io/meshcore/MHR/sim/MeshCore_Simulation_v3_Realdaten/">
+        <link rel="canonical" href="https://meshcore-dev.github.io/meshcore/MHR/sim/MeshCore_Simulation_v4_NeighborGraph/">
       
       
-        <link rel="prev" href="../">
+        <link rel="prev" href="../MeshCore_Simulation_v3_Realdaten/">
       
       
-        <link rel="next" href="../MeshCore_Simulation_v4_NeighborGraph/">
+        <link rel="next" href="../../study/MeshCore_Routing_Study/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>MeshCore-Simulation v3 — auf ECHTEN Live-Daten kalibriert - MeshCore Docs</title>
+        <title>MeshCore-Simulation v4 — auf der ECHTEN, server-gemessenen Link-Topologie - MeshCore Docs</title>
       
     
     
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#meshcore-simulation-v3-auf-echten-live-daten-kalibriert" class="md-skip">
+        <a href="#meshcore-simulation-v4-auf-der-echten-server-gemessenen-link-topologie" class="md-skip">
           Skip to content
         </a>
       
@@ -105,7 +105,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              MeshCore-Simulation v3 — auf ECHTEN Live-Daten kalibriert
+              MeshCore-Simulation v4 — auf der ECHTEN, server-gemessenen Link-Topologie
             
           </span>
         </div>
@@ -868,6 +868,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../MeshCore_Simulation_v3_Realdaten/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MeshCore-Simulation v3 — auf ECHTEN Live-Daten kalibriert
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -887,7 +915,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore-Simulation v3 — auf ECHTEN Live-Daten kalibriert
+    MeshCore-Simulation v4 — auf der ECHTEN, server-gemessenen Link-Topologie
   
 
     
@@ -905,7 +933,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore-Simulation v3 — auf ECHTEN Live-Daten kalibriert
+    MeshCore-Simulation v4 — auf der ECHTEN, server-gemessenen Link-Topologie
   
 
     
@@ -931,22 +959,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#baustein-a-was-aus-den-live-daten-gemessen-wurde" class="md-nav__link">
+  <a href="#1-reale-topologie" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Baustein A — Was aus den Live-Daten GEMESSEN wurde
+        1) Reale Topologie
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Baustein A — Was aus den Live-Daten GEMESSEN wurde">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-halt-die-studie-auf-echten-kanten-befund-fur-befund" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2) Hält die Studie auf echten Kanten? (Befund für Befund)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2) Hält die Studie auf echten Kanten? (Befund für Befund)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#a1-nodehash-mapping-disambiguierung" class="md-nav__link">
+  <a href="#2a-baseline-first-wins-flood-vs-mhr-bestatigt" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A1 — Node→Hash-Mapping &amp; Disambiguierung
+        2a) Baseline (first-wins-Flood) vs. MHR — BESTÄTIGT
       
     </span>
   </a>
@@ -954,10 +993,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#a2-beobachtete-relay-topologie-backbone" class="md-nav__link">
+  <a href="#2b-floodmax-sweep-floodmax-15-bestatigt-mit-nuance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A2 — Beobachtete Relay-Topologie (Backbone)
+        2b) flood.max-Sweep — flood.max = 15 BESTÄTIGT (mit Nuance)
       
     </span>
   </a>
@@ -965,10 +1004,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#a3-snrdistanz-linkmodell-kalibrieren-kernbefund-der-messung" class="md-nav__link">
+  <a href="#2c-adoptions-sweep-safety-invariante-dreiteilung-bestatigt-aber-suppressions-sicherheitszone-schrumpft-drastisch" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A3 — SNR/Distanz-Linkmodell kalibrieren (KERNBEFUND der Messung)
+        2c) Adoptions-Sweep + Safety-Invariante — Dreiteilung BESTÄTIGT, aber Suppressions-Sicherheitszone SCHRUMPFT DRASTISCH
       
     </span>
   </a>
@@ -976,10 +1015,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#a4-reale-detour-statistik-kernergebnis" class="md-nav__link">
+  <a href="#2d-snr-frage-neu-relativiert-v3-snr-ist-auf-echten-kanten-ein-etwas-starkerer-hebel-als-gedacht-aber-kein-hop-ersatz" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A4 — Reale Detour-Statistik (KERNERGEBNIS)
+        2d) SNR-Frage neu — RELATIVIERT v3 (SNR ist auf echten Kanten ein etwas stärkerer Hebel als gedacht, aber kein Hop-Ersatz)
       
     </span>
   </a>
@@ -992,41 +1031,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#baustein-b-routing-simulation-auf-der-grossen-realen-topologie" class="md-nav__link">
+  <a href="#3-firmware-implikationen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Baustein B — Routing-Simulation auf der GROSSEN realen Topologie
+        3) Firmware-Implikationen
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Baustein B — Routing-Simulation auf der GROSSEN realen Topologie">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#aktiver-repeater-subgraph" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Aktiver Repeater-Subgraph
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#baseline-meshcore-vs-mhr" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Baseline (MeshCore) vs. MHR
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1056,34 +1067,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../MeshCore_Simulation_v4_NeighborGraph/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    MeshCore-Simulation v4 — auf der ECHTEN, server-gemessenen Link-Topologie
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -1270,22 +1253,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#baustein-a-was-aus-den-live-daten-gemessen-wurde" class="md-nav__link">
+  <a href="#1-reale-topologie" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Baustein A — Was aus den Live-Daten GEMESSEN wurde
+        1) Reale Topologie
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Baustein A — Was aus den Live-Daten GEMESSEN wurde">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-halt-die-studie-auf-echten-kanten-befund-fur-befund" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2) Hält die Studie auf echten Kanten? (Befund für Befund)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2) Hält die Studie auf echten Kanten? (Befund für Befund)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#a1-nodehash-mapping-disambiguierung" class="md-nav__link">
+  <a href="#2a-baseline-first-wins-flood-vs-mhr-bestatigt" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A1 — Node→Hash-Mapping &amp; Disambiguierung
+        2a) Baseline (first-wins-Flood) vs. MHR — BESTÄTIGT
       
     </span>
   </a>
@@ -1293,10 +1287,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#a2-beobachtete-relay-topologie-backbone" class="md-nav__link">
+  <a href="#2b-floodmax-sweep-floodmax-15-bestatigt-mit-nuance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A2 — Beobachtete Relay-Topologie (Backbone)
+        2b) flood.max-Sweep — flood.max = 15 BESTÄTIGT (mit Nuance)
       
     </span>
   </a>
@@ -1304,10 +1298,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#a3-snrdistanz-linkmodell-kalibrieren-kernbefund-der-messung" class="md-nav__link">
+  <a href="#2c-adoptions-sweep-safety-invariante-dreiteilung-bestatigt-aber-suppressions-sicherheitszone-schrumpft-drastisch" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A3 — SNR/Distanz-Linkmodell kalibrieren (KERNBEFUND der Messung)
+        2c) Adoptions-Sweep + Safety-Invariante — Dreiteilung BESTÄTIGT, aber Suppressions-Sicherheitszone SCHRUMPFT DRASTISCH
       
     </span>
   </a>
@@ -1315,10 +1309,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#a4-reale-detour-statistik-kernergebnis" class="md-nav__link">
+  <a href="#2d-snr-frage-neu-relativiert-v3-snr-ist-auf-echten-kanten-ein-etwas-starkerer-hebel-als-gedacht-aber-kein-hop-ersatz" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A4 — Reale Detour-Statistik (KERNERGEBNIS)
+        2d) SNR-Frage neu — RELATIVIERT v3 (SNR ist auf echten Kanten ein etwas stärkerer Hebel als gedacht, aber kein Hop-Ersatz)
       
     </span>
   </a>
@@ -1331,41 +1325,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#baustein-b-routing-simulation-auf-der-grossen-realen-topologie" class="md-nav__link">
+  <a href="#3-firmware-implikationen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Baustein B — Routing-Simulation auf der GROSSEN realen Topologie
+        3) Firmware-Implikationen
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Baustein B — Routing-Simulation auf der GROSSEN realen Topologie">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#aktiver-repeater-subgraph" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Aktiver Repeater-Subgraph
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#baseline-meshcore-vs-mhr" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Baseline (MeshCore) vs. MHR
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1408,7 +1374,7 @@
 
 
   
-    <a href="https://github.com/meshcore-dev/meshcore/edit/main/docs/MHR/sim/MeshCore_Simulation_v3_Realdaten.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/meshcore-dev/meshcore/edit/main/docs/MHR/sim/MeshCore_Simulation_v4_NeighborGraph.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1416,219 +1382,332 @@
   
 
 
-<h1 id="meshcore-simulation-v3-auf-echten-live-daten-kalibriert">MeshCore-Simulation v3 — auf ECHTEN Live-Daten kalibriert</h1>
-<p><strong>Datenquelle:</strong> CoreScope (<code>corescope.meshrheinland.de</code>), Live-Abzug vom 2026-05-30.
-<strong>Datensatz:</strong> 1962 Knoten (1819 mit Geo), 38 Observer (19 mit Geo), <strong>109.980 reale rx-Pakete</strong>
-(Roh-<code>packets.jsonl</code> ≈ 197 MB, <em>nicht</em> im Repo — nur kompakte Derivate unter <code>data/</code>).
-<strong>Reproduzierbar:</strong> Seed 42. Collector: <code>mhr_collect_corescope.py</code>. Simulation: <code>mhr_sim_real_v3.py</code>.</p>
-<p>Diese Studie trennt strikt zwischen <strong>GEMESSEN</strong> (aus realen Produktionspaketen abgeleitet)
-und <strong>SIMULIERT</strong> (Monte-Carlo-Routing-Modell auf der realen Topologie). Bewusst ehrlich,
-ohne Schönfärberei: wo der Realdatensatz eine alte Annahme widerlegt, steht das hier.</p>
-<hr />
-<h2 id="baustein-a-was-aus-den-live-daten-gemessen-wurde">Baustein A — Was aus den Live-Daten GEMESSEN wurde</h2>
-<h3 id="a1-nodehash-mapping-disambiguierung">A1 — Node→Hash-Mapping &amp; Disambiguierung</h3>
-<p>MeshCore-Hash = die ersten <code>hash_size</code> Bytes des <code>public_key</code> (Hex-Präfix). Index über alle
-1/2/3-Byte-Präfixe gebaut. Bestätigte Eindeutigkeit:</p>
-<table>
-<thead>
-<tr>
-<th>Präfix</th>
-<th>distinct</th>
-<th>kollidierend</th>
-<th>Ø Knoten/Präfix</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1-Byte</td>
-<td>254</td>
-<td>254 (alle)</td>
-<td>7,72</td>
-</tr>
-<tr>
-<td>2-Byte</td>
-<td>1934</td>
-<td>27</td>
-<td>1,01</td>
-</tr>
-<tr>
-<td>3-Byte</td>
-<td>1961</td>
-<td>1</td>
-<td>1,00</td>
-</tr>
-</tbody>
-</table>
-<p>1-Byte-Hashes (real ~75 % aller Pfad-Hashes) kollidieren massiv. Disambiguierung über
-Geografie: bei Kollision wird der zum bereits aufgelösten Nachbar-Hop nächste Kandidat in
-LoRa-Reichweite (≤ 45 km) gewählt; vor- <strong>und</strong> rückwärts. Unauflösbares wird als <em>ambig</em>
-markiert und <strong>nicht geraten</strong>.</p>
-<p>Aufschlüsselung über alle 1,41 Mio. Pfad-Hash-Vorkommen:
-<code>unique 18,2 %</code>, <code>geo-disambiguiert 0,1 %</code>, <code>ambig 77,6 %</code>, <code>unknown 4,1 %</code>.
-Die hohe Ambig-Quote ist eine <strong>ehrliche Limitierung</strong>: 1-Byte-Hashes sind ohne
-zuverlässige Nachbar-Referenz oft nicht eindeutig zuordenbar. Für die <em>quantitativen</em>
-Auswertungen (SNR-Fit, Hop-Distanzen) verwenden wir daher ausschließlich <strong>eindeutig</strong>
-auflösbare Hops — das vermeidet Rate-Bias.</p>
-<h3 id="a2-beobachtete-relay-topologie-backbone">A2 — Beobachtete Relay-Topologie (Backbone)</h3>
-<p>Aufeinanderfolgende, aufgelöste Pfad-Hops = reale gerichtete Kanten „A leitet an B weiter".
-Aggregiert (nur Repeater↔Repeater):</p>
-<ul>
-<li><strong>Knoten im Backbone-Graph:</strong> 745</li>
-<li><strong>Gerichtete Kanten:</strong> 6246</li>
-<li><strong>Grad (ungerichtet):</strong> min 1 / median 6 / max 118</li>
-<li><strong>Größte Zusammenhangskomponente:</strong> 724 von 745 (97 %)</li>
-</ul>
-<p>Ergebnis: ein gut vernetzter, zusammenhängender Backbone mit wenigen Hub-Knoten (max. Grad 118).
-Kompakte Kantenliste: <code>data/topology_edges.json</code>. Plot: <code>fig_v3_real_topology.png</code>.</p>
-<h3 id="a3-snrdistanz-linkmodell-kalibrieren-kernbefund-der-messung">A3 — SNR/Distanz-Linkmodell kalibrieren (KERNBEFUND der Messung)</h3>
-<p>Für jedes rx-Paket: Observer (Position bekannt) hörte den <strong>letzten</strong> Hop der Pfadkette
-(Position via Hash-Map). Aus <strong>14.399 eindeutig</strong> auflösbaren (letzter-Hop → Observer)-Paaren
-ein Log-Distance-Modell <code>SNR ≈ SNR0 − 10·n·log10(d)</code> gefittet:</p>
-<table>
-<thead>
-<tr>
-<th>Modell</th>
-<th>SNR0 (dB)</th>
-<th>Pfadverlust-Exponent n</th>
-<th>Bemerkung</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>GEMESSEN (OLS)</strong></td>
-<td><strong>2,78</strong></td>
-<td><strong>0,41</strong></td>
-<td>corr(log d, SNR) = <strong>−0,42</strong></td>
-</tr>
-<tr>
-<td>GEMESSEN (Bin-Mediane)</td>
-<td>−0,75</td>
-<td>0,24</td>
-<td>robust gegen Sättigung</td>
-</tr>
-<tr>
-<td>ALTE ANNAHME (<code>mhr_sim_real.py</code>)</td>
-<td>17,0</td>
-<td>2,55</td>
-<td>unbelegt</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Befund — wichtig und unbequem:</strong> Im realen Datensatz erklärt die reine Distanz das SNR
-<strong>nur schwach</strong> (|corr| ≈ 0,42, n ≈ 0,4 statt der angenommenen 2,55). Antennenhöhe,
-Standort (viele Repeater auf Bergen/Hochhäusern), Richtwirkung und Gelände dominieren über
-die Luftlinie. Knoten in 40–70 km Entfernung werden teils mit besserem SNR gehört als
-Nachbarn in &lt; 2 km. Die saubere Pfadverlust-Annahme des alten Skripts ist damit für dieses
-reale Netz <strong>nicht haltbar</strong> — der vermeintliche „Genauigkeitsgewinn" besteht gerade darin,
-diese Diskrepanz offenzulegen. Plot: <code>fig_v3_snr_fit.png</code>. Parameter: <code>data/snr_calibration.json</code>.</p>
+<h1 id="meshcore-simulation-v4-auf-der-echten-server-gemessenen-link-topologie">MeshCore-Simulation v4 — auf der ECHTEN, server-gemessenen Link-Topologie</h1>
+<p><strong>Datenquelle:</strong> server-aufgelöster <code>neighbor_graph.json</code> (CoreScope-Pipeline, Abzug 2026-05-30).
+<strong>Datensatz:</strong> 1034 Knoten, 1956 Kanten mit <strong>echtem Per-Link-<code>avg_snr</code></strong> (Median ~4,2 dB),
+<code>weight</code> = Beobachtungszahl, <code>ambiguous</code>-Flag (173 Kanten = 8,8 %). Anreicherung (Geo/Rolle/
+Traffic) via Pubkey-(Präfix-)Join mit <code>nodes.json</code> (1962 Knoten).
+<strong>Reproduzierbar:</strong> Master-Seed 42, 6 Seeds für alle Zufallsanteile, 150 Quelle-Ziel-Paare/Seed.
+<strong>Skript:</strong> <code>mhr_sim_real_v4.py</code> · <strong>Ergebnisse:</strong> <code>sim_results_v4.json</code> · <strong>Plots:</strong> <code>fig_v4_*.png</code>.</p>
 <blockquote>
-<p><strong>Konsequenz fürs Simulationsmodell (Baustein B):</strong> Ein PLE von 0,4 ergäbe einen
-physikalisch unsinnigen Reichweitengraphen (quasi unbegrenzte Reichweite). Für die Sim
-wird daher der reale Intercept/Streuungs-Befund mit einem auf physikalisch plausible
-Untergrenze <strong>geclampten</strong> PLE = 2,0 kombiniert und so kalibriert, dass die <strong>empirisch
-gemessene</strong> mediane Hop-Distanz (s. u.) als zuverlässiger Link erscheint. Das ist eine
-bewusste, dokumentierte Modellwahl — kein gemessener Wert.</p>
+<p><strong>Warum v4 statt v3?</strong> v3 und die Studie bauten den Routing-Graphen aus einem
+GEOMETRISCHEN Log-Distance-Linkmodell (Reichweitenscheiben, pro Knoten Top-20-Nachbarn).
+Dieses Modell traf nur ~41,7 % der real beobachteten Kanten, und seine SNR-Distanz-Annahme
+wird von den Realdaten widerlegt (|corr(log d, SNR)| ≈ 0,42, PLE ≈ 0,4 statt 2,55). v4 nutzt
+stattdessen die <strong>echten gemessenen Kanten</strong> als Routing-Graph und das <strong>echte Per-Link-SNR</strong>
+für Reliability/ETX — die genaueste verfügbare Grundlage.</p>
 </blockquote>
-<p><strong>Empirische Hop-Distanz (ebenfalls GEMESSEN):</strong> Aus 172.052 eindeutig aufgelösten
-Nachbar-Hop-Paaren ist die mediane reale Hop-Distanz <strong>10,1 km</strong> (P90 28,8 km). Das ist ein
-direkt gemessenes, robustes Maß für die typische Funkstrecke eines Hops im Netz.</p>
-<h3 id="a4-reale-detour-statistik-kernergebnis">A4 — Reale Detour-Statistik (KERNERGEBNIS)</h3>
-<p>Für jedes Paket mit Pfad: reale Hop-Zahl <code>len(path)</code> vs. geografische <strong>Unterschranke</strong>
-<code>ceil(Luftlinie(erster↔letzter aufgelöster Hop) / Hop-Reichweite)</code>. Als Hop-Reichweite das
-<strong>empirische P75</strong> (19,3 km) der realen Nachbar-Hop-Distanzen → die Schranke bleibt eine echte
-<em>Unter</em>schranke (großzügige Hop-Reichweite ⇒ minimal nötige Hops eher unterschätzt).</p>
-<p>Über <strong>29.433</strong> auswertbare reale Pakete:</p>
-<ul>
-<li>Reale Hops: Median <strong>10</strong>, P90 <strong>18</strong>, Max <strong>32</strong></li>
-<li><strong>Detour-Faktor (real / geografische Unterschranke): Median 2,11× · Mittel 2,62× · P90 4,33× · P99 10×</strong></li>
-<li><strong>78,8 %</strong> der Pakete laufen &gt; 1,5× · <strong>50,2 %</strong> laufen &gt; 2× über die geografisch nötige Hop-Zahl</li>
-</ul>
-<p><strong>Das belegt das „first-wins-Umweg"-Problem mit ECHTEN Produktionsdaten:</strong> der real
-gecachte/gefloodete Pfad ist im Median ~2,1× so lang wie geografisch nötig, in 10 % der
-Fälle ≥ 4,3×, und jedes zweite Paket läuft ≥ 2× über die nötige Hop-Zahl.
-Plot: <code>fig_v3_real_detours.png</code>. Daten: <code>data/real_detour_stats.json</code>.</p>
 <hr />
-<h2 id="baustein-b-routing-simulation-auf-der-grossen-realen-topologie">Baustein B — Routing-Simulation auf der GROSSEN realen Topologie</h2>
-<h3 id="aktiver-repeater-subgraph">Aktiver Repeater-Subgraph</h3>
-<p>Auswahlkriterium: <code>role == repeater</code> <strong>und</strong> Geo vorhanden <strong>und</strong>
-(<code>relay_active</code> <strong>oder</strong> <code>relay_count_24h &gt; 0</code> <strong>oder</strong> im Datensatz als aufgelöster Pfad-Hop
-beobachtet). Begründung: das sind die Knoten, die im Beobachtungszeitraum nachweislich am
-Relaying beteiligt bzw. dafür aktiv konfiguriert waren.</p>
-<ul>
-<li><strong>Aktiver Subgraph:</strong> 881 Knoten (nach Geo-Plausibilitätsfilter, s. Limitierungen)</li>
-<li><strong>Link-/Reichweitengraph</strong> (kalibriertes A3-Sim-Modell, Kante wenn geschätztes SNR &gt; −12 dB,
-  Distanz ≤ 45 km; pro Knoten nur die 20 stärksten Links; Kantengewicht = ETX aus SNR):
-  881 Knoten, <strong>9.861 Kanten</strong>, größte Komponente <strong>831</strong>.</li>
-</ul>
-<h3 id="baseline-meshcore-vs-mhr">Baseline (MeshCore) vs. MHR</h3>
-<ul>
-<li><strong>Baseline:</strong> first-packet-wins-Flood, Monte-Carlo über zufälliges Hop-Timing (jeder
-  Repeater sendet genau einmal, hasSeen-Dedup); der zuerst am Ziel eintreffende Pfad gewinnt.</li>
-<li><strong>MHR:</strong> SNR-/qualitätsgeleiteter Pfad = ETX-kürzester Pfad (bester kumulierter SNR /
-  wenigste effektive Hops; prefer-shorter implizit, da ETX mit Hops wächst).</li>
-<li>Über zufällige Quelle-Ziel-Paare in der großen Komponente (Seed 42): mittlere Hops,
-  Detour-Ratio, Airtime (Σ sendende Repeater), Zuverlässigkeit (Produkt der Link-Reliabilities).</li>
-</ul>
-<p>Ergebnis über <strong>196</strong> auswertbare Quelle-Ziel-Paare (von 200 gezogen), Link-Graph
-881 Knoten / 9.861 Kanten (pro Knoten Top-20-Links) / größte Komponente <strong>831</strong>
-(siehe <code>sim_results_v3.json</code>, Plot <code>fig_v3_sim_compare.png</code>):</p>
+<h2 id="1-reale-topologie">1) Reale Topologie</h2>
+<table>
+<thead>
+<tr>
+<th>Größe</th>
+<th>v4 (echte Kanten)</th>
+<th>v3-Sim (geometrisch)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Knoten (Kern, ohne <code>ambiguous</code>)</td>
+<td><strong>1034</strong></td>
+<td>881 aktiver Subgraph</td>
+</tr>
+<tr>
+<td>Kanten</td>
+<td><strong>1783</strong> (173 ambiguous verworfen)</td>
+<td>9.861 (Top-20-Reichweite)</td>
+</tr>
+<tr>
+<td><strong>Ø-Grad</strong></td>
+<td><strong>3,45</strong> (median 2, max 92)</td>
+<td><strong>~23,7</strong></td>
+</tr>
+<tr>
+<td>Komponenten</td>
+<td>202</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Größte Zusammenhangskomponente</td>
+<td><strong>632</strong> (61 %)</td>
+<td>831</td>
+</tr>
+<tr>
+<td>Knoten mit Geo (joinbar)</td>
+<td>930/1034</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Rollen</td>
+<td>821 repeater, 146 companion, 56 room, 11 observer</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Kernunterschied:</strong> v4 ist eine <strong>SPARSE reale Topologie</strong> (Ø-Grad 3,45) mit vielen Blattknoten
+(405 Knoten Grad 1, 168 Grad 2) und wenigen Hubs (max. Grad 92). v3 war ein <strong>dichter geometrischer
+Graph</strong> (Ø-Grad ~24). Diese Sparsity ist der entscheidende Treiber aller v4-Abweichungen: das reale
+Netz hat <strong>viel weniger Pfad-Redundanz</strong> als das geometrische Modell suggerierte.</p>
+<p><strong>Link-Reliability/ETX aus echtem SNR (nicht Distanz):</strong> Pro Kante
+<code>p = clip(σ((avg_snr − (−12 dB)) / 4), 0.02, 0.995)</code> (logistisch um die Empfangsschwelle),
+<code>ETX = 1/p²</code>. Median-Link-SNR 4,2 dB → Median-Reliability <strong>0,98</strong>; P10-SNR −6,6 dB → schwache
+Links bleiben erkennbar. <code>weight</code> (Beobachtungszahl, Median 40) ist als Stabilitätsmaß im
+Kanten-Attribut erhalten.</p>
+<hr />
+<h2 id="2-halt-die-studie-auf-echten-kanten-befund-fur-befund">2) Hält die Studie auf echten Kanten? (Befund für Befund)</h2>
+<h3 id="2a-baseline-first-wins-flood-vs-mhr-bestatigt">2a) Baseline (first-wins-Flood) vs. MHR — <strong>BESTÄTIGT</strong></h3>
 <table>
 <thead>
 <tr>
 <th>Kennzahl</th>
-<th>MeshCore (Baseline)</th>
-<th>MHR</th>
+<th>Baseline (Flood)</th>
+<th>MHR (ETX/hop-geleitet)</th>
 <th>Δ</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td>Lieferquote</td>
+<td>0,931</td>
+<td>— (Pfad existiert)</td>
+<td>—</td>
+</tr>
+<tr>
 <td>Ø Hops</td>
-<td><strong>8,30</strong></td>
-<td><strong>7,12</strong></td>
-<td>−14 %</td>
+<td>5,05</td>
+<td><strong>4,84</strong></td>
+<td>−4 %</td>
 </tr>
 <tr>
-<td>Detour-Ratio (Baseline/MHR)</td>
+<td>Detour (Baseline/MHR), Median · Mittel</td>
 <td>—</td>
 <td>—</td>
-<td><strong>Median 1,17× · Mittel 1,20×</strong></td>
+<td><strong>1,00× · 1,06×</strong></td>
 </tr>
 <tr>
-<td>Paare mit Detour</td>
+<td>Paare, bei denen Baseline länger ist</td>
 <td>—</td>
 <td>—</td>
-<td><strong>98 %</strong></td>
+<td><strong>26 %</strong></td>
 </tr>
 <tr>
 <td>Ø Sende-Ereignisse (Airtime)</td>
-<td><strong>786</strong> (netzweiter Flood)</td>
-<td><strong>7,1</strong> (Unicast)</td>
-<td><strong>−99,1 %</strong></td>
+<td><strong>616,8</strong></td>
+<td><strong>4,84</strong> (Unicast)</td>
+<td><strong>−99,2 %</strong></td>
 </tr>
 <tr>
 <td>Ø Pfad-Zuverlässigkeit</td>
-<td><strong>0,47</strong></td>
-<td><strong>0,55</strong></td>
-<td><strong>+18 %</strong></td>
-</tr>
-<tr>
-<td>schlechtester Baseline-Pfad</td>
-<td>16 Hops</td>
-<td>—</td>
-<td>—</td>
+<td>0,707</td>
+<td><strong>0,806</strong></td>
+<td><strong>+14 %</strong></td>
 </tr>
 </tbody>
 </table>
-<p>Kernaussage der Simulation: metrik-geleitetes MHR liefert auf der <strong>realen 831-Knoten-Topologie</strong>
-kürzere, zuverlässigere Pfade bei drastisch geringerer Airtime — der MeshCore-Flood aktiviert
-im Mittel ~786 Repeater pro Discovery, MHR nur die ~7 Hops des gewählten Pfads.</p>
-<p><strong>Einordnung (ehrlich):</strong> Der <em>simulierte</em> Detour-Faktor fällt deutlich milder aus als der
-<strong>gemessene</strong> (A4), weil das Sim-Linkmodell ein idealisiertes Scheiben-/Disc-Modell ohne
-Gelände ist — geografisch kürzeste Pfade sind darin kurz und der Flood weicht wenig ab. Der
-<strong>reale</strong> Detour (Baustein A4, Median 2,0×) ist deshalb das belastbarere Argument für das
-Umweg-Problem; die Simulation zeigt vor allem den <strong>Airtime-</strong> und <strong>Zuverlässigkeits</strong>-Vorteil
-von metrik-geleitetem Routing (MHR Unicast entlang eines Pfads statt netzweitem Flood).</p>
+<p><strong>Bestätigung:</strong> Der <strong>Airtime-Vorteil</strong> von metrik-geleitetem MHR bleibt auf echten Kanten
+gewaltig (−99,2 %). Auf der <strong>sparsen</strong> realen Topologie flutet der Baseline-Flood netzweit
+durch fast die ganze 632-Knoten-Komponente (~617 Sende-Ereignisse pro Discovery), MHR nutzt
+nur die ~5 Hops des gewählten Pfads. Zuverlässigkeit steigt (+14 %, echtes SNR), Hops sinken leicht.</p>
+<p><strong>Abweichung (ehrlich):</strong> Der <strong>Detour-Vorteil</strong> schrumpft praktisch auf null
+(Median 1,00×, Mittel 1,06×). Grund: in einer <strong>sparsen</strong> Topologie gibt es kaum alternative
+Pfade — der first-wins-Flood findet fast immer denselben (kurzen) Pfad wie MHR, weil es schlicht
+keine langen Umweg-Alternativen gibt. Das <strong>relativiert</strong> das v3-Sim-Detour-Argument (dort
+Median 1,17×) und den gemessenen A4-Detour (Median 2,1× aus realen Paketen) — Letzterer
+entstand durch reale Timing-/Kollisions-/Mixed-Firmware-Effekte, die dieses idealisierte
+Flood-Modell <strong>nicht</strong> abbildet. <strong>Der belastbare MHR-Gewinn auf echten Kanten ist Airtime
+und Zuverlässigkeit, nicht Hop-Detour.</strong></p>
+<h3 id="2b-floodmax-sweep-floodmax-15-bestatigt-mit-nuance">2b) flood.max-Sweep — <strong>flood.max = 15 BESTÄTIGT (mit Nuance)</strong></h3>
+<p>Realer Netzdurchmesser (Hop-Stichprobe der Riesenkomponente): <strong>P90 = 12 Hops, max = 14</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>flood.max</th>
+<th>Lieferquote</th>
+<th>Δ vs. Baseline</th>
+<th>Airtime vs. Baseline</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td>0,951</td>
+<td><strong>+0,020</strong></td>
+<td>−1,4 %</td>
+</tr>
+<tr>
+<td>12</td>
+<td>0,943</td>
+<td>+0,012</td>
+<td>−0,2 %</td>
+</tr>
+<tr>
+<td><strong>15</strong></td>
+<td><strong>0,939</strong></td>
+<td><strong>+0,008</strong></td>
+<td>±0,0 %</td>
+</tr>
+<tr>
+<td>18</td>
+<td>0,931</td>
+<td>±0,000</td>
+<td>±0,0 %</td>
+</tr>
+<tr>
+<td>20</td>
+<td>0,931</td>
+<td>±0,000</td>
+<td>±0,0 %</td>
+</tr>
+<tr>
+<td>64</td>
+<td>0,931</td>
+<td>±0,000</td>
+<td>±0,0 %</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Befund:</strong> Auf der realen Topologie ändert <code>flood.max</code> ab 15 <strong>nichts</strong> an Lieferquote oder
+Airtime — weil der reale Durchmesser (P90 = 12) klar darunter liegt; höhere Limits sind reine
+Reserve. Werte <strong>≤ 12</strong> kappen sogar einige der wenigen langen (15–18-Hop-)Pfade und erhöhen die
+gemessene Lieferquote minimal (+0,01…0,02) bei kaum geänderter Airtime — das ist aber ein
+Effekt der <strong>idealisierten</strong> Topologie (keine Kollisionen) und kein Sicherheitsgewinn.</p>
+<p><strong>Implikation:</strong> <strong><code>flood.max = 15</code> ist auf der echten Topologie weiterhin eine sichere,
+sinnvolle Wahl</strong> (Lieferquote ≥ Baseline, Airtime ≤ Baseline, Reserve über dem P90-Durchmesser
+von 12). Es gibt <strong>keinen</strong> Beleg, von 15 abzuweichen; 12 wäre knapp am realen P90-Durchmesser
+(zu wenig Reserve), 64 ist unnötig hoch. <strong><code>MHR_HOP_HORIZON = 12</code></strong> ist als Wert konsistent mit
+dem realen P90-Durchmesser, aber als <em>hartes</em> Flood-Limit zu knapp — 15 lässt die nötige Reserve.</p>
+<h3 id="2c-adoptions-sweep-safety-invariante-dreiteilung-bestatigt-aber-suppressions-sicherheitszone-schrumpft-drastisch">2c) Adoptions-Sweep + Safety-Invariante — <strong>Dreiteilung BESTÄTIGT, aber Suppressions-Sicherheitszone SCHRUMPFT DRASTISCH</strong></h3>
+<p>Safety-Invariante: Lieferquote ≥ Baseline − Rausch-Band UND Airtime ≤ Baseline + Rausch-Band.</p>
+<p><strong>Gruppe 1 — „gute Bürger" (sicher bei JEDEM α, monoton): BESTÄTIGT</strong>
+- <strong>M1 (hop-gewichtetes Delay):</strong> deliv +0,02 über alle α, Airtime ≈ Baseline. Safe von 1 Knoten → alle.
+- <strong>M5 (Best-of-N am Ziel nach Hops):</strong> exakt neutral (deliv/airtime = Baseline), safe überall.
+- <strong>M7_15 (flood.max = 15):</strong> deliv +0,008, Airtime neutral, safe überall.</p>
+<p><strong>Gruppe 2 — „adaptive Suppression" (NICHT mehr bis α=1 sicher): ABWEICHUNG</strong></p>
+<table>
+<thead>
+<tr>
+<th>Mechanismus</th>
+<th>safe bis α ≈</th>
+<th>bei α = 1.0: Lieferquote</th>
+<th>Airtime</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M3 (shorter-path-cancel)</td>
+<td><strong>0,10</strong></td>
+<td>0,762 (<strong>−0,17</strong>)</td>
+<td>−37,8 %</td>
+</tr>
+<tr>
+<td>COMBI (M1+M3+M5+M7)</td>
+<td><strong>0,05</strong></td>
+<td>0,759 (<strong>−0,17</strong>)</td>
+<td>−39,3 %</td>
+</tr>
+<tr>
+<td>M4 (MPR/CDS-Schweigen)</td>
+<td><strong>0,05</strong> (≤1 %)</td>
+<td>0,536 (<strong>−0,40</strong>)</td>
+<td>−87,2 %</td>
+</tr>
+<tr>
+<td>M2k2 / M2k3 (counter-suppress)</td>
+<td>bricht früh</td>
+<td>0,63 / 0,76</td>
+<td>−53 % / −34 %</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Das ist die wichtigste v4-Abweichung von der Studie.</strong> In v3/Studie galten die
+Suppressions-Mechanismen bis zu hohen α als sicher, weil der <strong>dichte geometrische Graph
+(Ø-Grad ~24)</strong> massive Pfad-Redundanz bot — unterdrückte Sender wurden durch Nachbarn ersetzt.
+Auf der <strong>sparsen realen Topologie (Ø-Grad 3,45)</strong> existiert diese Redundanz <strong>nicht</strong>: jeder
+unterdrückte Rebroadcast kann der <strong>einzige</strong> Pfad zu einem Blattknoten gewesen sein, also bricht
+die Lieferquote schon ab moderater Adoption ein. <strong>M4 (MPR/CDS) bricht am frühesten (ab α≈0,05)</strong> —
+das bestätigt die Studien-Warnung „MPR kippt bei voller Adoption in Coverage-Verlust", <strong>aber auf
+echten Kanten passiert das viel früher und härter</strong>.</p>
+<p><strong>Fundament-Gruppe (M0/Baseline + neutrale Mechanismen):</strong> unverändert sicher.</p>
+<blockquote>
+<p><strong>Konsequenz:</strong> Reine <strong>Airtime-Suppression (Stufe B/C) ist auf der echten sparsen Topologie
+NICHT mischbetriebs-sicher über α≈5–10 % hinaus</strong> ohne harte Redundanz-Garantie. Der v3/Studie-
+Optimismus für M3/M4/COMBI bei hoher Adoption hält auf echten Kanten NICHT.</p>
+</blockquote>
+<h3 id="2d-snr-frage-neu-relativiert-v3-snr-ist-auf-echten-kanten-ein-etwas-starkerer-hebel-als-gedacht-aber-kein-hop-ersatz">2d) SNR-Frage neu — <strong>RELATIVIERT v3 (SNR ist auf echten Kanten ein etwas stärkerer Hebel als gedacht, aber kein Hop-Ersatz)</strong></h3>
+<p>Jetzt liegt echtes Per-Link-SNR vor (kein Distanz-Proxy):</p>
+<table>
+<thead>
+<tr>
+<th>Frage</th>
+<th>v4-Befund</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Korr(mittleres Pfad-SNR, Hop-Zahl)</td>
+<td><strong>+0,17</strong> (schwach)</td>
+</tr>
+<tr>
+<td>ETX-Pfad vs. reiner Hop-Pfad: Ø extra Hops</td>
+<td><strong>+0,19</strong></td>
+</tr>
+<tr>
+<td>ETX-Pfad vs. Hop-Pfad: Ø Reliability-Gewinn</td>
+<td><strong>+0,168</strong> (Median +0,041)</td>
+</tr>
+<tr>
+<td>Anteil Paare, bei denen ETX-Pfad ≠ Hop-Pfad</td>
+<td><strong>18 %</strong></td>
+</tr>
+<tr>
+<td>Korr(Einzel-Link-SNR, Knotengrad)</td>
+<td><strong>−0,52</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Bestätigung von v3 (Richtung):</strong> SNR korreliert nur <strong>schwach</strong> mit Pfad-Kürze (+0,17) — ein
+kurzer Pfad ist nicht automatisch SNR-stark. Hop-Zahl bleibt der dominante Kürze-Hebel.</p>
+<p><strong>Relativierung (ehrlich):</strong> Anders als v3 suggerierte, ist SNR <strong>nicht wertlos</strong>: ein
+SNR-/ETX-geleiteter Pfad liefert in 18 % der Paare einen <strong>anderen</strong> (und im Mittel <strong>+0,168
+zuverlässigeren</strong>) Pfad als der reine Hop-kürzeste — für nur <strong>+0,19 zusätzliche Hops</strong>. Echtes
+Per-Link-SNR ist also ein <strong>brauchbarer Zuverlässigkeits-Tiebreaker</strong>, kein Ersatz für die
+Hop-Metrik. Der starke <strong>negative</strong> Zusammenhang Link-SNR ↔ Knotengrad (−0,52) ist aufschlussreich:
+<strong>Hub-Knoten haben im Mittel SCHWÄCHERE Einzel-Links</strong> (viele entfernte/marginale Nachbarn),
+während Knoten mit wenigen, nahen Nachbarn starke Links haben. Das ist genau der Grund, warum eine
+ETX-Metrik (SNR-gewichtet) Hubs nicht blind bevorzugt — ein realer Vorteil gegenüber reinem Hop-Count.</p>
+<hr />
+<h2 id="3-firmware-implikationen">3) Firmware-Implikationen</h2>
+<p><strong>Bestätigt v4 die ausgelieferte Stufe A?</strong> — <strong>JA, in vollem Umfang, mit zusätzlicher Schärfung:</strong></p>
+<ol>
+<li><strong><code>flood.max = 15</code></strong> — <strong>bestätigt.</strong> Realer Durchmesser P90 = 12 → 15 ist die korrekte Wahl
+   (Reserve über dem Durchmesser, Lieferquote ≥ Baseline, Airtime neutral). <strong>Nicht</strong> auf 12 senken
+   (zu knapp am P90), <strong>nicht</strong> auf 64 belassen (unnötig). 15 bleibt.</li>
+<li><strong>Hop-gewichtetes Rebroadcast-Delay (<code>tx_hop_weight = 0,6</code>)</strong> — <strong>bestätigt.</strong> M1 ist über den
+   gesamten Adoptions-Sweep safe und monoton (deliv +0,02, Airtime neutral), führt den Flood
+   zuverlässig über kürzere Pfade. <code>tx_hop_weight = 0,6</code> ist ein guter Wert; kein Änderungsbedarf.</li>
+<li><strong>EWMA-Nachbar-SNR + SNR-/ETX-Tiebreak</strong> — <strong>gestärkt.</strong> v4 zeigt: echtes Per-Link-SNR ist ein
+   <strong>brauchbarer Zuverlässigkeits-Tiebreaker</strong> (18 % andere Pfade, +0,168 Reliability für +0,19 Hops),
+   und Hub-Links sind real schwächer (Korr −0,52). Eine ETX-Metrik, die SNR <strong>als Tiebreaker nach
+   Hops</strong> nutzt (nicht primär), ist datenbelegt sinnvoll. <strong><code>MHR_HOP_HORIZON</code></strong> sollte als
+   Pfad-Längen-Horizont bei <strong>12</strong> (= realer P90-Durchmesser) bleiben; das <em>Flood-Limit</em> <code>flood.max</code>
+   bei <strong>15</strong>.</li>
+</ol>
+<p><strong>Was v4 NEU mahnt (gegenüber Studie/Roadmap):</strong></p>
+<ol>
+<li><strong>Airtime-Suppression (Stufe B/C: M2/M3/M4/COMBI) NICHT ohne harte Redundanz-Garantie ausrollen.</strong>
+   Auf der echten sparsen Topologie (Ø-Grad 3,45) bricht jede reine Suppression die Lieferquote schon
+   ab <strong>α ≈ 5–10 %</strong> (M4 ab α≈5 %, −0,40 bei voller Adoption). Die in v3/Studie attestierte
+   Hochadoptions-Sicherheit dieser Mechanismen <strong>hält auf echten Kanten nicht</strong>. Empfehlung:</li>
+<li>Stufe B/C nur mit <strong>lokal bestätigter Redundanz</strong> (k≥2 unabhängige Cover-Sender <em>gehört</em>, bevor
+     unterdrückt wird) und <strong>Reliability-Floor</strong> (nie den einzigen Pfad zu einem Blattknoten kappen).</li>
+<li>Vor Hardware-Rollout zwingend auf dieser realen Topologie gegenrechnen, nicht auf dem
+     geometrischen Modell.</li>
+</ol>
+<p><strong>Netto:</strong> Stufe A (hop-delay, flood.max 15, tx_hop_weight 0,6, EWMA-SNR) ist auf echten Kanten
+<strong>voll bestätigt und sicher</strong>. Der eigentliche Gewinn ist <strong>Airtime</strong> (−99 % bei MHR-Unicast,
+Flood aktiviert real ~617 Repeater) und <strong>Zuverlässigkeit</strong> (+14 %), nicht Hop-Detour. Die
+aggressiveren Suppressions-Stufen brauchen mehr Vorsicht als die Studie nahelegte.</p>
 <hr />
 <h2 id="erzeugte-artefakte">Erzeugte Artefakte</h2>
 <table>
@@ -1640,80 +1719,58 @@ von metrik-geleitetem Routing (MHR Unicast entlang eines Pfads statt netzweitem 
 </thead>
 <tbody>
 <tr>
-<td><code>mhr_sim_real_v3.py</code></td>
-<td>Komplette Mess- + Simulationspipeline (Seed 42, kommentiert)</td>
+<td><code>mhr_sim_real_v4.py</code></td>
+<td>Komplette v4-Pipeline (Seed 42, 6 Seeds, kommentiert)</td>
 </tr>
 <tr>
-<td><code>mhr_collect_corescope.py</code></td>
-<td>Reproduzierbarer Collector (urllib + UA + unverified SSL, Offset-Pagination)</td>
+<td><code>sim_results_v4.json</code></td>
+<td>Alle Kennzahlen (Topologie, Baseline-vs-MHR, flood.max-Sweep, Adoptions-Sweep, SNR)</td>
 </tr>
 <tr>
-<td><code>data/nodes.json</code>, <code>data/observers.json</code></td>
-<td>Kompakte Kopien der Stammdaten</td>
+<td><code>fig_v4_topology.png</code></td>
+<td>Echte neighbor-graph-Topologie, Kanten nach echtem avg_snr gefärbt</td>
 </tr>
 <tr>
-<td><code>data/topology_edges.json</code></td>
-<td>Aggregierte beobachtete Kantenliste (A2)</td>
-</tr>
-<tr>
-<td><code>data/snr_calibration.json</code></td>
-<td>SNR-Fit-Parameter + Stichprobengröße (A3)</td>
-</tr>
-<tr>
-<td><code>data/real_detour_stats.json</code></td>
-<td>Reale Detour-Statistik (A4)</td>
-</tr>
-<tr>
-<td><code>sim_results_v3.json</code></td>
-<td>Alle Kennzahlen (Messung + Simulation)</td>
-</tr>
-<tr>
-<td><code>fig_v3_real_topology.png</code></td>
-<td>Gemessene Backbone-Topologie</td>
-</tr>
-<tr>
-<td><code>fig_v3_snr_fit.png</code></td>
-<td>SNR/Distanz: gemessen vs. alt angenommen</td>
-</tr>
-<tr>
-<td><code>fig_v3_real_detours.png</code></td>
-<td>Gemessene Detour-Faktor-Verteilung</td>
-</tr>
-<tr>
-<td><code>fig_v3_sim_compare.png</code></td>
+<td><code>fig_v4_baseline_vs_mhr.png</code></td>
 <td>Baseline vs. MHR (Hops, Airtime, Zuverlässigkeit)</td>
+</tr>
+<tr>
+<td><code>fig_v4_floodmax_sweep.png</code></td>
+<td>flood.max-Sweep (Lieferquote + Airtime vs. Baseline)</td>
+</tr>
+<tr>
+<td><code>fig_v4_adoption_safety.png</code></td>
+<td>Safety-Matrix (Mechanismus × α), Top-Traffic</td>
+</tr>
+<tr>
+<td><code>fig_v4_snr_vs_reliability.png</code></td>
+<td>SNR vs. Pfad-Kürze + ETX-Pfad-Reliability-Vorteil</td>
 </tr>
 </tbody>
 </table>
 <hr />
 <h2 id="limitierungen-wissenschaftlich-ehrlich">Limitierungen (wissenschaftlich ehrlich)</h2>
 <ol>
-<li><strong>Hash-Ambiguität:</strong> 1-Byte-Pfad-Hashes (Großteil) kollidieren stark (Ø 7,7 Knoten/Hash);
-   77,6 % der Hash-Vorkommen blieben unauflösbar. Alle quantitativen Auswertungen nutzen
-   nur eindeutige Hops — das reduziert Bias, aber auch die Stichprobe und kann seltene,
-   nur über 1-Byte-Knoten laufende Pfade unterrepräsentieren.</li>
-<li><strong>Observer-Bias:</strong> Nur 19 von 38 Observern haben Geo; der SNR-Fit stützt sich auf deren
-   Standorte (Schwerpunkt Rheinland). Die SNR-Stichprobe ist also räumlich nicht uniform.</li>
-<li><strong>Distanz erklärt SNR real kaum</strong> (|corr| ≈ 0,42): ohne Geländedaten/Antennenhöhen/
-   Richtdiagramme ist ein reines Log-Distance-Modell für dieses Netz grob. Das <strong>Sim-Linkmodell
-   ist daher idealisiert</strong> (geclampter PLE = 2,0) — es ist eine Modellannahme, kein Messwert,
-   und liefert tendenziell <strong>konservativere</strong> (mildere) Detour-Werte als die Realität (A4).</li>
-<li><strong>„letzter Hop" ≠ zwingend Sender beim Observer:</strong> bei langen/teils ambigen Pfaden kann der
-   wirklich gehörte Sender vom aufgelösten letzten Hop abweichen — zusätzliches Rauschen im
-   SNR-Fit (mitverantwortlich für die schwache Korrelation).</li>
-<li><strong>Detour-Unterschranke ist geografisch, nicht topologisch:</strong> sie nimmt eine konstante
-   Hop-Reichweite (P75 = 19,3 km) an. Echte minimale Hop-Zahlen könnten lokal höher liegen
-   (Funklöcher) — d. h. der reale Detour-Faktor ist eher <strong>unter</strong>- als überschätzt.</li>
-<li><strong>Simulation ohne Duty-Cycle/Kollisionen:</strong> das Flood-Modell zählt Sende-Ereignisse, modelliert
-   aber keine CSMA-Kollisionen, 10-%-Duty-Cycle-Drosselung oder Pufferüberläufe. Der reale
-   Airtime-Druck (geteilter Halbduplex-Kanal) ist damit eher noch unterschätzt — zugunsten von MHR.</li>
-<li><strong>Momentaufnahme:</strong> ein einzelner Live-Abzug; Tageszeit-/Churn-Effekte nicht gemittelt.</li>
-<li><strong>Geo-Plausibilitätsfilter:</strong> einige Knoten/Observer tragen Platzhalter-Koordinaten
-   (0,0) oder Werte außerhalb Mitteleuropas; diese werden verworfen (Bounding-Box
-   35–60 °N, −12–25 °O). Das säubert Topologie-Plot und Distanzen, verwirft aber auch
-   wenige evtl. legitime Außenposten.</li>
-<li><strong>Hop-Cap im Sim-Graph:</strong> pro Knoten werden nur die 20 stärksten Links behalten
-   (Rechenbarkeit + Realismus). Sehr schwache Fern-Links bleiben unberücksichtigt.</li>
+<li><strong>neighbor-graph erfasst nur REAL GENUTZTE Links.</strong> Kanten entstehen aus beobachteten
+   Relay-Pfaden — <strong>potenzielle</strong> (aber im Beobachtungsfenster ungenutzte) Links fehlen. Die echte
+   Topologie ist damit eher noch etwas dichter als hier; die Sparsity (und die daraus gefolgerte
+   geringe Redundanz) ist eine <strong>Obergrenze</strong> der Vorsicht, kann aber Suppression real minimal
+   besser dastehen lassen, als v4 zeigt. Richtungsaussage (Suppression bricht früh) bleibt robust.</li>
+<li><strong>Momentaufnahme:</strong> ein einzelner Abzug (2026-05-30). Tageszeit-/Churn-Effekte nicht gemittelt.</li>
+<li><strong>Observer-Bias:</strong> der Graph stützt sich auf die Beobachterstandorte (Schwerpunkt Rheinland);
+   Regionen mit wenigen Observern sind unterrepräsentiert (kleinere Komponenten, evtl. künstlich
+   getrennt).</li>
+<li><strong><code>ambiguous</code>-Kanten verworfen</strong> (173 = 8,8 %): die Kern-Analyse ist konservativ; diese Kanten
+   würden die Konnektivität leicht erhöhen (Riesenkomponente etwas größer). Separat gezählt.</li>
+<li><strong>Pubkey-Join unvollständig:</strong> 137 gekürzte Endpunkt-Keys ohne eindeutigen Treffer in <code>nodes.json</code>
+   → diese Knoten ohne Geo/Stats (Topologie-Plot zeigt nur 930/1034 Knoten geografisch). Die
+   Routing-Analyse läuft trotzdem auf allen Kern-Knoten (Identität = Pubkey).</li>
+<li><strong>Flood-Modell ohne Duty-Cycle/CSMA-Kollisionen:</strong> zählt Sende-Ereignisse, modelliert keine
+   Kanalkollisionen oder 10-%-Duty-Cycle-Drosselung. Der reale Airtime-Druck ist damit eher noch
+   unterschätzt — zugunsten von MHR. Umgekehrt erklärt das, warum der <strong>idealisierte</strong> Flood hier
+   fast keine Detours zeigt, während reale Pakete (A4 in v3) Median 2,1× Detour hatten.</li>
+<li><strong>SNR-Reliability-Kurve ist eine Modellwahl</strong> (logistisch, Breite 4 dB um −12 dB-Schwelle):
+   echtes avg_snr geht ein, aber die Abbildung SNR→p ist kalibriert, nicht gemessen.</li>
 </ol>
 
 
