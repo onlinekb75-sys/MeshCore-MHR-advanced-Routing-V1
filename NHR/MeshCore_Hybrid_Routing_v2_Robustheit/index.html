@@ -1,0 +1,1392 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the open source MeshCore firmware">
+      
+      
+      
+        <link rel="canonical" href="https://meshcore-dev.github.io/meshcore/NHR/MeshCore_Hybrid_Routing_v2_Robustheit/">
+      
+      
+        <link rel="prev" href="../MeshCore_Hybrid_Routing_Entwurf/">
+      
+      
+        <link rel="next" href="../MeshCore_Routing_Analyse_und_Optimierung/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>NHR v2 – Härtung für Robustheit & Stabilität (aus Realdaten) - MeshCore Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../_stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#nhr-v2-hartung-fur-robustheit-stabilitat-aus-realdaten" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="MeshCore Docs" class="md-header__button md-logo" aria-label="MeshCore Docs" data-md-component="logo">
+      
+  <img src="../../_assets/meshcore.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MeshCore Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              NHR v2 – Härtung für Robustheit &amp; Stabilität (aus Realdaten)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/meshcore-dev/meshcore/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    meshcore-dev/meshcore
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="MeshCore Docs" class="md-nav__button md-logo" aria-label="MeshCore Docs" data-md-component="logo">
+      
+  <img src="../../_assets/meshcore.svg" alt="logo">
+
+    </a>
+    MeshCore Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/meshcore-dev/meshcore/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    meshcore-dev/meshcore
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli_commands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../companion_protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Companion Protocol
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../docs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frequently Asked Questions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kiss_modem_protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MeshCore KISS Modem Protocol
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../nrf52_power_management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    nRF52 Power Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../number_allocations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Number Allocations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packet_format/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Packet Format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../payloads/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Payload Format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../qr_codes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QR Codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../stats_binary_frames/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stats Binary Frame Structures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../terminal_chat_cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terminal Chat CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NHR
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    NHR
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGES_NHR/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NHR – Änderungen gegenüber Upstream (Phase 0 + Phase 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MeshCore_Hybrid_Routing_Entwurf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MeshCore Hybrid Routing (NHR) – ein fusionierter Routing-Entwurf für 10 % Duty-Cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NHR v2 – Härtung für Robustheit &amp; Stabilität (aus Realdaten)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NHR v2 – Härtung für Robustheit &amp; Stabilität (aus Realdaten)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-was-die-realitat-gezeigt-hat-und-was-daraus-folgt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Was die Realität gezeigt hat – und was daraus folgt
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-die-sieben-hartungen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Die sieben Härtungen
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Die sieben Härtungen">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#h1-regions-hierarchie-statt-flachem-backbone-skaliert-auf-80-repeater" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        H1 – Regions-Hierarchie statt flachem Backbone (skaliert auf 80+ Repeater)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#h2-schleifenfreie-konvergenz-babel-feasibility-statt-reinem-dsdv-lange-ketten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        H2 – Schleifenfreie Konvergenz (Babel-Feasibility statt reinem DSDV) (lange Ketten)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#h3-feasible-successor-backup-partitions-linkausfall-toleranz" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        H3 – Feasible-Successor-Backup (Partitions-/Linkausfall-Toleranz)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#h4-metrik-hartung-zuverlassigkeitsdominant-gedampft-knoten-bewusst-058-reliability-flattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        H4 – Metrik-Härtung: zuverlässigkeitsdominant, gedämpft, knoten-bewusst (0,58-Reliability + Flattern)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#h5-zuverlassigkeits-untergrenze-hop-fur-hop-retry-lieferquote" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        H5 – Zuverlässigkeits-Untergrenze + Hop-für-Hop-Retry (Lieferquote)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#h6-mixed-firmware-koexistenz-als-erstklasse-anforderung-2-byte-hashes-pending-forks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        H6 – Mixed-Firmware-Koexistenz als Erstklasse-Anforderung (2-Byte-Hashes, „Pending", Forks)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#h7-mull-doubletten-missbrauchshartung-messy-reality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        H7 – Müll-, Doubletten- &amp; Missbrauchshärtung (messy reality)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-architektur-v2-kompakt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Architektur v2 (kompakt)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-abdeckung-der-fehlermodi-v1-v2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Abdeckung der Fehlermodi (v1 → v2)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-erwartete-wirkung-validierung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Erwartete Wirkung &amp; Validierung
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MeshCore_Routing_Analyse_und_Optimierung/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MeshCore_Simulation_25Knoten/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulation: MeshCore vs. NHR – 25 Knoten, Rheinland-Topologie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MeshCore_Simulation_ECHTE_Daten/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-was-die-realitat-gezeigt-hat-und-was-daraus-folgt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Was die Realität gezeigt hat – und was daraus folgt
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-die-sieben-hartungen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Die sieben Härtungen
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Die sieben Härtungen">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#h1-regions-hierarchie-statt-flachem-backbone-skaliert-auf-80-repeater" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        H1 – Regions-Hierarchie statt flachem Backbone (skaliert auf 80+ Repeater)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#h2-schleifenfreie-konvergenz-babel-feasibility-statt-reinem-dsdv-lange-ketten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        H2 – Schleifenfreie Konvergenz (Babel-Feasibility statt reinem DSDV) (lange Ketten)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#h3-feasible-successor-backup-partitions-linkausfall-toleranz" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        H3 – Feasible-Successor-Backup (Partitions-/Linkausfall-Toleranz)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#h4-metrik-hartung-zuverlassigkeitsdominant-gedampft-knoten-bewusst-058-reliability-flattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        H4 – Metrik-Härtung: zuverlässigkeitsdominant, gedämpft, knoten-bewusst (0,58-Reliability + Flattern)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#h5-zuverlassigkeits-untergrenze-hop-fur-hop-retry-lieferquote" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        H5 – Zuverlässigkeits-Untergrenze + Hop-für-Hop-Retry (Lieferquote)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#h6-mixed-firmware-koexistenz-als-erstklasse-anforderung-2-byte-hashes-pending-forks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        H6 – Mixed-Firmware-Koexistenz als Erstklasse-Anforderung (2-Byte-Hashes, „Pending", Forks)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#h7-mull-doubletten-missbrauchshartung-messy-reality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        H7 – Müll-, Doubletten- &amp; Missbrauchshärtung (messy reality)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-architektur-v2-kompakt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Architektur v2 (kompakt)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-abdeckung-der-fehlermodi-v1-v2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Abdeckung der Fehlermodi (v1 → v2)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-erwartete-wirkung-validierung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Erwartete Wirkung &amp; Validierung
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/meshcore-dev/meshcore/edit/main/docs/NHR/MeshCore_Hybrid_Routing_v2_Robustheit.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="nhr-v2-hartung-fur-robustheit-stabilitat-aus-realdaten">NHR v2 – Härtung für Robustheit &amp; Stabilität (aus Realdaten)</h1>
+<p>Überarbeitung des NHR-Entwurfs auf Basis der <strong>echten CoreScope-Beobachtungen</strong> (Live-Abruf Raum Bonn–Rhein-Sieg–Siebengebirge–Lohmar–Leverkusen). Die Realität weicht an mehreren Stellen von den Annahmen der v1 ab – v2 schließt genau diese Lücken.</p>
+<hr />
+<h2 id="1-was-die-realitat-gezeigt-hat-und-was-daraus-folgt">1. Was die Realität gezeigt hat – und was daraus folgt</h2>
+<table>
+<thead>
+<tr>
+<th>Beobachtung (echt)</th>
+<th>Annahme in v1</th>
+<th>Implikation für v2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>80 Repeater</strong> vs. nur 20 Companions im aktiven Gebiet</td>
+<td>„wenige stabile Repeater, viele Clients"</td>
+<td>Backbone ist <strong>groß &amp; dicht</strong> → naives flächiges DV skaliert nicht; Hierarchie nötig</td>
+</tr>
+<tr>
+<td>Pfade bis <strong>8 Hops</strong>, ~50 km gestreckt</td>
+<td>kurze Backbone-Pfade</td>
+<td>Lange Ketten → <strong>Schleifenfreiheit &amp; Konvergenz</strong> werden kritisch</td>
+</tr>
+<tr>
+<td>Ende-zu-Ende-Zuverlässigkeit nur <strong>0,58</strong></td>
+<td>Links „meist ok"</td>
+<td>Metrik muss <strong>Zuverlässigkeit</strong> vor Hopzahl gewichten; Redundanz nötig</td>
+</tr>
+<tr>
+<td>advert_count <strong>7 … 455</strong> (extrem heterogen)</td>
+<td>Repeater ~gleich stabil</td>
+<td>Flatternde Knoten dürfen <strong>nicht als Transit</strong> dienen → Stabilitäts-Gating</td>
+</tr>
+<tr>
+<td>1 Knoten <strong>funkisoliert</strong> (Leverkusen)</td>
+<td>Backbone zusammenhängend</td>
+<td><strong>Partitionstoleranz</strong> + sauberer Reactive-Fallback Pflicht</td>
+</tr>
+<tr>
+<td>Doubletten (Lohmar #17 ×2), „Pending", <strong>2-Byte-Hashes</strong>, multi-byte-Status gemischt</td>
+<td>sauberes, homogenes Netz</td>
+<td><strong>Mixed-Firmware-Koexistenz</strong> + Müll-/Doublettenhärtung als Erstklasse-Anforderung</td>
+</tr>
+<tr>
+<td>Deployment nutzt <strong>Regionen</strong> (de-nw, rheinland, bonn, koeln, eifel, leverkusen) zum Scoping</td>
+<td>Regionen ignoriert</td>
+<td>Regionen als <strong>fertige Cluster-Grenzen</strong> wiederverwenden</td>
+</tr>
+</tbody>
+</table>
+<p>Kernbefund der Sim (echte Topologie): <strong>60 % der Pfadaufbauten</strong> liefen auf Umwege, <strong>−82 % Airtime</strong> mit NHR – der Gewinn ist real groß, aber v1 wäre in diesem großen, lossy, heterogenen Netz <strong>instabil</strong> geworden (DV-Last, Flattern, Schleifen). v2 priorisiert daher Stabilität über letzte Optimalität.</p>
+<hr />
+<h2 id="2-die-sieben-hartungen">2. Die sieben Härtungen</h2>
+<h3 id="h1-regions-hierarchie-statt-flachem-backbone-skaliert-auf-80-repeater">H1 – Regions-Hierarchie statt flachem Backbone <em>(skaliert auf 80+ Repeater)</em></h3>
+<p>Statt ein DV über alle Repeater zu fahren, werden die <strong>bereits existierenden Regionen</strong> als Cluster genutzt:</p>
+<ul>
+<li><strong>Intra-Region:</strong> proaktives DV nur innerhalb einer Region (z. B. „bonn", „koeln") – wenige Knoten, schnelle Konvergenz, geringe Last.</li>
+<li><strong>Inter-Region:</strong> wenige <strong>Border-Repeater</strong> (Knoten, die Adverts mehrerer Regionen hören) bilden einen dünnen Backbone-2.-Ordnung. Nur sie tauschen <em>aggregierte</em> „Region erreichbar über mich, Kosten X"-Einträge aus.</li>
+</ul>
+<p>Effekt: DV-Tabellen und Kontroll-Traffic skalieren mit <em>Regionsgröße</em>, nicht mit Gesamtnetz. Das ist klassische <strong>hierarchische/Area-Routing</strong>-Logik (OSPF-Areas-Idee), aufgesetzt auf die reale Regions-Struktur. Code-seitig: Region wird heute schon pro Paket bestimmt (<code>region_map.findMatch</code>, <code>filterRecvFloodPacket</code>) – die Information ist vorhanden.</p>
+<h3 id="h2-schleifenfreie-konvergenz-babel-feasibility-statt-reinem-dsdv-lange-ketten">H2 – Schleifenfreie Konvergenz (Babel-Feasibility statt reinem DSDV) <em>(lange Ketten)</em></h3>
+<p>Bei bis zu 8 Hops auf lossy Links sind transiente Schleifen teuer. v2 übernimmt die <strong>Feasibility-Bedingung</strong> von Babel/EIGRP: ein Nachbar wird nur dann als Next-Hop akzeptiert, wenn seine annoncierten Kosten <strong>echt kleiner</strong> sind als die zuletzt selbst erreichten (feasible distance). Plus <strong>Sequenznummern</strong> je Ziel. Das garantiert Schleifenfreiheit <em>während</em> der Konvergenz – nicht nur danach – ohne globales Topologiebild.</p>
+<h3 id="h3-feasible-successor-backup-partitions-linkausfall-toleranz">H3 – Feasible-Successor-Backup <em>(Partitions-/Linkausfall-Toleranz)</em></h3>
+<p>Jeder Repeater hält pro Ziel <strong>zwei</strong> Routen: primären Next-Hop + einen vorab als schleifenfrei validierten <strong>Backup-Next-Hop</strong>. Fällt der primäre Hop aus, wird ohne neue Flutung sofort auf den Backup umgeschaltet (EIGRP-Prinzip). Das adressiert direkt die beobachteten Ausfälle/Isolation: ein einzelner Linkverlust löst <strong>keine</strong> teure Re-Discovery mehr aus.</p>
+<h3 id="h4-metrik-hartung-zuverlassigkeitsdominant-gedampft-knoten-bewusst-058-reliability-flattern">H4 – Metrik-Härtung: zuverlässigkeitsdominant, gedämpft, knoten-bewusst <em>(0,58-Reliability + Flattern)</em></h3>
+<p>Die ETX-Metrik aus v1 wird gehärtet:</p>
+<ul>
+<li><strong>Zuverlässigkeit dominiert Hopzahl:</strong> Kosten = ETX (nicht Hops); ein 3-Hop-Weg mit guten Links schlägt einen 2-Hop-Weg mit Wackel-Link.</li>
+<li><strong>EWMA + Hysterese:</strong> Linkkosten werden geglättet, und ein neuer Pfad ersetzt den alten nur, wenn er <strong>spürbar</strong> besser ist (z. B. ≥ 15 %). Das verhindert das Hin-und-Her-Flattern, das auf lossy Links sonst entsteht. (Gegenstück zum „klebrigen Pfad" aus der Analyse – v2 sucht das stabile Mittel: wechseln bei <em>deutlicher</em> Verbesserung, sonst halten.)</li>
+<li><strong>Knoten-Stabilitäts-Gating:</strong> aus der Advert-Regelmäßigkeit (real: advert_count 7…455) wird ein Verfügbarkeits-Score gebildet. Knoten unter Schwelle dürfen <strong>Endpunkt</strong>, aber <strong>nicht bevorzugter Transit</strong> sein. Flatternde Repeater vergiften so keine Backbone-Routen.</li>
+</ul>
+<h3 id="h5-zuverlassigkeits-untergrenze-hop-fur-hop-retry-lieferquote">H5 – Zuverlässigkeits-Untergrenze + Hop-für-Hop-Retry <em>(Lieferquote)</em></h3>
+<p>Best-of-N wählt nicht nur „beste Metrik", sondern verwirft Pfade unter einer <strong>geschätzten Lieferwahrscheinlichkeits-Schwelle</strong> (z. B. &lt; 0,5) zugunsten eines etwas längeren, aber zuverlässigeren Wegs. Auf dem Backbone bleibt MeshCores Hop-für-Hop-Direct-Retry aktiv; optional <strong>Dual-Path</strong> für wichtige Nachrichten (zwei disjunkte Routen) – bewusst nur on demand, da es Airtime kostet.</p>
+<h3 id="h6-mixed-firmware-koexistenz-als-erstklasse-anforderung-2-byte-hashes-pending-forks">H6 – Mixed-Firmware-Koexistenz als Erstklasse-Anforderung <em>(2-Byte-Hashes, „Pending", Forks)</em></h3>
+<p>Real laufen verschiedene Firmware-Stände und Hash-Größen nebeneinander. v2 fordert:</p>
+<ul>
+<li>DV-/Backbone-Pakete als <strong>eigener, ignorierbarer Payload-Typ</strong> → Alt-Knoten verwerfen sie wirkungslos.</li>
+<li>Wo NHR-Knoten fehlen oder die Region keine Backbone-Route hat, <strong>automatischer Rückfall auf das heutige Flood-and-cache</strong>. NHR darf das bestehende Verhalten <strong>nie</strong> verschlechtern, nur ergänzen.</li>
+<li>Respektiere die vorhandene <strong>Hash-Size-Migration</strong> (1/2/3-Byte) und Loop-Detection.</li>
+</ul>
+<h3 id="h7-mull-doubletten-missbrauchshartung-messy-reality">H7 – Müll-, Doubletten- &amp; Missbrauchshärtung <em>(messy reality)</em></h3>
+<ul>
+<li><strong>Doubletten</strong> (gleicher Schlüssel/quasi-gleiche Koordinaten, vgl. Lohmar #17 ×2) werden über den Public-Key dedupliziert, nicht über den Namen.</li>
+<li><strong>Rate-Limiting</strong> der DV-Updates pro Nachbar (greift Hand in Hand mit dem bestehenden <code>discover_limiter</code>).</li>
+<li>Sequenznummern + Plausibilitätsprüfung verhindern, dass ein einzelner fehlkonfigurierter/böser Knoten Routen vergiftet oder einen Paketsturm auslöst (knüpft an die reale Loop-Detection-Begründung in den MeshCore-Docs an).</li>
+</ul>
+<hr />
+<h2 id="3-architektur-v2-kompakt">3. Architektur v2 (kompakt)</h2>
+<pre><code>L2  Client-Kante  : reaktiv, attach an Region-Repeater, Discovery-Short-Circuit
+                    -&gt; Fallback auf Flood, wenn keine Backbone-Route
+L1b Inter-Region  : Border-Repeater, aggregiertes DV &quot;Region X via mich, Kosten&quot;
+L1a Intra-Region  : proaktives DV, Babel-Feasibility + Seqno + Feasible-Successor
+L0  Link-Sensing  : EWMA-ETX (zuverlässigkeitsdominant) + Knoten-Stabilitäts-Score
+</code></pre>
+<p>Leitprinzip v2: <strong>Stabilität vor letzter Optimalität.</strong> Lieber ein leicht suboptimaler, aber stabiler und schleifenfreier Pfad als ein theoretisch kürzester, der flattert. Genau das fehlt MeshCore heute (Zufalls-Umwege) <em>und</em> würde einer naiven v1 in diesem Netz fehlen (DV-Instabilität).</p>
+<hr />
+<h2 id="4-abdeckung-der-fehlermodi-v1-v2">4. Abdeckung der Fehlermodi (v1 → v2)</h2>
+<table>
+<thead>
+<tr>
+<th>Fehlermodus</th>
+<th>v1</th>
+<th>v2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DV skaliert nicht auf 80+ Repeater</td>
+<td>Risiko</td>
+<td><strong>H1</strong> Regions-Hierarchie</td>
+</tr>
+<tr>
+<td>Transiente Schleifen auf langen Pfaden</td>
+<td>seqno/split-horizon</td>
+<td><strong>H2</strong> Feasibility-Bedingung</td>
+</tr>
+<tr>
+<td>Linkausfall → teure Re-Discovery</td>
+<td>Re-Flood</td>
+<td><strong>H3</strong> Backup-Successor</td>
+</tr>
+<tr>
+<td>Routen-Flattern auf lossy Links</td>
+<td>–</td>
+<td><strong>H4</strong> EWMA+Hysterese</td>
+</tr>
+<tr>
+<td>Unzuverlässige/flatternde Transit-Knoten</td>
+<td>–</td>
+<td><strong>H4</strong> Stabilitäts-Gating</td>
+</tr>
+<tr>
+<td>Niedrige Lieferquote</td>
+<td>kürzester Pfad</td>
+<td><strong>H5</strong> Reliability-Floor + Retry/Dual-Path</td>
+</tr>
+<tr>
+<td>Mixed-Firmware/Hashes</td>
+<td>„graceful" (vage)</td>
+<td><strong>H6</strong> harte Anforderung + Fallback</td>
+</tr>
+<tr>
+<td>Doubletten/Müll/Missbrauch</td>
+<td>–</td>
+<td><strong>H7</strong> Dedup + Rate-Limit + Seqno</td>
+</tr>
+<tr>
+<td>Backbone-Partition</td>
+<td>Fallback</td>
+<td><strong>H3 + H6</strong> Backup + Reactive-Fallback</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-erwartete-wirkung-validierung">5. Erwartete Wirkung &amp; Validierung</h2>
+<p>v2 zielt nicht auf bessere Bestwerte als v1, sondern auf <strong>gehaltene Gewinne unter realen Störungen</strong>: die ~82 % Airtime-Ersparnis und die Umweg-Reduktion sollen auch bei Knoten-Churn, Linkausfällen und gemischter Firmware <em>stabil</em> bleiben, statt in Flattern/Schleifen zu kippen.</p>
+<p><strong>Validierungsplan (nächster Schritt):</strong> die bestehende Real-Daten-Sim (<code>sim/nhr_sim_real.py</code>) um Störszenarien erweitern und v1 vs. v2 vergleichen:</p>
+<ul>
+<li><strong>Churn:</strong> Knoten gemäß ihrem realen advert_count-Profil zufällig an/abschalten → Routen-Wechselrate (Flattern) und Lieferquote messen.</li>
+<li><strong>Linkausfall:</strong> zufällige Links/Hochlast-Knoten ausfallen lassen → Re-Discovery-Häufigkeit (v1) vs. Backup-Umschaltung (v2).</li>
+<li><strong>Partition:</strong> isolierte Knoten (real: Leverkusen) → sauberer Fallback statt Endlos-Flood?</li>
+<li><strong>Metriken:</strong> Routen-Stabilität (Wechsel/Stunde), Konvergenzzeit, Airtime unter Störung, Lieferquote.</li>
+</ul>
+<hr />
+<p><em>Baut auf <code>MeshCore_Hybrid_Routing_Entwurf.md</code> (v1), <code>MeshCore_Simulation_ECHTE_Daten.md</code> und <code>MeshCore_Routing_Analyse_und_Optimierung.md</code> auf. Der 4-Phasen-Rollout aus v1 gilt weiter; H1/H2/H3 gehören in Phase 2 (Backbone), H4/H5 in Phase 1, H6/H7 durchgängig.</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.action.edit", "content.code.copy", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

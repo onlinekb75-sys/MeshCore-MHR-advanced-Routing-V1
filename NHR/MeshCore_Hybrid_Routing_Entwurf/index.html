@@ -1,0 +1,1467 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the open source MeshCore firmware">
+      
+      
+      
+        <link rel="canonical" href="https://meshcore-dev.github.io/meshcore/NHR/MeshCore_Hybrid_Routing_Entwurf/">
+      
+      
+        <link rel="prev" href="../CHANGES_NHR/">
+      
+      
+        <link rel="next" href="../MeshCore_Hybrid_Routing_v2_Robustheit/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>MeshCore Hybrid Routing (NHR) – ein fusionierter Routing-Entwurf für 10 % Duty-Cycle - MeshCore Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../_stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#meshcore-hybrid-routing-nhr-ein-fusionierter-routing-entwurf-fur-10-duty-cycle" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="MeshCore Docs" class="md-header__button md-logo" aria-label="MeshCore Docs" data-md-component="logo">
+      
+  <img src="../../_assets/meshcore.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MeshCore Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              MeshCore Hybrid Routing (NHR) – ein fusionierter Routing-Entwurf für 10 % Duty-Cycle
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/meshcore-dev/meshcore/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    meshcore-dev/meshcore
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="MeshCore Docs" class="md-nav__button md-logo" aria-label="MeshCore Docs" data-md-component="logo">
+      
+  <img src="../../_assets/meshcore.svg" alt="logo">
+
+    </a>
+    MeshCore Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/meshcore-dev/meshcore/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    meshcore-dev/meshcore
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli_commands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../companion_protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Companion Protocol
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../docs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frequently Asked Questions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kiss_modem_protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MeshCore KISS Modem Protocol
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../nrf52_power_management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    nRF52 Power Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../number_allocations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Number Allocations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packet_format/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Packet Format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../payloads/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Payload Format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../qr_codes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QR Codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../stats_binary_frames/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stats Binary Frame Structures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../terminal_chat_cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terminal Chat CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NHR
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    NHR
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGES_NHR/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NHR – Änderungen gegenüber Upstream (Phase 0 + Phase 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MeshCore Hybrid Routing (NHR) – ein fusionierter Routing-Entwurf für 10 % Duty-Cycle
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MeshCore Hybrid Routing (NHR) – ein fusionierter Routing-Entwurf für 10 % Duty-Cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-leitidee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Leitidee
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-welche-ansatze-fusioniert-werden" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Welche Ansätze fusioniert werden
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-architektur-in-drei-ebenen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Architektur in drei Ebenen
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Architektur in drei Ebenen">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#l0-link-sensing-alle-knoten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        L0 – Link Sensing (alle Knoten)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#l1-repeater-backbone-proaktiv-distance-vector" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        L1 – Repeater-Backbone (proaktiv, Distance-Vector)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#l2-client-kante-reaktiv-aodv-artig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        L2 – Client-Kante (reaktiv, AODV-artig)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-die-fusionierte-metrik-etx-snr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Die fusionierte Metrik (ETX + SNR)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-ablauf-einer-nachricht-heute-vs-nhr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Ablauf einer Nachricht – heute vs. NHR
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-einsatz-des-10-budgets-airtime-bilanz" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Einsatz des 10 %-Budgets (Airtime-Bilanz)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-konkrete-eingriffe-im-meshcore-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Konkrete Eingriffe im MeshCore-Code
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-schrittweiser-rollout-kompatibilitatsschonend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Schrittweiser Rollout (kompatibilitätsschonend)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-fehlermodi-risiken-ehrlich" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Fehlermodi &amp; Risiken (ehrlich)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-validierung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Validierung
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-fazit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Fazit
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MeshCore_Hybrid_Routing_v2_Robustheit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NHR v2 – Härtung für Robustheit &amp; Stabilität (aus Realdaten)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MeshCore_Routing_Analyse_und_Optimierung/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MeshCore_Simulation_25Knoten/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulation: MeshCore vs. NHR – 25 Knoten, Rheinland-Topologie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MeshCore_Simulation_ECHTE_Daten/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-leitidee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Leitidee
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-welche-ansatze-fusioniert-werden" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Welche Ansätze fusioniert werden
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-architektur-in-drei-ebenen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Architektur in drei Ebenen
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Architektur in drei Ebenen">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#l0-link-sensing-alle-knoten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        L0 – Link Sensing (alle Knoten)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#l1-repeater-backbone-proaktiv-distance-vector" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        L1 – Repeater-Backbone (proaktiv, Distance-Vector)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#l2-client-kante-reaktiv-aodv-artig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        L2 – Client-Kante (reaktiv, AODV-artig)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-die-fusionierte-metrik-etx-snr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Die fusionierte Metrik (ETX + SNR)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-ablauf-einer-nachricht-heute-vs-nhr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Ablauf einer Nachricht – heute vs. NHR
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-einsatz-des-10-budgets-airtime-bilanz" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Einsatz des 10 %-Budgets (Airtime-Bilanz)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-konkrete-eingriffe-im-meshcore-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Konkrete Eingriffe im MeshCore-Code
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-schrittweiser-rollout-kompatibilitatsschonend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Schrittweiser Rollout (kompatibilitätsschonend)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-fehlermodi-risiken-ehrlich" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Fehlermodi &amp; Risiken (ehrlich)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-validierung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Validierung
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-fazit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Fazit
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/meshcore-dev/meshcore/edit/main/docs/NHR/MeshCore_Hybrid_Routing_Entwurf.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="meshcore-hybrid-routing-nhr-ein-fusionierter-routing-entwurf-fur-10-duty-cycle">MeshCore Hybrid Routing (NHR) – ein fusionierter Routing-Entwurf für 10 % Duty-Cycle</h1>
+<p>Entwurf für einen MeshCore-Fork. Baut auf der Code-Analyse von <code>meshcore-dev/MeshCore</code> (<code>main</code>) auf und fusioniert mehrere Routing-Theorien zu einem Verfahren, das gezielt das 10 %-Duty-Cycle-Budget (Sub-Band 869.4–869.65 MHz) ausnutzt und die heutigen Umwege beseitigt.</p>
+<hr />
+<h2 id="1-leitidee">1. Leitidee</h2>
+<p>Der entscheidende Hebel ist eine Eigenschaft, die MeshCore bisher <strong>nicht</strong> ausnutzt: das Netz besteht aus <strong>zwei sehr unterschiedlichen Knotenklassen</strong>.</p>
+<ul>
+<li><strong>Repeater</strong> – meist netzgebunden, ortsfest, dauerstrombetrieben, Topologie ändert sich selten.</li>
+<li><strong>Clients/Companions</strong> – mobil, batteriebetrieben, schlafend, kommen und gehen.</li>
+</ul>
+<p>Heute behandelt MeshCore beide gleich: jede Erstverbindung wird <strong>netzweit geflutet</strong>, und der zuerst eintreffende (zufällige) Pfad wird eingefroren. Genau das erzeugt Umwege <em>und</em> den größten Airtime-Verbrauch.</p>
+<p><strong>NHR-Kernidee:</strong> Die 10 %-Headroom wird <em>bewusst investiert</em>, um auf dem <strong>stabilen Repeater-Backbone</strong> ein sparsames, <strong>proaktives, metrik-basiertes</strong> Routing laufen zu lassen. Sobald der Backbone seine eigene Topologie kennt, kollabiert die teure netzweite Flutung zu „flute nur bis zum nächsten Repeater – ab da routet der Backbone gezielt". Clients bleiben <strong>reaktiv</strong> und damit schlaf-/mobilfreundlich.</p>
+<p>Das ist – theoretisch sauber eingeordnet – ein <strong>Zone Routing Protocol (ZRP)</strong>, aber statt nach Radius wird nach <strong>Knotenklasse</strong> getrennt: proaktiv im Backbone, reaktiv an der Kante.</p>
+<p>Wichtig: Der zusätzliche Kontroll-Traffic des Backbones ist <strong>kleiner</strong> als die netzweiten Discovery-Floods, die dadurch wegfallen. Netto soll die Airtime <strong>sinken</strong>, nicht steigen. Die 10 % sind das Polster, das diese Investition risikolos macht.</p>
+<hr />
+<h2 id="2-welche-ansatze-fusioniert-werden">2. Welche Ansätze fusioniert werden</h2>
+<table>
+<thead>
+<tr>
+<th>Theorie / Verfahren</th>
+<th>Was übernommen wird</th>
+<th>Wohin in NHR</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ZRP</strong> (Zone Routing)</td>
+<td>Hybrid proaktiv-innen / reaktiv-außen</td>
+<td>Trennung Backbone ↔ Client</td>
+</tr>
+<tr>
+<td><strong>BATMAN / DSDV</strong> (Distance-Vector)</td>
+<td>Hop-für-Hop Vektoraustausch, kein Voll-Topologie-Bild</td>
+<td>Backbone-Routing (L1)</td>
+</tr>
+<tr>
+<td><strong>ETX / ETT</strong></td>
+<td>Link-Metrik aus Lieferrate × Funkqualität</td>
+<td>Kostenfunktion</td>
+</tr>
+<tr>
+<td><strong>AODV</strong></td>
+<td>Best-Path-Auswahl + aktive Route-Maintenance</td>
+<td>Reaktive Kante + Upgrade</td>
+</tr>
+<tr>
+<td><strong>Selective/Opportunistic Flooding</strong></td>
+<td>SNR-gewichtete Rebroadcast-Verzögerung</td>
+<td>Flood-Pruning (<code>rx_delay_base</code>)</td>
+</tr>
+<tr>
+<td><strong>Connected Dominating Set / Backbone</strong></td>
+<td>Repeater als tragendes Gerüst</td>
+<td>Klassendefinition</td>
+</tr>
+<tr>
+<td><strong>Geo-Routing (GPSR)</strong></td>
+<td>Richtungs-Bias der Discovery</td>
+<td>optionale Scoped-Discovery</td>
+</tr>
+</tbody>
+</table>
+<p>NHR erfindet nichts Exotisches – es kombiniert bewährte Bausteine entlang der MeshCore-Realität.</p>
+<hr />
+<h2 id="3-architektur-in-drei-ebenen">3. Architektur in drei Ebenen</h2>
+<h3 id="l0-link-sensing-alle-knoten">L0 – Link Sensing (alle Knoten)</h3>
+<p>Jeder Knoten pflegt pro direkt gehörtem Nachbarn:
+- <strong>EWMA-SNR</strong> (gleitend geglättet, Marge über Noise-Floor),
+- <strong>Advert-Empfangsrate</strong> über ein Zeitfenster (gehörte / erwartete Zero-Hop-Adverts) → Schätzer für Lieferwahrscheinlichkeit in <em>einer</em> Richtung.</p>
+<p>MeshCore liefert die Bausteine bereits: <code>putNeighbour(id, timestamp, snr)</code> (<code>simple_repeater/MyMesh.cpp:641,824</code>) und die periodischen Zero-Hop-Adverts (<code>advert.interval</code>, Default 2 min). L0 erweitert nur die Neighbour-Tabelle um die beiden Messgrößen.</p>
+<h3 id="l1-repeater-backbone-proaktiv-distance-vector">L1 – Repeater-Backbone (proaktiv, Distance-Vector)</h3>
+<p>Nur Repeater nehmen teil. Jeder Repeater sendet <strong>zyklisch per Zero-Hop-Broadcast</strong> (nur direkte Nachbarn hören es!) einen kompakten <strong>Distanzvektor</strong>:</p>
+<pre><code>{ seqno, [ (dest_repeater_hash, path_cost), ... ] }
+</code></pre>
+<p>Nachbarn integrieren per <strong>Bellman-Ford</strong> (<code>neue Kosten = Linkkosten + announced cost</code>), behalten je Ziel den günstigsten Next-Hop und re-annoncieren beim nächsten Zyklus. Die Information wandert so <strong>Hop für Hop ausschließlich über Zero-Hop-Broadcasts</strong> durchs Backbone – <strong>niemals netzweiter Flood</strong>. Airtime-Aufwand pro Repeater = ein kleiner Broadcast je Zyklus, gehört nur lokal ⇒ O(Nachbarn), nicht O(Netz).</p>
+<p>Schleifenschutz: <strong>Sequenznummern</strong> (DSDV) + <strong>Split-Horizon/Poisoned-Reverse</strong>. Selbstheilung erfolgt rein über den Zyklus – <strong>kein</strong> Re-Flood bei Ausfall nötig.</p>
+<p><em>Die 10 % erlauben hier eine zügige Update-Kadenz (z. B. alle 1–3 min, dichte-adaptiv – vgl. MeshCore-Discussion #2053), und damit schnelle Konvergenz und Heilung.</em></p>
+<h3 id="l2-client-kante-reaktiv-aodv-artig">L2 – Client-Kante (reaktiv, AODV-artig)</h3>
+<p>Clients bauen <strong>keine</strong> Tabellen. Ein Client „registriert" sich implizit beim nächstgelegenen Repeater über seine Zero-Hop-Adverts; dieser <strong>Home-Repeater</strong> nimmt den Client als Host-Route (<code>client_hash → self</code>) in seinen Distanzvektor auf. Will Client A Client B erreichen:</p>
+<ol>
+<li>A flutet eine Discovery – <strong>aber nur so weit, bis ein Backbone-Repeater sie hört</strong> (<code>flood.max</code> klein, SNR-Backoff aktiv).</li>
+<li>Der erste Repeater mit bekannter Backbone-Route zu B's Home-Repeater <strong>stoppt die Flutung</strong> und leitet die Discovery als <strong>gerichteten Unicast über den Backbone</strong> weiter.</li>
+<li>B's Home-Repeater stellt zu; der Rückpfad wird wie gewohnt als Source-Route zurückgegeben.</li>
+</ol>
+<p>Damit wird aus einem O(Netz)-Flood ein <strong>O(lokal)-Flood + Backbone-Unicast</strong>. Das ist der zentrale Gewinn: weniger Airtime <em>und</em> kein zufälliger Umweg, weil der Backbone metrisch den günstigsten Weg wählt.</p>
+<hr />
+<h2 id="4-die-fusionierte-metrik-etx-snr">4. Die fusionierte Metrik (ETX + SNR)</h2>
+<p>Pro Link:</p>
+<pre><code>deliv = empfangsrate_hin × empfangsrate_zurück      // ETX-Idee, beidseitig (Asymmetrie!)
+etx   = 1 / max(deliv, ε)
+snr_pen = f(SNR-Marge)                               // kleiner Zuschlag für knappe Links
+link_cost = etx + α · snr_pen
+</code></pre>
+<p>Pfadkosten = <strong>Summe</strong> der Linkkosten (additiv ⇒ Bellman-Ford/Dijkstra-tauglich). ETX sorgt für <strong>Zuverlässigkeit</strong> (vermeidet flapping/lossy Hops), die SNR-Komponente bricht Gleichstände zugunsten <strong>robuster Marge</strong>. Beide Größen liefert L0 ohne Zusatz-Traffic, weil sie aus den ohnehin laufenden Adverts gewonnen werden.</p>
+<p>Das ersetzt das heutige „first packet wins" (<code>Mesh.cpp:138</code>) und „Pfad ungeprüft überschreiben" (<code>BaseChatMesh.cpp:305</code>) durch eine echte Kostenentscheidung.</p>
+<hr />
+<h2 id="5-ablauf-einer-nachricht-heute-vs-nhr">5. Ablauf einer Nachricht – heute vs. NHR</h2>
+<p><strong>Heute:</strong> A flutet B netzweit (bis zu 64 Hops). Dutzende Repeater rebroadcasten zufällig verzögert. B nimmt die <em>erste</em> Kopie → evtl. 4-Hop-Umweg statt 2-Hop-Direktweg. Dieser Umweg wird eingefroren, bis er 3× ausfällt.</p>
+<p><strong>Mit NHR:</strong>
+1. A flutet lokal (klein, SNR-gepruned) → erreicht Repeater R1.
+2. R1 kennt aus dem Backbone-DV den günstigsten Weg zu B's Home-Repeater R4: <code>R1→R2→R4</code> (Kostenminimum). Flutung endet bei R1.
+3. Discovery läuft als Backbone-Unicast <code>R1→R2→R4→B</code>.
+4. Rückpfad = Source-Route, von B's Seite metrik-bestätigt.</p>
+<p>Ergebnis: deterministisch kürzester/zuverlässigster Pfad statt Zufall; ein Bruchteil der Sendeereignisse.</p>
+<hr />
+<h2 id="6-einsatz-des-10-budgets-airtime-bilanz">6. Einsatz des 10 %-Budgets (Airtime-Bilanz)</h2>
+<p>Das Budget wird an <strong>genau zwei</strong> Stellen investiert:</p>
+<ul>
+<li><strong>Backbone-DV-Zyklus:</strong> ein kleiner Zero-Hop-Broadcast je Repeater alle 1–3 min. Last ist <strong>lokal</strong> und <strong>konstant</strong>, skaliert nicht mit Netzgröße, nur mit Nachbardichte.</li>
+<li><strong>Best-of-N-Sammelfenster</strong> am Ziel (ein paar Airtimes Wartezeit, einmalig je Pfadaufbau).</li>
+</ul>
+<p>Gespart wird der teuerste Posten von heute: <strong>netzweite Discovery-Floods</strong> (jeder Erstkontakt, jeder Pfad-Reset, jede Heilung). Bei einem Netz mit vielen Erstkontakten/Resets dominiert dieser Posten – sein Wegfall überkompensiert den DV-Overhead deutlich. Die 10 % sind dabei <strong>Sicherheitsmarge</strong>, nicht Dauerlast: NHR zielt darauf, die <em>durchschnittliche</em> Kanalauslastung zu senken und Lastspitzen (Flood-Stürme) zu glätten.</p>
+<p>Hinweis Aggregat-Kanal: Da L1 nur Zero-Hop sendet, belastet es <strong>nicht</strong> das gesamte geteilte Medium netzweit, sondern nur die jeweilige Funkzelle – das ist der Grund, warum dieser proaktive Anteil trotz geteiltem Halbduplex-Kanal skaliert.</p>
+<hr />
+<h2 id="7-konkrete-eingriffe-im-meshcore-code">7. Konkrete Eingriffe im MeshCore-Code</h2>
+<table>
+<thead>
+<tr>
+<th>NHR-Element</th>
+<th>Code-Ankerpunkt</th>
+<th>Änderung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Link-Metrik (L0)</td>
+<td><code>putNeighbour()</code>, Neighbour-Struct</td>
+<td>SNR-EWMA + Advert-Empfangsrate ergänzen</td>
+</tr>
+<tr>
+<td>Backbone-DV (L1)</td>
+<td>neuer <code>PAYLOAD_TYPE_*</code> (Repeater-only) oder erweitertes Advert; neue Routing-Tabelle</td>
+<td>Zero-Hop-Vektor senden/integrieren (Bellman-Ford, seqno)</td>
+</tr>
+<tr>
+<td>Flood-Suppression</td>
+<td><code>routeRecvPacket()</code> <code>Mesh.cpp:330</code>; <code>allowPacketForward()</code> <code>MyMesh.cpp:429</code></td>
+<td>Wenn Backbone-Route bekannt: nicht weiterfluten, sondern Backbone-Unicast</td>
+</tr>
+<tr>
+<td>Best-of-N + Metrik</td>
+<td><code>onPeerPathRecv()</code> / <code>Mesh.cpp:138</code></td>
+<td>Sammelfenster, günstigste Kopie wählen statt erster</td>
+</tr>
+<tr>
+<td>Pfad-Upgrade</td>
+<td><code>onContactPathRecv()</code> <code>BaseChatMesh.cpp:304</code></td>
+<td>nur bei niedrigeren Kosten überschreiben + periodischer Refresh</td>
+</tr>
+<tr>
+<td>Opportunistic Flood</td>
+<td><code>calcRxDelay()</code> / <code>rx_delay_base</code> <code>MyMesh.cpp:534,874</code></td>
+<td>aktivieren (Default &gt;0)</td>
+</tr>
+<tr>
+<td>Scope/Geo-Bias</td>
+<td><code>flood.max</code> <code>CommonCLI.cpp:599</code>; scoped adverts</td>
+<td>kleines Hop-Limit + optional Richtungsfilter</td>
+</tr>
+<tr>
+<td>Tuning-Knöpfe</td>
+<td><code>CommonCLI.cpp</code></td>
+<td>neue <code>set</code>-Kommandos: <code>bb.interval</code>, <code>metric.mode</code>, <code>pathwin</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-schrittweiser-rollout-kompatibilitatsschonend">8. Schrittweiser Rollout (kompatibilitätsschonend)</h2>
+<ul>
+<li><strong>Phase 0 – reine Konfig (sofort, rückwärtskompatibel):</strong> <code>rxdelay</code> aktivieren, <code>flood.max</code> senken, Loop-Detect an. Bringt bereits messbar weniger Umwege.</li>
+<li><strong>Phase 1 – Metrik + Best-of-N:</strong> Pfadauswahl am Ziel + Upgrade beim Sender. Lokale Änderung, interoperiert mit Stock-Firmware (schlechtere Knoten verhalten sich nur wie bisher).</li>
+<li><strong>Phase 2 – Backbone-DV:</strong> proaktives L1 zwischen NHR-Repeatern. Stock-Repeater nehmen nicht teil, brechen aber nichts (DV-Pakete sind für sie unbekannter Typ → ignoriert).</li>
+<li><strong>Phase 3 – Discovery-Short-Circuit + Geo-Bias:</strong> der eigentliche Airtime-Sprung; setzt kritische Masse an NHR-Repeatern voraus.</li>
+</ul>
+<p>Interoperabilität ist Leitplanke: In einem gemischten Netz muss NHR <strong>graceful degradieren</strong> auf das heutige Flood-and-cache, sobald keine Backbone-Route verfügbar ist.</p>
+<hr />
+<h2 id="9-fehlermodi-risiken-ehrlich">9. Fehlermodi &amp; Risiken (ehrlich)</h2>
+<ul>
+<li><strong>DV-Schleifen / Count-to-Infinity:</strong> durch Sequenznummern + Split-Horizon/Poisoned-Reverse beherrschbar, aber sorgfältig zu implementieren.</li>
+<li><strong>Konvergenzzeit:</strong> nach Topologieänderung braucht der Backbone einige Zyklen; in der Lücke fällt NHR auf Flood zurück.</li>
+<li><strong>Asymmetrische Links:</strong> beidseitige ETX-Messung nötig; reine SNR-Metrik wäre fehleranfällig.</li>
+<li><strong>Client-State-Explosion:</strong> Host-Routes für sehr viele Clients können Backbone-Tabellen sprengen → nur aktive/kürzlich gehörte Clients announcen, Rest über (billigen) Repeater-only-Flood.</li>
+<li><strong>Backbone-Partition:</strong> getrennte Repeater-Inseln müssen sauber auf reaktiv zurückfallen.</li>
+<li><strong>Mixed-Firmware-Netz:</strong> ohne kritische NHR-Masse bleibt der Gewinn klein.</li>
+<li><strong>Fehl-getunte Metrik:</strong> ETX/SNR-Gewichte sind netzabhängig und müssen empirisch kalibriert werden.</li>
+</ul>
+<hr />
+<h2 id="10-validierung">10. Validierung</h2>
+<ul>
+<li><strong>Vorher/Nachher</strong> auf Referenzstrecken: <code>trace</code>-Kommando (reale Hop-Folge), Pfadlängen-Verteilung, Airtime-Statistik (<code>Radio Stats</code>, <code>docs/cli_commands.md:133</code>), Flood-Dups (<code>getNumFloodDups()</code>).</li>
+<li><strong>Metriken:</strong> mittlere Hop-Zahl pro Zustellung, Anteil „kürzester Pfad gewählt", aggregierte Kanalauslastung, Zustellrate bei Pfadlänge ≥ 2 (heute lt. Community ~45 % unzuverlässig).</li>
+<li><strong>Simulation vor Feldtest:</strong> Discrete-Event-Sim (z. B. ns-3/LoRaSim-artig) mit realer Topologie, um DV-Kadenz und Metrik-Gewichte zu kalibrieren, bevor Firmware aufs reale Netz geht.</li>
+</ul>
+<hr />
+<h2 id="11-fazit">11. Fazit</h2>
+<p>NHR ist kein Bruch mit MeshCore, sondern dessen konsequente Weiterentwicklung: das bestehende reaktive DSR bleibt das Fundament, bekommt aber eine <strong>echte Metrik</strong>, eine <strong>Best-Path-Auswahl</strong> und – ermöglicht durch die 10 %-Marge – einen <strong>sparsamen proaktiven Backbone</strong>, der die teuren netzweiten Floods überflüssig macht. Die Knotenklassen-Trennung (ZRP-Prinzip) ist der Trick, der proaktiv und reaktiv jeweils dort einsetzt, wo sie billig sind. Erwartetes Ergebnis: kürzere, deterministische Pfade und <strong>trotz</strong> zusätzlichem Kontroll-Traffic eine <strong>niedrigere</strong> Gesamt-Airtime.</p>
+<p><em>Verwandtes Dokument: <code>MeshCore_Routing_Analyse_und_Optimierung.md</code> (Ursachenanalyse + Stufen A–D).</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.action.edit", "content.code.copy", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,114 @@
+{
+  "meta": {
+    "seed": 42,
+    "n_nodes": 25,
+    "n_repeaters": 18,
+    "n_clients": 7,
+    "topology": "CoreScope 25 echte Knoten (Bonn/Rhein-Sieg/Siebengebirge/Lohmar/Leverkusen)",
+    "link_model": {
+      "SNR0": 17.0,
+      "PLE": 2.55,
+      "SNR_THR": -12.0
+    },
+    "scenarios": "churn (advert_count), linkfail (0/10/20/30%), partition (Leverkusen)"
+  },
+  "scenario_churn": {
+    "rounds": 200,
+    "baseline": {
+      "flap_rate": 0.7795929298339582,
+      "switches": 2911,
+      "comparisons": 3734,
+      "delivery_ratio": 0.9876315789473684,
+      "mean_hops": 2.2168931521449506
+    },
+    "nhr": {
+      "flap_rate": 0.1671523178807947,
+      "switches": 631,
+      "comparisons": 3775,
+      "delivery_ratio": 0.998421052631579,
+      "mean_hops": 1.7933579335793357
+    }
+  },
+  "scenario_linkfail": {
+    "levels": [
+      0.0,
+      0.1,
+      0.2,
+      0.3
+    ],
+    "baseline": {
+      "unreachable": [
+        0.0,
+        0.003947368421052632,
+        0.009210526315789473,
+        0.055263157894736833
+      ],
+      "rediscovery": [
+        0.0,
+        0.16578947368421051,
+        0.29605263157894735,
+        0.4947368421052632
+      ],
+      "airtime": [
+        1.7894736842105263,
+        3.007894736842105,
+        3.675,
+        4.598684210526316
+      ],
+      "delivery": [
+        1.0,
+        0.9960526315789473,
+        0.9907894736842107,
+        0.9447368421052632
+      ]
+    },
+    "nhr": {
+      "unreachable": [
+        0.0,
+        0.0,
+        0.0,
+        0.015789473684210527
+      ],
+      "rediscovery": [
+        0.0,
+        0.0,
+        0.0,
+        0.015789473684210527
+      ],
+      "airtime": [
+        1.7894736842105263,
+        1.857894736842105,
+        1.9092105263157897,
+        2.0973684210526313
+      ],
+      "delivery": [
+        1.0,
+        1.0,
+        1.0,
+        0.9842105263157894
+      ]
+    }
+  },
+  "scenario_partition": {
+    "isolated_node": "LEV-JO31MA",
+    "n_components": 2,
+    "component_sizes": [
+      17,
+      1
+    ],
+    "partitioned_pairs": 1,
+    "attempts": 50,
+    "baseline": {
+      "total_airtime": 849.0,
+      "floods": 50,
+      "airtime_per_attempt": 16.98
+    },
+    "nhr": {
+      "total_airtime": 17.0,
+      "floods": 1,
+      "gave_up_after_floods": 1,
+      "airtime_per_attempt": 0.34
+    },
+    "airtime_reduction_pct": 97.99764428739694
+  }
+}
