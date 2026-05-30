@@ -76,4 +76,20 @@
          <loc>https://meshcore-dev.github.io/meshcore/MHR/MeshCore_Simulation_ECHTE_Daten/</loc>
          <lastmod>2026-05-30</lastmod>
     </url>
+    <url>
+         <loc>https://meshcore-dev.github.io/meshcore/MHR/sim/MeshCore_Simulation_v3_Realdaten/</loc>
+         <lastmod>2026-05-30</lastmod>
+    </url>
+    <url>
+         <loc>https://meshcore-dev.github.io/meshcore/MHR/study/MeshCore_Routing_Study/</loc>
+         <lastmod>2026-05-30</lastmod>
+    </url>
+    <url>
+         <loc>https://meshcore-dev.github.io/meshcore/MHR/study/STUDY_DESIGN/</loc>
+         <lastmod>2026-05-30</lastmod>
+    </url>
+    <url>
+         <loc>https://meshcore-dev.github.io/meshcore/MHR/study/STUDY_RESULTS/</loc>
+         <lastmod>2026-05-30</lastmod>
+    </url>
 </urlset>

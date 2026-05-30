@@ -1,0 +1,1549 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the open source MeshCore firmware">
+      
+      
+      
+        <link rel="canonical" href="https://meshcore-dev.github.io/meshcore/MHR/study/MeshCore_Routing_Study/">
+      
+      
+        <link rel="prev" href="../../sim/MeshCore_Simulation_v3_Realdaten/">
+      
+      
+        <link rel="next" href="../STUDY_DESIGN/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Studie: Routing-Optimierungen für MeshCore unter Mischbetrieb - MeshCore Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../_stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#studie-routing-optimierungen-fur-meshcore-unter-mischbetrieb" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="MeshCore Docs" class="md-header__button md-logo" aria-label="MeshCore Docs" data-md-component="logo">
+      
+  <img src="../../../_assets/meshcore.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MeshCore Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Studie: Routing-Optimierungen für MeshCore unter Mischbetrieb
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/meshcore-dev/meshcore/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    meshcore-dev/meshcore
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="MeshCore Docs" class="md-nav__button md-logo" aria-label="MeshCore Docs" data-md-component="logo">
+      
+  <img src="../../../_assets/meshcore.svg" alt="logo">
+
+    </a>
+    MeshCore Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/meshcore-dev/meshcore/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    meshcore-dev/meshcore
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli_commands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../companion_protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Companion Protocol
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../docs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frequently Asked Questions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../kiss_modem_protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MeshCore KISS Modem Protocol
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../nrf52_power_management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    nRF52 Power Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../number_allocations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Number Allocations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../packet_format/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Packet Format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../payloads/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Payload Format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../qr_codes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QR Codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../stats_binary_frames/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stats Binary Frame Structures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../terminal_chat_cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terminal Chat CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MHR
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    MHR
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHANGES_MHR/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MHR – Änderungen gegenüber Upstream (Phase 0 + Phase 1)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MeshCore_Hybrid_Routing_Entwurf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MeshCore Hybrid Routing (MHR) – ein fusionierter Routing-Entwurf für 10 % Duty-Cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MeshCore_Hybrid_Routing_v2_Robustheit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MHR v2 – Härtung für Robustheit &amp; Stabilität (aus Realdaten)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MeshCore_Routing_Analyse_und_Optimierung/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MeshCore_Simulation_25Knoten/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulation: MeshCore vs. MHR – 25 Knoten, Rheinland-Topologie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MeshCore_Simulation_ECHTE_Daten/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_14_7" id="__nav_14_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sim
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_14_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Sim
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sim/MeshCore_Simulation_v3_Realdaten/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MeshCore-Simulation v3 — auf ECHTEN Live-Daten kalibriert
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_14_8" id="__nav_14_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Study
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_14_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_14_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Study
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Studie: Routing-Optimierungen für MeshCore unter Mischbetrieb
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Studie: Routing-Optimierungen für MeshCore unter Mischbetrieb
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-kurzfassung-fur-eilige" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Kurzfassung (für Eilige)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-ausgangslage-was-die-realdaten-uber-die-hebel-sagten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Ausgangslage (was die Realdaten über die Hebel sagten)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-methode-kurz" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Methode (kurz)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-ergebnisse-je-mechanismus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Ergebnisse je Mechanismus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-interpretation-die-zentrale-stabilitats-erkenntnis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Interpretation &amp; die zentrale Stabilitäts-Erkenntnis
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-empfohlene-roadmap-gestuft-mischbetriebs-sicher-stabilitatsorientiert" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Empfohlene Roadmap (gestuft, mischbetriebs-sicher, stabilitätsorientiert)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-limitierungen-ehrlich" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Limitierungen (ehrlich)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../STUDY_DESIGN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Studie: Routing-Optimierungen für MeshCore unter Mischbetrieb
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../STUDY_RESULTS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Studien-Ergebnisse: Routing-Mechanismen × Adoption (MeshCore, Realdaten)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-kurzfassung-fur-eilige" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Kurzfassung (für Eilige)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-ausgangslage-was-die-realdaten-uber-die-hebel-sagten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Ausgangslage (was die Realdaten über die Hebel sagten)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-methode-kurz" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Methode (kurz)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-ergebnisse-je-mechanismus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Ergebnisse je Mechanismus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-interpretation-die-zentrale-stabilitats-erkenntnis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Interpretation &amp; die zentrale Stabilitäts-Erkenntnis
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-empfohlene-roadmap-gestuft-mischbetriebs-sicher-stabilitatsorientiert" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Empfohlene Roadmap (gestuft, mischbetriebs-sicher, stabilitätsorientiert)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-limitierungen-ehrlich" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Limitierungen (ehrlich)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/meshcore-dev/meshcore/edit/main/docs/MHR/study/MeshCore_Routing_Study.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="studie-routing-optimierungen-fur-meshcore-unter-mischbetrieb">Studie: Routing-Optimierungen für MeshCore unter Mischbetrieb</h1>
+<p><em>Auf echten CoreScope-Realdaten (109.980 Pakete, 1962 Knoten) simuliert. Qualität &amp; Stabilität vor
+maximaler Optimalität. Alle Mechanismen sind mit der Original-Firmware koexistenzfähig.</em></p>
+<p>Begleitdokumente: <a href="../STUDY_DESIGN/">STUDY_DESIGN.md</a> (mein Denkprozess &amp; Protokoll),
+<a href="../STUDY_RESULTS/">STUDY_RESULTS.md</a> (rohe Ergebnis-Tabellen), <code>study_sim.py</code> (Simulation),
+<code>study_results.json</code>, Plots <code>fig_study_*.png</code>. Datenbasis siehe <code>../sim/MeshCore_Simulation_v3_Realdaten.md</code>.</p>
+<hr />
+<h2 id="1-kurzfassung-fur-eilige">1. Kurzfassung (für Eilige)</h2>
+<p>Wir haben <strong>8 Routing-Mechanismen</strong> (konventionell bis unkonventionell) auf der realen
+776-Knoten-Repeater-Topologie simuliert und dabei <strong>systematisch variiert, wie viele Knoten die
+neue Firmware tragen</strong> (1 Knoten → alle). Maßstab war eine harte <strong>Safety-Invariante</strong>: ein
+Mechanismus darf bei <em>keinem</em> Adoptionsgrad die Lieferquote senken oder die Airtime erhöhen.</p>
+<p><strong>Das Ergebnis ist eine klare Dreiteilung:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Mechanismen</th>
+<th>Eigenschaft</th>
+<th>Empfehlung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1 — „Gute Bürger"</strong></td>
+<td>M5 (Best-of-N am Ziel), M1 (Hop-gewichtetes Delay), M7=15 (flood.max 15)</td>
+<td>safe ab <strong>1 Knoten</strong>, monoton, nie schlechter</td>
+<td><strong>bedenkenlos ausrollen</strong></td>
+</tr>
+<tr>
+<td><strong>2 — Airtime-Hebel</strong></td>
+<td>M3 (Shorter-Path-Cancel), M2 (Counter-Suppression), M4 (MPR/CDS)</td>
+<td>große Airtime-Gewinne (−19…−99 %), aber nur <strong>bis ~10–25 % Adoption</strong> sicher</td>
+<td><strong>adaptiv/selbstbegrenzend</strong> bauen, schrittweise</td>
+</tr>
+<tr>
+<td><strong>3 — Kostenloses Fundament</strong></td>
+<td>M6 (passives Topologie-Lernen + Backup-Pfad)</td>
+<td><strong>0 Airtime</strong>, spart 94–96 % Re-Discovery</td>
+<td><strong>Fundament zuerst legen</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Wichtigster Befund zur Stabilität:</strong> Die aggressiven Airtime-Hebel (M2/M3/M4) funktionieren nur,
+weil <strong>Stock-Knoten als Sicherheitsnetz</strong> weiterfluten. Bei 100 % Adoption <em>ohne</em> dieses Netz kippt
+z. B. MPR/CDS in Coverage-Verlust (Lieferquote 0,93 → 0,07). <strong>Konsequenz:</strong> diese Mechanismen
+dürfen nur unterdrücken, wenn der Knoten <em>lokal genug Redundanz bestätigt</em> — dann bleiben sie auch
+bei voller Adoption sicher. Das ist die zentrale Konstruktionsvorgabe dieser Studie.</p>
+<hr />
+<h2 id="2-ausgangslage-was-die-realdaten-uber-die-hebel-sagten">2. Ausgangslage (was die Realdaten über die Hebel sagten)</h2>
+<ul>
+<li>Reales Umweg-Median <strong>2,1×</strong>, Flood-Pfade bis 63 Hops, <strong>~751 sendende Repeater pro Flood</strong> →
+  Airtime ist der Engpass, Redundanz der größte Hebel.</li>
+<li><strong>SNR ist ein schwacher Hebel</strong> (Distanz erklärt SNR kaum, PLE≈0,4) → <strong>Hop-Zahl</strong> ist das
+  verlässliche Signal. Das verschiebt den Fokus weg von SNR-Gewichtung (Phase 1) hin zu
+  hop-basierten Verfahren.</li>
+<li>Jedes Flood-Paket trägt seine <strong>komplette Hop-Kette</strong> → Topologie ist <em>passiv, gratis</em> lernbar.</li>
+</ul>
+<p>Daraus mein Leitprinzip: <strong>Nutze was schon im Paket steht (Hops), entscheide lokal, sende weniger —
+aber nie auf Kosten der Erreichbarkeit.</strong></p>
+<hr />
+<h2 id="3-methode-kurz">3. Methode (kurz)</h2>
+<ul>
+<li><strong>Topologie:</strong> reale aktive Repeater-Komponente (776 Knoten / 9226 Kanten), kalibriertes
+  Reichweiten-/Reliability-Modell wie in v3. Quervalidierung gegen beobachtete Kanten: das
+  geometrische Modell reproduziert 41,7 % — Teilüberlappung, ehrlich dokumentiert.</li>
+<li><strong>Flood-Modell:</strong> Airtime = Σ Rebroadcasts pro Zustellung; Lieferquote; Hops/Detour;
+  Routen-Stabilität. Baseline M0 = Stock-Flood, first-wins.</li>
+<li><strong>Adoptions-Sweep:</strong> α ∈ {0, 1 Knoten, 1 %, 5 %, 10 %, 25 %, 50 %, 100 %}, je zufällig <em>und</em>
+  „Top-Traffic-Repeater zuerst" (realistischer Rollout), ≥5 Seeds.</li>
+<li><strong>Mischbetrieb:</strong> Neu-Knoten wenden ihre lokale Regel an; Stock-Knoten fluten normal.</li>
+<li><strong>Safety-Invariante:</strong> Lieferquote ≥ Baseline <strong>und</strong> Airtime ≤ Baseline bei <em>jedem</em> α.</li>
+</ul>
+<p>Baseline (M0): Lieferquote <strong>0,930</strong>, Airtime <strong>751 TX/Zustellung</strong>, Detour-Median <strong>1,11</strong>.</p>
+<hr />
+<h2 id="4-ergebnisse-je-mechanismus">4. Ergebnisse je Mechanismus</h2>
+<table>
+<thead>
+<tr>
+<th>Mechanismus</th>
+<th>Typ</th>
+<th>Airtime-Gewinn</th>
+<th>safe bis α</th>
+<th>Wirkung</th>
+<th>Verdikt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>M5 Best-of-N am Ziel (Hops)</strong></td>
+<td>lokal, Ziel</td>
+<td>±0</td>
+<td><strong>alle (ab 1 Knoten)</strong></td>
+<td>Detour <strong>1,11→1,00</strong></td>
+<td>✅ Tier 1</td>
+</tr>
+<tr>
+<td><strong>M1 Hop-gewichtetes Delay</strong></td>
+<td>lokal, Relay</td>
+<td>±0</td>
+<td><strong>alle</strong></td>
+<td>Detour→1,00, Lieferquote leicht besser</td>
+<td>✅ Tier 1</td>
+</tr>
+<tr>
+<td><strong>M7=15 flood.max 15</strong></td>
+<td>lokal/Konfig</td>
+<td>−3,6 %</td>
+<td><strong>alle</strong></td>
+<td>kappt Extrem-Umwege</td>
+<td>✅ Tier 1</td>
+</tr>
+<tr>
+<td><strong>M3 Shorter-Path-Cancel</strong></td>
+<td>lokal, Relay</td>
+<td><strong>−18,9 %</strong></td>
+<td><strong>0,25</strong></td>
+<td>Airtime ↓ ohne Coverage-Verlust (bis Schwelle)</td>
+<td>⚠️ Tier 2</td>
+</tr>
+<tr>
+<td><strong>M2 Counter-Suppression (k=3)</strong></td>
+<td>lokal, Relay</td>
+<td><strong>−23,1 %</strong></td>
+<td><strong>0,25</strong></td>
+<td>Gossip-Unterdrückung</td>
+<td>⚠️ Tier 2</td>
+</tr>
+<tr>
+<td><strong>M4 MPR/CDS-Relay-Reduktion</strong></td>
+<td>lokal+passiv</td>
+<td>−9,9 % (safe) … −99,5 % (unsafe)</td>
+<td><strong>0,10</strong></td>
+<td>nur Dominating-Set sendet</td>
+<td>⚠️ Tier 2 (heikel)</td>
+</tr>
+<tr>
+<td><strong>M7=12 flood.max 12</strong></td>
+<td>lokal/Konfig</td>
+<td>größer</td>
+<td><strong>&lt;1,0</strong></td>
+<td><strong>zu aggressiv</strong> für Netzdurchmesser</td>
+<td>❌ verworfen (→ 15)</td>
+</tr>
+<tr>
+<td><strong>M6 passives Topologie-Lernen + Backup</strong></td>
+<td>passiv</td>
+<td><strong>−94…96 % Re-Discovery</strong></td>
+<td><strong>alle</strong></td>
+<td>Backup-Pfad statt Re-Flood bei Linkbruch</td>
+<td>✅ Tier 3 (Fundament)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Safety-Verletzungen (wichtigstes Stabilitäts-Ergebnis):</strong> M5, M1, M7=15 verletzen die Invariante
+<strong>bei keinem α</strong>. Verletzt wird sie ab: M2k2 α≥0,25 · M2k3/M3 α≥0,5 · M4 α≥0,25 (Top-Traffic) bzw.
+≥0,05 (zufällig) · M7=12 bei α=1,0. Bei α=1,0 <strong>ohne</strong> Stock-Sicherheitsnetz kollabiert M4
+(Lieferquote 0,07) — exakt das vorhergesagte Coverage-Risiko ohne kritische Stock-Masse.</p>
+<p><strong>Kombination M3+M5+M7:</strong> mit flood.max=12 nur bis α=0,10 safe (−8,4 %, Detour 1,00); <strong>mit
+flood.max=15 bleibt sie länger sicher</strong> — die empfohlene Kombi.</p>
+<p><strong>Stress (Churn 20 % nach advert_count, Linkausfall 10/20 %):</strong> Routen-Stabilität bleibt 1,00 (kein
+Flattern, keine Partition). <strong>M6</strong> spart bei Linkbruch <strong>94–96 %</strong> der Re-Discovery-Airtime
+(Baseline-Reflood ~680 TX) — der mit Abstand stärkste <em>kostenlose</em> Hebel.</p>
+<hr />
+<h2 id="5-interpretation-die-zentrale-stabilitats-erkenntnis">5. Interpretation &amp; die zentrale Stabilitäts-Erkenntnis</h2>
+<p>Die Studie trennt sauber zwei Klassen:</p>
+<ol>
+<li>
+<p><strong>Pfad-<em>qualität</em>-Mechanismen (M5, M1, M7):</strong> ändern <em>welcher</em> Pfad gewinnt, nicht <em>wie viele</em>
+   senden. Sie sind <strong>strukturell sicher</strong> — ein Knoten, der den kürzeren Pfad bevorzugt, kann die
+   Erreichbarkeit nicht verschlechtern. Darum safe ab dem ersten Knoten und monoton.</p>
+</li>
+<li>
+<p><strong>Airtime-<em>Suppressions</em>-Mechanismen (M3, M2, M4):</strong> ein Knoten, der <em>schweigt</em>, spart Airtime —
+   aber wenn zu viele schweigen, reißt die Abdeckung. Ihre Sicherheit hängt davon ab, dass <em>genug
+   andere</em> (Stock oder Neu) noch senden. Daher die Adoptionsschwelle.</p>
+</li>
+</ol>
+<p><strong>Die Lösung für Klasse 2 ist nicht „weniger ausrollen", sondern „adaptiv unterdrücken":</strong> Ein
+Neu-Knoten darf seinen Rebroadcast nur dann streichen, wenn er <em>lokal beobachtet</em>, dass das Paket
+bereits ausreichend oft / über einen gleich-kurzen Pfad weitergetragen wurde (M3 ist genau das in
+schwacher Form; M2 mit höherem k ebenso). Macht man diese Bedingung streng genug an die <em>real
+gehörte Redundanz</em> gekoppelt, bleibt der Mechanismus <strong>selbst bei 100 % Adoption sicher</strong>, weil
+jeder Knoten erst dann schweigt, wenn die Abdeckung nachweislich schon steht. Das ist der Weg, die
+großen Airtime-Gewinne <em>ohne</em> das Stock-Sicherheitsnetz zu heben — und die wichtigste
+Implementierungs-Vorgabe, die aus dieser Studie folgt.</p>
+<hr />
+<h2 id="6-empfohlene-roadmap-gestuft-mischbetriebs-sicher-stabilitatsorientiert">6. Empfohlene Roadmap (gestuft, mischbetriebs-sicher, stabilitätsorientiert)</h2>
+<p><strong>Stufe A — sofort, „nie schlechter" (Tier 1 + Fundament):</strong>
+1. <strong>M7=15:</strong> <code>flood.max</code> von 64 auf ~15 (empirischer Netzdurchmesser P90=18; 12 ist zu aggressiv).
+   Reine Konfig, pro Knoten wirksam. <em>(Aktualisiert die bisherige „bewusst nicht geändert"-Haltung
+   mit Daten.)</em>
+2. <strong>M1 Hop-gewichtetes Rebroadcast-Delay</strong> als Ersatz/Ergänzung des schwachen SNR-Hebels
+   (<code>getRetransmitDelay</code>): Kopien mit weniger akkumulierten Hops senden früher. Lokal, monoton.
+3. <strong>M5 Best-of-N am Ziel (nach Hops):</strong> der bewusst zurückgestellte Phase-1-Kern — jetzt durch die
+   Daten als <em>der</em> Detour-Killer bestätigt (1,11→1,00 ab 1 Knoten). Machbarkeit klären:
+   Sammelfenster am Ziel ohne Bruch der Dedup (Kernrisiko, sorgfältig + Bench-Test).
+4. <strong>M6 passives Topologie-Lernen:</strong> aus den Pfad-Ketten lokale Link-Tabelle bauen (0 Airtime) →
+   Backup-Pfad statt Re-Flood bei Linkbruch. Fundament für alles Weitere.</p>
+<p><strong>Stufe B — adaptive Airtime-Suppression (Tier 2, vorsichtig):</strong>
+5. <strong>M3 Shorter-Path-Cancel</strong> und <strong>M2 Counter-Suppression (k=3)</strong> — aber <strong>adaptiv</strong> (nur
+   unterdrücken bei lokal bestätigter Redundanz, siehe §5), damit sie auch jenseits 25 % Adoption
+   sicher bleiben. Mit Telemetrie/<code>trace</code> vorher/nachher messen.</p>
+<p><strong>Stufe C — perspektivisch:</strong>
+6. <strong>M4 MPR/CDS</strong> nur mit harter Redundanz-Garantie und konservativem Relay-Set; größtes Potenzial,
+   höchstes Risiko — zuletzt.</p>
+<p>SNR-Gewichtung (Phase 1 <code>tx_snr_weight</code>) bleibt als „nie schlechter"-Option erhalten, verliert aber
+gegenüber den hop-basierten Verfahren an Priorität (Realdaten-Befund).</p>
+<hr />
+<h2 id="7-limitierungen-ehrlich">7. Limitierungen (ehrlich)</h2>
+<p>Linkmodell geometrisch (Log-Distance, PLE-Floor 2,0; Gelände/Antennenhöhe fehlen) → <strong>absolute</strong>
+Airtime-Zahlen modellabhängig, <strong>relative</strong> Mechanismus-Vergleiche robuster. Quervalidierung deckt
+41,7 % der beobachteten Kanten. Timing-Backoff modelliert (nicht HW-gemessen) → M1/M3 hängen am
+Timing-Modell. M2 approximiert das kontinuierliche Backoff grob. M6 als Airtime-Einsparungs-Modell
+gerechnet, nicht als volle DV-Protokoll-Simulation. Stichprobe 5 Seeds × 120 Paare, keine
+Konfidenzintervalle. Alles auf Hardware ungetestet — Bench-Gerät vor produktivem Repeater.</p>
+<hr />
+<p><em>Diese Studie verschiebt die Projekt-Priorität von SNR-Gewichtung hin zu </em><em>hop-basierter
+Pfadwahl (M5/M1)</em><em>, einem </em><em>datenbasierten flood.max (15)</em><em> und </em><em>adaptiver, selbstbegrenzender
+Airtime-Suppression</em><em> — mit </em><em>passivem Topologie-Lernen</em><em> als kostenlosem Fundament.</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["content.action.edit", "content.code.copy", "search.highlight", "search.suggest"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

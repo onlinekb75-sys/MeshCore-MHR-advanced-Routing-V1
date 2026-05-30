@@ -934,6 +934,228 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_14_7" id="__nav_14_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sim
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_14_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Sim
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sim/MeshCore_Simulation_v3_Realdaten/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MeshCore-Simulation v3 — auf ECHTEN Live-Daten kalibriert
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_14_8" id="__nav_14_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Study
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_14_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Study
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../study/MeshCore_Routing_Study/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Studie: Routing-Optimierungen für MeshCore unter Mischbetrieb
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../study/STUDY_DESIGN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Studie: Routing-Optimierungen für MeshCore unter Mischbetrieb
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../study/STUDY_RESULTS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Studien-Ergebnisse: Routing-Mechanismen × Adoption (MeshCore, Realdaten)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1157,6 +1379,8 @@ Build verifiziert: <code>pio run -e heltec_v4_repeater</code> → SUCCESS (RAM 3
 <li><strong>Linkausfall (0–30 %)</strong>: Re-Discovery ≤ 1,6 % statt bis 49,5 %, Airtime nahezu flach.</li>
 <li><strong>Partition</strong>: −98 % Airtime (Baseline läuft in Endlos-Flood, MHR flutet einmal + Fallback).</li>
 <li>Ergebnisse in <code>sim/sim_results_v2.json</code>, Plots <code>fig_v2_*.png</code>. Reproduzierbar (Seed 42).</li>
+<li><code>docs/MHR/sim/mhr_sim_real_v3.py</code> — <strong>auf echten CoreScope-Live-Daten</strong> (109.980 Pakete, 1962 Knoten) kalibriert. GEMESSEN: realer Umweg-Median <strong>2,1×</strong> (78,8 % der Pakete &gt; 1,5×) — belegt das „first-wins"-Problem mit Produktionsdaten; das alte Log-Distance-SNR-Modell trägt für dieses Netz nicht (real PLE ≈ 0,4). Datensatz reproduzierbar via <code>mhr_collect_corescope.py</code>.</li>
+<li><code>docs/MHR/study/MeshCore_Routing_Study.md</code> — <strong>Mechanismus-Studie mit Adoptions-Sweep</strong> (1 Knoten → alle) auf der realen 776-Knoten-Topologie, Safety-Invariante „nie schlechter als Baseline". Ergebnis: hop-basierte Pfadwahl (Best-of-N nach Hops, Hop-Delay) + <code>flood.max</code> 15 sind ab 1 Knoten safe; Airtime-Suppression (Cancel/Counter/MPR) braucht adaptive Redundanz-Bedingung. Verschiebt die Priorität von SNR weg hin zur Hop-Zahl.</li>
 </ul>
 
 
