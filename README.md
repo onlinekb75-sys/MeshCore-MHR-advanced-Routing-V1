@@ -2,6 +2,8 @@
 
 Ein **Fork von [meshcore-dev/MeshCore](https://github.com/meshcore-dev/MeshCore)** (MIT) V1.15 mit dem Ziel, die Pfadfindung robuster zu machen und die durch zufällige Flood-Umwege verursachte Airtime-Last zu senken.
 
+**MHR** steht für **M**eshCore **H**ybrid **R**outing.
+
 > ⚠️ **Experimentell & auf Hardware ungetestet.** Umgesetzt sind **Phase 0 + Phase 1** (konservativ, reversibel). Flashe **zuerst auf ein Ersatz-/Bench-Gerät**, nicht auf produktive Repeater. Das weitergehende proaktive Backbone-Redesign (Phase 2, „MHR v2") ist in `docs/MHR/` als **Design** beschrieben, aber **noch nicht** im Code.
 
 ---
@@ -32,7 +34,7 @@ Simulation auf **echter 25-Knoten-Topologie**: **−82 % Airtime**, Umwege deutl
 ## 🇬🇧 Core advantages
 
 ### What is MHR-MeshCore?
-A fork of **[meshcore-dev/MeshCore](https://github.com/meshcore-dev/MeshCore)** (MIT) that makes **path-finding** in the LoRa mesh more robust and cuts the **airtime** wasted on random flood detours. MeshCore is a hybrid mesh-routing protocol for LoRa radios (ESP32/nRF52, C++/PlatformIO).
+**MHR** stands for **M**eshCore **H**ybrid **R**outing. A fork of **[meshcore-dev/MeshCore](https://github.com/meshcore-dev/MeshCore)** (MIT) that makes **path-finding** in the LoRa mesh more robust and cuts the **airtime** wasted on random flood detours. MeshCore is a hybrid mesh-routing protocol for LoRa radios (ESP32/nRF52, C++/PlatformIO).
 
 ### The problem
 MeshCore uses **no** metric-based routing. The first message to a contact is flooded, the resulting path is cached, and **every following packet is pinned to that one path**. Crucially, the winner is **not the shortest or best path, but whichever flood copy happens to reach the destination first** ("first packet wins"), while signal-quality-weighted propagation is off by default. From analysis of real network data: **~60 % of path setups end up on a detour** — burning airtime, the real bottleneck on a shared half-duplex radio channel.
