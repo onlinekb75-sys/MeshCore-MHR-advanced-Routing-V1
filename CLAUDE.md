@@ -6,7 +6,7 @@ Diese Datei fasst das gesamte Projekt zusammen, damit Claude Code direkt produkt
 
 Fork von **meshcore-dev/MeshCore** (`main`, MIT). Ziel: die Pfadfindung robuster machen und die durch zufällige Flood-**Umwege** verursachte Airtime-Last senken. MeshCore ist ein hybrides Mesh-Routing-Protokoll für LoRa-Funkgeräte (C++/Arduino/PlatformIO, nRF52 & ESP32).
 
-**Status:** Phase 0 + erster Teil von Phase 1 sind im Code (Build verifiziert: `pio run -e heltec_v4_repeater` → SUCCESS). Umgesetzt: RX-SNR-Flutung (P0), prefer-shorter Pfad-Adoption (P0), TX-SNR-gewichtetes Retransmit-Delay via neuem Pref `tx_snr_weight` (P1), EWMA-Nachbar-SNR (P1). Noch offen aus Phase 1: echtes Best-of-N am Ziel (würde `hasSeen()`-Dedup aufbohren — bewusst verschoben) + ETX-Kostenmetrik. Phase 2 nur Design. Stress-Sim `docs/MHR/sim/mhr_sim_v2.py` validiert die Gewinne unter Churn/Linkausfall/Partition. Alles auf Hardware **ungetestet** — zuerst Bench-Gerät flashen.
+**Status:** Build grün auf 4 Targets (repeater/companion/room_server/sensor). **Im Code & aktiv (default-an):** Phase 0 (RX-SNR-Flutung, prefer-shorter), Stufe A (hop-gewichtetes Delay `tx_hop_weight` + `tx_snr_weight` + EWMA-SNR + `flood.max` 64→15) und **Best-of-N am Ziel** (kürzester Pfad, dedup-sicher). **Im Code, default-AUS (Bench-gegated):** Stufe B guarded Suppression (`supp.enable`) und **Phase 2 DV-Backbone** (`bb.enable`, Konvergenz-Gate GO; Data-Plane-Short-Circuit noch nicht verdrahtet). **Verworfen, datenbelegt:** adaptiver Regler (2× NO-GO), per-Node-Kalibrierung, TPC. Validiert auf echten CoreScope-Daten (v3/v4 + Studien in `docs/MHR/sim`+`study`; CHANGES_MHR Patch 1–9). Alles auf Hardware **ungetestet** → `docs/MHR/BENCH_TEST_PLAN.md`.
 
 ## Das Problem (mit Code-Stellen im Upstream-Verhalten)
 
