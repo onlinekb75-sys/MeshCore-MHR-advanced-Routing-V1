@@ -803,6 +803,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#stufe-b-redundanz-gesicherte-flood-suppression-im-code-default-aus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stufe B — redundanz-gesicherte Flood-Suppression (im Code, default-AUS)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Stufe B — redundanz-gesicherte Flood-Suppression (im Code, default-AUS)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#patch-7-5-guard-suppression-passives-2-hop-lernen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Patch 7 — 5-Guard-Suppression + passives 2-Hop-Lernen
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adaptiver-selbst-regler-gepruft-und-verworfen-no-go" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adaptiver Selbst-Regler — geprüft und VERWORFEN (NO-GO)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#bewusst-nicht-geandert" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1166,6 +1205,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../study/Adaptive_Controller_Design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adaptiver Suppressions-Regler — Design &amp; Validierung (Ergebnis: NO-GO)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../study/MeshCore_Routing_Study/" class="md-nav__link">
         
   
@@ -1458,6 +1525,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#stufe-b-redundanz-gesicherte-flood-suppression-im-code-default-aus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stufe B — redundanz-gesicherte Flood-Suppression (im Code, default-AUS)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Stufe B — redundanz-gesicherte Flood-Suppression (im Code, default-AUS)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#patch-7-5-guard-suppression-passives-2-hop-lernen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Patch 7 — 5-Guard-Suppression + passives 2-Hop-Lernen
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adaptiver-selbst-regler-gepruft-und-verworfen-no-go" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adaptiver Selbst-Regler — geprüft und VERWORFEN (NO-GO)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#bewusst-nicht-geandert" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1582,11 +1688,37 @@ einem einzelnen Knoten sicher und monoton — ideal für langsame Verbreitung im
   tragen längere Pfade weiter → ein einzelner MHR-Knoten ist nie schlechter, tötet aber lokal
   Fern-Umweg-Kopien. Netzabhängig, weiter per CLI einstellbar: <code>set flood.max &lt;n&gt;</code>.</li>
 </ul>
+<h2 id="stufe-b-redundanz-gesicherte-flood-suppression-im-code-default-aus">Stufe B — redundanz-gesicherte Flood-Suppression (im Code, <strong>default-AUS</strong>)</h2>
+<p>Implementiert, aber <strong>dormant</strong> (<code>supp_enable = 0</code>): bei AUS verhält sich der Knoten <strong>exakt wie
+Stufe A</strong> (adversarial reviewt — kein einziger Zusatzeffekt im Sende-/Empfangspfad). Erst nach
+Bench-Test per CLI aktivieren (<code>set supp.enable 1</code>). Design + Validierung:
+<code>docs/MHR/study/Suppression_Design.md</code>, <code>SUPPRESSION_VALIDATION.md</code>.</p>
+<h3 id="patch-7-5-guard-suppression-passives-2-hop-lernen">Patch 7 — 5-Guard-Suppression + passives 2-Hop-Lernen</h3>
+<ul>
+<li>Dateien: <code>examples/simple_repeater/MyMesh.{h,cpp}</code>, <code>src/Dispatcher.{h,cpp}</code> (neuer virtueller Hook
+  <code>allowFloodRebroadcast()</code>, Default <code>true</code> → andere Builds bit-identisch), <code>src/helpers/CommonCLI.{h,cpp}</code>.</li>
+<li>Logik: ein Repeater unterdrückt seinen Flood-Rebroadcast NUR, wenn alle Guards halten —
+  <strong>G1</strong> degree ≥ <code>supp_min_degree</code>, <strong>G2</strong> ≥ <code>supp_k_cover</code> verschiedene Cover-Sender im Backoff
+  gehört, <strong>G3</strong> jeder eigene Nachbar ist durch einen Cover gedeckt (via passiv gelernter, frische-
+  gegateter 2-Hop-Tabelle — die <em>tragende</em> Schicht gegen „letzten Pfad kappen"), <strong>G4</strong> Cover-SNR ≥
+  <code>supp_snr_floor</code>, <strong>G5</strong> Prob <code>supp_prob</code>. Default-Aktion = senden (nie schlechter).</li>
+<li>Neue persistierte Prefs @299–303: <code>supp_enable</code>(0), <code>supp_min_degree</code>(4), <code>supp_k_cover</code>(2),
+  <code>supp_snr_floor</code>(-6 dB), <code>supp_prob</code>(80 %). CLI <code>set/get supp.enable|mindeg|kcover|snrfloor|prob</code>.</li>
+<li>Fixe Tabellen (~0,8 KB, keine dyn. Allokation). Validiert: Lieferquote ≥ Baseline über den
+  GESAMTEN Adoptions-Sweep, −12…15 % Airtime bei hoher Adoption. Bench-Test offen (Cover-Timing in
+  HW, 2-Hop-Konvergenz, Frische-Gating).</li>
+</ul>
+<h2 id="adaptiver-selbst-regler-gepruft-und-verworfen-no-go">Adaptiver Selbst-Regler — geprüft und VERWORFEN (NO-GO)</h2>
+<p>Ein langsamer (1–2 h) Regler, der <code>supp_prob</code> an die lokale Umgebung anpasst, wurde entworfen und
+simuliert (<code>docs/MHR/study/Adaptive_Controller_Design.md</code>). Ergebnis: oszilliert nicht, bringt aber
+nur <strong>+0,76 pp</strong> Airtime über den statischen sicheren Satz (&lt; 2 pp Schwelle) und ist minimal weniger
+strikt-safe → <strong>nicht codiert</strong> (Qualität/Stabilität vor letzter Optimierung). Der statische sichere
+Satz ist die Empfehlung.</p>
 <h2 id="bewusst-nicht-geandert">Bewusst NICHT geändert</h2>
 <ul>
 <li>Kein neues Paketformat, keine Metrik im Paket, kein Backbone, kein echtes Best-of-N am Ziel —
   Letzteres würde die <code>hasSeen()</code>-Dedup aufbohren (Risiko von Nachrichten-Duplikaten) und gehört
-  in eine eigene, gründlich getestete Stufe (siehe Studie Stufe A „Best-of-N am Ziel" + Stufe B/C).</li>
+  in eine eigene, gründlich getestete Stufe (siehe Studie Stufe A „Best-of-N am Ziel").</li>
 </ul>
 <h2 id="validierung-simulation">Validierung (Simulation)</h2>
 <ul>

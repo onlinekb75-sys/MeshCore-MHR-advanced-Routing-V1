@@ -10,28 +10,28 @@
       
       
       
-        <link rel="canonical" href="https://meshcore-dev.github.io/meshcore/MHR/sim/">
+        <link rel="canonical" href="https://meshcore-dev.github.io/meshcore/MHR/study/Adaptive_Controller_Design/">
       
       
-        <link rel="prev" href="../MeshCore_Simulation_ECHTE_Daten/">
+        <link rel="prev" href="../../sim/MeshCore_Simulation_v4_NeighborGraph/">
       
       
-        <link rel="next" href="MeshCore_Simulation_v3_Realdaten/">
+        <link rel="next" href="../MeshCore_Routing_Study/">
       
       
         
       
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>MHR-Simulationen & Realdatensatz - MeshCore Docs</title>
+        <title>Adaptiver Suppressions-Regler — Design & Validierung (Ergebnis: NO-GO) - MeshCore Docs</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
       
       
 
@@ -50,9 +50,9 @@
       
     
     
-      <link rel="stylesheet" href="../../_stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../_stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#mhr-simulationen-realdatensatz" class="md-skip">
+        <a href="#adaptiver-suppressions-regler-design-validierung-ergebnis-no-go" class="md-skip">
           Skip to content
         </a>
       
@@ -86,9 +86,9 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="MeshCore Docs" class="md-header__button md-logo" aria-label="MeshCore Docs" data-md-component="logo">
+    <a href="../../.." title="MeshCore Docs" class="md-header__button md-logo" aria-label="MeshCore Docs" data-md-component="logo">
       
-  <img src="../../_assets/meshcore.svg" alt="logo">
+  <img src="../../../_assets/meshcore.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -105,7 +105,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              MHR-Simulationen &amp; Realdatensatz
+              Adaptiver Suppressions-Regler — Design &amp; Validierung (Ergebnis: NO-GO)
             
           </span>
         </div>
@@ -197,9 +197,9 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="MeshCore Docs" class="md-nav__button md-logo" aria-label="MeshCore Docs" data-md-component="logo">
+    <a href="../../.." title="MeshCore Docs" class="md-nav__button md-logo" aria-label="MeshCore Docs" data-md-component="logo">
       
-  <img src="../../_assets/meshcore.svg" alt="logo">
+  <img src="../../../_assets/meshcore.svg" alt="logo">
 
     </a>
     MeshCore Docs
@@ -226,7 +226,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -253,7 +253,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli_commands/" class="md-nav__link">
+      <a href="../../../cli_commands/" class="md-nav__link">
         
   
   
@@ -280,7 +280,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../companion_protocol/" class="md-nav__link">
+      <a href="../../../companion_protocol/" class="md-nav__link">
         
   
   
@@ -307,7 +307,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../docs/" class="md-nav__link">
+      <a href="../../../docs/" class="md-nav__link">
         
   
   
@@ -334,7 +334,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../faq/" class="md-nav__link">
+      <a href="../../../faq/" class="md-nav__link">
         
   
   
@@ -361,7 +361,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../kiss_modem_protocol/" class="md-nav__link">
+      <a href="../../../kiss_modem_protocol/" class="md-nav__link">
         
   
   
@@ -388,7 +388,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../nrf52_power_management/" class="md-nav__link">
+      <a href="../../../nrf52_power_management/" class="md-nav__link">
         
   
   
@@ -415,7 +415,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../number_allocations/" class="md-nav__link">
+      <a href="../../../number_allocations/" class="md-nav__link">
         
   
   
@@ -442,7 +442,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../packet_format/" class="md-nav__link">
+      <a href="../../../packet_format/" class="md-nav__link">
         
   
   
@@ -469,7 +469,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../payloads/" class="md-nav__link">
+      <a href="../../../payloads/" class="md-nav__link">
         
   
   
@@ -496,7 +496,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../qr_codes/" class="md-nav__link">
+      <a href="../../../qr_codes/" class="md-nav__link">
         
   
   
@@ -523,7 +523,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../stats_binary_frames/" class="md-nav__link">
+      <a href="../../../stats_binary_frames/" class="md-nav__link">
         
   
   
@@ -550,7 +550,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../terminal_chat_cli/" class="md-nav__link">
+      <a href="../../../terminal_chat_cli/" class="md-nav__link">
         
   
   
@@ -626,7 +626,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../CHANGES_MHR/" class="md-nav__link">
+      <a href="../../CHANGES_MHR/" class="md-nav__link">
         
   
   
@@ -654,7 +654,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../MeshCore_Hybrid_Routing_Entwurf/" class="md-nav__link">
+      <a href="../../MeshCore_Hybrid_Routing_Entwurf/" class="md-nav__link">
         
   
   
@@ -682,7 +682,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../MeshCore_Hybrid_Routing_v2_Robustheit/" class="md-nav__link">
+      <a href="../../MeshCore_Hybrid_Routing_v2_Robustheit/" class="md-nav__link">
         
   
   
@@ -710,7 +710,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../MeshCore_Routing_Analyse_und_Optimierung/" class="md-nav__link">
+      <a href="../../MeshCore_Routing_Analyse_und_Optimierung/" class="md-nav__link">
         
   
   
@@ -738,7 +738,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../MeshCore_Simulation_25Knoten/" class="md-nav__link">
+      <a href="../../MeshCore_Simulation_25Knoten/" class="md-nav__link">
         
   
   
@@ -766,7 +766,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../MeshCore_Simulation_ECHTE_Daten/" class="md-nav__link">
+      <a href="../../MeshCore_Simulation_ECHTE_Daten/" class="md-nav__link">
         
   
   
@@ -791,20 +791,18 @@
                 
   
   
-    
   
   
-  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14_7" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14_7" >
         
           
           <label class="md-nav__link" for="__nav_14_7" id="__nav_14_7_label" tabindex="0">
@@ -825,7 +823,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_14_7_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_14_7_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_14_7">
             <span class="md-nav__icon md-icon"></span>
             
@@ -840,37 +838,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    MHR-Simulationen &amp; Realdatensatz
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../sim/" class="md-nav__link">
         
   
   
@@ -886,109 +857,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#voraussetzungen" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Voraussetzungen
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#datensatz-data" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Datensatz (data/)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Datensatz (data/)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#reichere-corescope-endpoints-fur-genauereneue-simulationen" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reichere CoreScope-Endpoints (für genauere/neue Simulationen)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#schnellstart-v3-realdaten-sim-aus-dem-repo-reproduzieren" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Schnellstart — v3-Realdaten-Sim aus dem Repo reproduzieren
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#vollstandig-frische-daten-holen-statt-repo-snapshot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Vollständig frische Daten holen (statt Repo-Snapshot)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#die-simulationen-im-uberblick" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Die Simulationen im Überblick
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#eigene-auswertungen-bauen" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Eigene Auswertungen bauen
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1001,7 +869,7 @@
   
   
     <li class="md-nav__item">
-      <a href="MeshCore_Simulation_v3_Realdaten/" class="md-nav__link">
+      <a href="../../sim/MeshCore_Simulation_v3_Realdaten/" class="md-nav__link">
         
   
   
@@ -1029,7 +897,7 @@
   
   
     <li class="md-nav__item">
-      <a href="MeshCore_Simulation_v4_NeighborGraph/" class="md-nav__link">
+      <a href="../../sim/MeshCore_Simulation_v4_NeighborGraph/" class="md-nav__link">
         
   
   
@@ -1062,18 +930,20 @@
                 
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14_8" checked>
         
           
           <label class="md-nav__link" for="__nav_14_8" id="__nav_14_8_label" tabindex="0">
@@ -1094,7 +964,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_14_8_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_14_8_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_14_8">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1109,10 +979,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../study/Adaptive_Controller_Design/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adaptiver Suppressions-Regler — Design &amp; Validierung (Ergebnis: NO-GO)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1128,6 +1025,70 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#das-untersuchte-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Das untersuchte Design
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ergebnisse-statisch-sicher-vs-adaptiv-airtime-gewinn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ergebnisse (statisch sicher vs. adaptiv, Airtime-Gewinn)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entscheidung-no-go-go-false" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entscheidung: NO-GO (go = false)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limitierungen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitierungen
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1140,7 +1101,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../study/MeshCore_Routing_Study/" class="md-nav__link">
+      <a href="../MeshCore_Routing_Study/" class="md-nav__link">
         
   
   
@@ -1168,7 +1129,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../study/STUDY_DESIGN/" class="md-nav__link">
+      <a href="../STUDY_DESIGN/" class="md-nav__link">
         
   
   
@@ -1196,7 +1157,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../study/STUDY_RESULTS/" class="md-nav__link">
+      <a href="../STUDY_RESULTS/" class="md-nav__link">
         
   
   
@@ -1224,7 +1185,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../study/SUPPRESSION_VALIDATION/" class="md-nav__link">
+      <a href="../SUPPRESSION_VALIDATION/" class="md-nav__link">
         
   
   
@@ -1252,7 +1213,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../study/Suppression_Design/" class="md-nav__link">
+      <a href="../Suppression_Design/" class="md-nav__link">
         
   
   
@@ -1315,10 +1276,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#voraussetzungen" class="md-nav__link">
+  <a href="#das-untersuchte-design" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Voraussetzungen
+        Das untersuchte Design
       
     </span>
   </a>
@@ -1326,38 +1287,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#datensatz-data" class="md-nav__link">
+  <a href="#ergebnisse-statisch-sicher-vs-adaptiv-airtime-gewinn" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Datensatz (data/)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Datensatz (data/)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#reichere-corescope-endpoints-fur-genauereneue-simulationen" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reichere CoreScope-Endpoints (für genauere/neue Simulationen)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#schnellstart-v3-realdaten-sim-aus-dem-repo-reproduzieren" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Schnellstart — v3-Realdaten-Sim aus dem Repo reproduzieren
+        Ergebnisse (statisch sicher vs. adaptiv, Airtime-Gewinn)
       
     </span>
   </a>
@@ -1365,10 +1298,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#vollstandig-frische-daten-holen-statt-repo-snapshot" class="md-nav__link">
+  <a href="#entscheidung-no-go-go-false" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Vollständig frische Daten holen (statt Repo-Snapshot)
+        Entscheidung: NO-GO (go = false)
       
     </span>
   </a>
@@ -1376,21 +1309,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#die-simulationen-im-uberblick" class="md-nav__link">
+  <a href="#limitierungen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Die Simulationen im Überblick
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#eigene-auswertungen-bauen" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Eigene Auswertungen bauen
+        Limitierungen
       
     </span>
   </a>
@@ -1414,7 +1336,7 @@
 
 
   
-    <a href="https://github.com/meshcore-dev/meshcore/edit/main/docs/MHR/sim/README.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/meshcore-dev/meshcore/edit/main/docs/MHR/study/Adaptive_Controller_Design.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1422,135 +1344,92 @@
   
 
 
-<h1 id="mhr-simulationen-realdatensatz">MHR-Simulationen &amp; Realdatensatz</h1>
-<p>Dieser Ordner enthält die Routing-Simulationen des MHR-Forks <strong>und den echten CoreScope-Datensatz</strong>,
-mit dem sie kalibriert wurden — damit jede:r die Ergebnisse reproduzieren oder eigene Auswertungen
-bauen kann.</p>
-<h2 id="voraussetzungen">Voraussetzungen</h2>
-<pre><code class="language-bash">pip install numpy networkx matplotlib
-# zum Entpacken der Rohdaten: xz (macOS: brew install xz, Debian/Ubuntu: apt install xz-utils)
-</code></pre>
-<h2 id="datensatz-data">Datensatz (<code>data/</code>)</h2>
+<h1 id="adaptiver-suppressions-regler-design-validierung-ergebnis-no-go">Adaptiver Suppressions-Regler — Design &amp; Validierung (Ergebnis: NO-GO)</h1>
+<p><em>Frage (Nutzer): Kann sich die Firmware alle 1–2 h selbst an die Umgebung anpassen, um die
+Suppression optimal einzustellen? Ist das sinnvoll?</em>
+<strong>Antwort nach Simulation: technisch möglich und stabil — aber NICHT lohnend. Der statische
+sichere Parametersatz fängt den Gewinn bereits ein.</strong></p>
+<p>Validierung: <code>adaptive_sim.py</code> / <code>adaptive_results.json</code> (echter neighbor-graph, Seed 42, ≥5 Seeds,
+40 Adaptions-Ticks pro Szenario). Baut auf der validierten guarded Suppression auf
+(<a href="../Suppression_Design/">Suppression_Design.md</a>, <a href="../SUPPRESSION_VALIDATION/">SUPPRESSION_VALIDATION.md</a>).</p>
+<h2 id="das-untersuchte-design">Das untersuchte Design</h2>
+<p>Schnelle Sicherheit bleibt per-Paket bei den Guards G1–G5. Ein LANGSAMER äußerer Regelkreis (Tick ≈
+1–2 h) stellt pro Knoten nur die Suppressions-<strong>Aggressivität</strong> (<code>supp_prob</code>) <strong>innerhalb des
+validierten sicheren Fensters</strong> nach — anhand lokal messbarer Größen (Nachbar-Dichte, gehörte
+Cover-Redundanz, Airtime-Druck, Churn). Asymmetrisch (schnell zurück auf konservativ bei
+Churn/sinkender Redundanz, langsam vor), gedämpft, bounded. Da die Guards die Lieferquote für jeden
+Parameterwert schützen, kann die Adaption nur Airtime gegen Marge tauschen.</p>
+<h2 id="ergebnisse-statisch-sicher-vs-adaptiv-airtime-gewinn">Ergebnisse (statisch sicher vs. adaptiv, Airtime-Gewinn)</h2>
 <table>
 <thead>
 <tr>
-<th>Datei</th>
-<th>Inhalt</th>
-<th>Größe</th>
+<th>Szenario</th>
+<th>statisch</th>
+<th>adaptiv</th>
+<th>Δ (pp)</th>
+<th>strikt-safe Ticks (stat/adapt)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>data/packets.jsonl.xz</code></td>
-<td><strong>vollständige Rohdaten</strong>: 109.980 reale Pakete (1 JSON/Zeile), je mit <code>path_json</code> (Hop-Kette), <code>snr</code>, <code>rssi</code>, <code>observer_id</code>, <code>route_type</code>, <code>payload_type</code>, <code>timestamp</code></td>
-<td>16,6 MB (entpackt 188 MB)</td>
+<td>Tag/Nacht-Last</td>
+<td>12,3 %</td>
+<td>14,8 %</td>
+<td><strong>+2,5</strong></td>
+<td>20 / 20</td>
 </tr>
 <tr>
-<td><code>data/nodes.json</code></td>
-<td>1962 Knoten: <code>public_key</code>, <code>lat</code>/<code>lon</code>, <code>role</code>, <code>advert_count</code>, <code>relay_count_*</code>, <code>usefulness_score</code>, …</td>
-<td>1,3 MB</td>
+<td>Knoten-Churn</td>
+<td>12,6 %</td>
+<td>14,5 %</td>
+<td><strong>+1,9</strong></td>
+<td>17 / 14</td>
 </tr>
 <tr>
-<td><code>data/observers.json</code></td>
-<td>38 Observer (Empfangs-Knoten)</td>
-<td>24 KB</td>
+<td>Dichte-Verschiebung</td>
+<td>10,5 %</td>
+<td>9,6 %</td>
+<td><strong>−0,9</strong></td>
+<td>22 / 19</td>
 </tr>
 <tr>
-<td><code>data/topology_edges.json</code></td>
-<td>aus den Pfaden abgeleitete beobachtete Relay-Kanten (aggregiert)</td>
-<td>0,7 MB</td>
+<td>Linkausfall</td>
+<td>11,8 %</td>
+<td>11,4 %</td>
+<td><strong>−0,3</strong></td>
+<td>17 / 20</td>
 </tr>
 <tr>
-<td><code>data/neighbor_graph.json</code></td>
-<td><strong>bestes Link-Modell</strong>: server-aufgelöste reale Nachbar-Topologie (1034 Knoten, 1956 Kanten) mit vollen Pubkeys, <code>avg_snr</code> <strong>pro Kante</strong> und <code>ambiguous</code>-Flag (nur 8,8 % ambig)</td>
-<td>0,6 MB</td>
-</tr>
-<tr>
-<td><code>data/hash_sizes.json</code></td>
-<td>Hash-Größen-Verteilung (1/2/3-Byte) im Netz</td>
-<td>0,5 MB</td>
-</tr>
-<tr>
-<td><code>data/snr_calibration.json</code>, <code>data/real_detour_stats.json</code></td>
-<td>abgeleitete Kennzahlen (SNR-Fit, reale Detour-Statistik)</td>
-<td>klein</td>
+<td><strong>Mittel</strong></td>
+<td></td>
+<td></td>
+<td><strong>+0,76</strong></td>
+<td></td>
 </tr>
 </tbody>
 </table>
-<h3 id="reichere-corescope-endpoints-fur-genauereneue-simulationen">Reichere CoreScope-Endpoints (für genauere/neue Simulationen)</h3>
-<p>Die CoreScope-API bietet mehr als die anfangs genutzten Basis-Endpoints — für ein echtes Link-Modell sind besonders nützlich:
-- <strong><code>/api/analytics/neighbor-graph</code></strong> — fertige reale Link-Topologie mit <code>avg_snr</code> pro Kante + <code>ambiguous</code>-Flag (Quelle von <code>data/neighbor_graph.json</code>). Ersetzt das geometrische v3-Modell durch <strong>echte gemessene Kanten</strong> → deutlich genauer.
-- <strong><code>/api/packets?expand=observations</code></strong> — liefert pro Paket ALLE Observer-Empfänge (je eigenes <code>snr</code>/<code>rssi</code>), statt nur einer Messung → viel dichtere Link-Qualitäts-Daten.
-- <strong><code>/api/resolve-hops</code></strong> (POST) / <strong><code>/api/paths/inspect</code></strong> (POST) — server-seitige Hash→Knoten-Auflösung (umgeht die 1-Byte-Hash-Ambiguität).
-- <strong><code>/api/nodes/{pubkey}</code></strong>, <strong><code>/api/analytics/hash-sizes</code></strong>, time-Pagination (<code>?before=</code>/<code>?since=</code>).</p>
-<p><strong>Quelle:</strong> öffentliche CoreScope-API <code>https://corescope.meshrheinland.de/api/{nodes,observers,packets}</code>
-(MeshCore Rheinland). Der Datensatz ist eine <strong>Momentaufnahme</strong> (30.05.2026). Rohdaten bewusst als
-<code>.xz</code> eingebunden (xz packt JSON-Lines ~11×; 188 MB → 16,6 MB, unter GitHubs Limit).</p>
-<h2 id="schnellstart-v3-realdaten-sim-aus-dem-repo-reproduzieren">Schnellstart — v3-Realdaten-Sim aus dem Repo reproduzieren</h2>
-<p>Die Skripte erwarten die Rohdaten unter <code>/tmp/cs_data/</code>. Einmalig vorbereiten:</p>
-<pre><code class="language-bash">mkdir -p /tmp/cs_data
-xz -dkc data/packets.jsonl.xz &gt; /tmp/cs_data/packets.jsonl     # entpacken (~188 MB)
-cp data/nodes.json data/observers.json /tmp/cs_data/
-python3 mhr_sim_real_v3.py        # → sim_results_v3.json, data/*, fig_v3_*.png
-</code></pre>
-<h2 id="vollstandig-frische-daten-holen-statt-repo-snapshot">Vollständig frische Daten holen (statt Repo-Snapshot)</h2>
-<pre><code class="language-bash">python3 mhr_collect_corescope.py            # lädt aktuelle Daten nach /tmp/cs_data/ (paginiert ~110k Pakete)
-python3 mhr_sim_real_v3.py
-</code></pre>
-<p>Der Collector nutzt urllib mit Browser-User-Agent + offset-Pagination (siehe Kopf der Datei).</p>
-<h2 id="die-simulationen-im-uberblick">Die Simulationen im Überblick</h2>
-<table>
-<thead>
-<tr>
-<th>Skript</th>
-<th>Was</th>
-<th>Datenbasis</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>mhr_sim.py</code></td>
-<td>v1 — synthetische Rheinland-Topologie, MeshCore-Flood vs. MHR</td>
-<td>synthetisch <em>(illustrativ — das angenommene SNR-Modell wird von den Realdaten widerlegt)</em></td>
-</tr>
-<tr>
-<td><code>mhr_sim_real.py</code></td>
-<td>v1 auf 25 echten Knoten</td>
-<td>klein, angenommenes Linkmodell</td>
-</tr>
-<tr>
-<td><code>mhr_sim_v2.py</code></td>
-<td>Stress-Szenarien (Churn, Linkausfall, Partition)</td>
-<td>reale 25-Knoten-Topologie</td>
-</tr>
-<tr>
-<td><code>mhr_sim_real_v3.py</code></td>
-<td><strong>v3 — auf vollem Realdatensatz kalibriert</strong>: misst reale Topologie, SNR-Fit, reale Detours (Median 2,1×), simuliert Baseline vs. MHR</td>
-<td><code>data/</code> + Rohpakete</td>
-</tr>
-<tr>
-<td><code>../study/study_sim.py</code></td>
-<td><strong>Mechanismus × Adoptions-Sweep</strong> (1 Knoten → alle), Safety-Invariante</td>
-<td>reale 776-Knoten-Topologie</td>
-</tr>
-</tbody>
-</table>
-<p>Alle reproduzierbar mit <strong>Seed 42</strong>. Ergebnisse landen als <code>*_results*.json</code> + <code>fig_*.png</code> daneben.</p>
-<h2 id="eigene-auswertungen-bauen">Eigene Auswertungen bauen</h2>
 <ul>
-<li>Pakete streamen (nie komplett in den RAM): <code>for line in open('/tmp/cs_data/packets.jsonl'): p = json.loads(line)</code>.
-  Direkt aus dem <code>.xz</code> ohne Entpacken: <code>import lzma, json; [json.loads(l) for l in lzma.open('data/packets.jsonl.xz','rt')]</code>.</li>
-<li><strong>Node→Hash-Mapping:</strong> der MeshCore-Hash eines Knotens = die ersten <code>hash_size</code> Bytes des
-  <code>public_key</code> (Hex-Präfix). 2-Byte-Hashes sind ~99 % eindeutig, 1-Byte kollidieren stark — bei
-  1-Byte über Geografie disambiguieren oder als ambig zählen (nicht raten).</li>
-<li><code>path_json</code> ist die reale Hop-Kette eines Flood-Pakets; aufeinanderfolgende Hashes = reale Kante.</li>
-<li>Methodik &amp; Limitierungen ehrlich dokumentiert in <code>MeshCore_Simulation_v3_Realdaten.md</code> und
-  <code>../study/MeshCore_Routing_Study.md</code>.</li>
+<li><strong>Konvergenz/Oszillation:</strong> der Regler <strong>oszilliert nicht</strong> (<code>any_oscillation = false</code>; Settle-Varianz
+  von supp_prob 3e-7 … 7e-3; er pendelt sich je nach Dichte um p ≈ 0,58–0,77 ein). Das Konzept ist
+  also stabil — das war nicht das Problem.</li>
+<li><strong>Mehrwert:</strong> im Mittel nur <strong>+0,76 pp</strong> Airtime gegenüber dem statischen sicheren Satz (max
+  +2,48 pp), in zwei Szenarien sogar leicht schlechter. Unter der Nutzen-Schwelle (2,0 pp).</li>
+<li><strong>Sicherheit:</strong> <code>all_scenarios_safe = false</code> — der adaptive Regler ist in einzelnen Ticks minimal
+  weniger strikt-safe als der statische Satz (der durchgehend safe ist).</li>
 </ul>
-<blockquote>
-<p>Hinweis: Das v3-Linkmodell ist geometrisch idealisiert (reales Gelände/Antennenhöhe fehlen) —
-<strong>relative</strong> Mechanismus-Vergleiche sind robuster als <strong>absolute</strong> Airtime-Zahlen.</p>
-</blockquote>
+<h2 id="entscheidung-no-go-go-false">Entscheidung: NO-GO (<code>go = false</code>)</h2>
+<p>Der adaptive Regler bringt für die <strong>zusätzliche Komplexität und ein minimales Sicherheitsrisiko</strong>
+nur einen vernachlässigbaren Airtime-Vorteil über den ohnehin sehr guten statischen sicheren Satz.
+Gemäß Projektpriorität <strong>Qualität &amp; Stabilität vor letzter Optimierung</strong> wird er <strong>nicht codiert</strong>.</p>
+<p><strong>Stattdessen empfohlen:</strong> den <strong>statischen</strong> sicheren Satz nutzen (<code>k_cover=2, min_degree=3..4,
+snr_floor=-6, prob=0.8</code>). Er ist einfacher, durchgehend safe und holt praktisch denselben Gewinn.</p>
+<p><strong>Aufgehoben, nicht verloren:</strong> Falls künftig Daten aus <em>sehr</em> heterogenen Netzen (z. B. extreme
+Tag/Nacht-Schwankung, wo Adaptiv +2,5 pp zeigte) einen größeren Spread belegen, kann der Regler — er
+ist ja stabil — als opt-in Schicht reaktiviert und neu bewertet werden. Heute: nein.</p>
+<h2 id="limitierungen">Limitierungen</h2>
+<p>Verteilte Regler beeinflussen sich gegenseitig (im Modell erfasst, real evtl. anders); lokaler
+Airtime-Proxy ≠ globale Delivery (durch Guards aber abgesichert); Sim-Idealisierungen (kein
+Duty-Cycle/Kollisionen). Die Kernaussage „Mehrwert &lt; statischer Satz" ist über alle Szenarien robust.</p>
 
 
 
@@ -1600,10 +1479,10 @@ python3 mhr_sim_real_v3.py
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.action.edit", "content.code.copy", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["content.action.edit", "content.code.copy", "search.highlight", "search.suggest"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
