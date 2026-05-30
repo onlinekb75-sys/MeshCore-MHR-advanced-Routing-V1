@@ -6,9 +6,9 @@
 
 ---
 
-## GESAMT-VERDIKT: **GO** — darf Phase 2 codiert werden?
+## GESAMT-VERDIKT: **GO** — darf Phase 2 (gefixte Logik) codiert werden?
 
-**GO.** Alle fuenf Gate-Punkte bestehen: null transiente Schleifen mit Feasibility (waehrend die Gegenprobe ohne Feasibility Loops zeigt), endliche Konvergenz kalt und nach Stoerung, vollstaendige Re-Konvergenz unter Churn **mit der jetzt pflichtigen Churn-Haertung** (Trigger-on-change + Hold-down/Route-Poisoning + origin-unabhaengige Aggregat-Feasibility — Gate 3 ging damit von FAIL auf PASS), Mixed-FW graceful und nie schlechter als Baseline, und das Kontroll-Budget passt locker ins 10%-Duty-Cycle-Sub-Band.
+**GO fuer die GEFIXTE Logik (pro-Ziel-Seqno).** Alle fuenf Gate-Punkte bestehen mit der gefixten Seqno-Variante: null transiente Schleifen mit Feasibility (waehrend Gegenprobe OHNE Feasibility und die **B1-bug-Variante** MIT pro-Annoncierer-Seqno Loops zeigen), endliche Konvergenz kalt und nach Stoerung, vollstaendige Re-Konvergenz unter Churn **mit der jetzt pflichtigen Churn-Haertung** (Trigger-on-change + Hold-down/Route-Poisoning + origin-unabhaengige Aggregat-Feasibility — Gate 3 ging damit von FAIL auf PASS), Mixed-FW graceful und nie schlechter als Baseline, und das Kontroll-Budget passt locker ins 10%-Duty-Cycle-Sub-Band. Die **B1-Regression** (Abschnitt unter Gate 1) belegt zusaetzlich: der behobene Loop-BLOCKER B1 (pro-Annoncierer-Seqno hebelt das Feasibility-Gate aus) loopt reproduzierbar, der Fix beseitigt ihn.
 
 | Gate | Inhalt | Ergebnis |
 |---|---|---|
@@ -30,6 +30,27 @@ Geprueft wird die AKTUELLE Next-Hop-Kette ueber alle Ticks und Seeds, je Tick ta
 - **Die Gegenprobe traegt:** ohne Feasibility entstehen deutlich mehr (und persistente, count-to-infinity-artige) Loops; mit Feasibility ist der Kaltstart komplett schleifenfrei und alle Loops nach einer Stoerung sind rein transient (loesen sich auf). Die Schleifenfreiheit kommt also aus dem Mechanismus (Babel-Bedingung), nicht aus der Topologie.
 - Beleg: `fig_p2_loops.png`. Zusaetzlich belegt ein Mini-Topologie-Unittest (Linie D-X-A-B, X getoetet) den Mechanismus isoliert: naiv = 40/40 Loop-Ticks (A<->B count-to-infinity), Feasibility = 0.
 
+### B1-Regression — pro-Annoncierer- vs. pro-Ziel-Seqno (Loop-BLOCKER B1)
+
+Der Firmware-Review fand **B1**: die DV-Seqno war **pro-Annoncierer** (ein globaler Zaehler je Knoten, im Header fuer alle Entries, steigt bei jeder Annonce) statt **pro-Ziel**. Folge: `seqno_newer` ist fast immer wahr -> das Babel-Feasibility-Gate `cand<fd` wird umgangen -> strikt schlechtere Loop-Routen werden feasibel. Der Fix (in der Firmware umgesetzt): **pro-Ziel-Seqno**, vom Origin erhoeht, vom Relay unveraendert propagiert. Hier validiert als Regression in drei Modi auf der realen Topologie (FIXED = Gate-Variante, alle Seeds; naiv/B1-bug = 2 Seeds, reiner Mechanismus-Beleg).
+
+| Modus | Loops gesamt (real) | max Loops/Tick | persistent (Endtick) | Kaltphase-Loops | akzeptiert schlechte Route (§3a) |
+|---|---|---|---|---|---|
+| **naiv** (kein Feasibility) | 55 | 2 | 1 | 0 | ja |
+| **B1-bug** (Feas.+pro-Annoncierer-Seqno) | 82142 | 776 | 244 | 41969 | ja |
+| **fixed** (Feas.+pro-Ziel-Seqno) | 0 | 0 | 0 | 0 | nein |
+
+**§3a-Mini-Loop-Testfall** (isolierte Topologie R-C-A-B, eine Region; Ziel R; die gute Kante C-A faellt aus, B reannonciert R mit hoeherer Metrik ueber den Loop zurueck an A):
+
+| Modus | Loop-Ticks (40) | akzeptiert B (schlechtere Loop-Route) |
+|---|---|---|
+| naiv   | 40 | ja |
+| B1-bug | 40 | ja |
+| fixed  | 0 | nein |
+
+- **B1-bug reproduziert den Review-Befund:** die pro-Annoncierer-Seqno hebelt die Feasibility aus -> B1-bug akzeptiert die strikt schlechtere Route (§3a) und loopt sowohl im Mini-Test als auch massiv auf der realen Topologie. **fixed lehnt B ab** (pro-Ziel-Seqno laesst das `cand<fd`-Gate greifen) und bleibt schleifenfrei. Naiv loopt im Mini-Test ebenfalls, zeigt auf der grossen Topologie aber WENIGER Loops als B1-bug: B1 ist sogar schlimmer als gar keine Feasibility, weil es Feasibility VORTAEUSCHT, aber umgeht.
+- Beleg: `fig_p2_b1_regression.png` (Loops/Tick naiv vs. B1-bug vs. fixed).
+
 ## Gate 2 — Konvergenzzeit
 
 Konvergenz = aufgeloeste Next-Hops der Stichprobe stabil ueber 2 Ticks UND null Loops.
@@ -44,17 +65,17 @@ Knoten gehen nach advert_count-Profil an/aus (selten gehoerte = instabiler) plus
 
 **Churn-Haertung (jetzt Pflicht, Design Abschnitt 3):** (a) **Trigger-on-change** rate-limitiert (>= 2 Ticks zwischen getriggerten Updates je Knoten) — sofortiges DV-Update bei Metrik-/Next-Hop-Aenderung statt nur periodisch; (b) **Hold-down + Route-Poisoning** bei Knoten-/Link-Ausfall (Poison = INF mit erhoehter Seqno, Hold-down 20 Ticks = keine schlechtere Alternative annehmen); (c) **origin-unabhaengige Aggregat-Feasibility** ueber den Ziel-Schluessel `("R",dreg)` (stellt die Babel-Invariante fuer die H1-Schicht wieder her). Hysterese >=15 % bleibt aktiv.
 
-| Metrik (max/Mittel ueber Seeds) | ALT (nur periodisch) | GEHAERTET |
-|---|---|---|
-| Re-Konvergenz nach Churn-Stopp (Loops=0 UND Wechsel=0) | **NEIN** | ja |
-| Restschleifen nach Churn-Stopp (Settle, max ueber Seeds) | **4** | **0** |
-| Restschleifen je Seed (Settle) | [4, 0] | [0, 0, 0, 0, 0] |
-| Restwechsel nach Churn-Stopp (Settle, max) | 0 | 0 |
-| Routen-Wechselrate Tail (eingeschwungen) | 0.80%/Tick | 0.19%/Tick |
-| Wechselrate gesamt | 1.46%/Tick | 1.52%/Tick |
-| transiente Loops max (waehrend Churn) | 40 | 14 |
-| Tail <= Gesamt (schwingt nicht auf) | ja | ja |
-| **Gate-3-Verdikt** | **FAIL** | PASS |
+| Metrik (max/Mittel ueber Seeds) | ALT (nur periodisch) | B1-bug (gehaertet, pro-Annoncierer-Seqno) | FIXED/GEHAERTET (pro-Ziel-Seqno) |
+|---|---|---|---|
+| Re-Konvergenz nach Churn-Stopp (Loops=0 UND Wechsel=0) | **NEIN** | **NEIN** | ja |
+| Restschleifen nach Churn-Stopp (Settle, max ueber Seeds) | **4** | **25** | **0** |
+| Restschleifen je Seed (Settle) | [4, 0] | [25, 21] | [0, 0, 0, 0, 0] |
+| Restwechsel nach Churn-Stopp (Settle, max) | 0 | 6 | 0 |
+| Routen-Wechselrate Tail (eingeschwungen) | 0.80%/Tick | 0.22%/Tick | 0.19%/Tick |
+| transiente Loops max (waehrend Churn) | 40 | 108 | 14 |
+| **Gate-3-Verdikt** | **FAIL** | **FAIL** | PASS |
+
+- B1-bug laeuft mit der **gleichen vollen Churn-Haertung** wie FIXED, nur mit der fehlerhaften pro-Annoncierer-Seqno -> isoliert: der Seqno-Bug ist der Loop-Treiber, nicht die fehlende Haertung. Selbst gehaertet faellt B1-bug durch.
 
 - Beleg: `fig_p2_churn_stability.png` (Wechselrate ALT vs. GEHAERTET, Seed 42).
 

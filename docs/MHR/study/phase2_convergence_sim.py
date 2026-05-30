@@ -27,6 +27,14 @@ EHRLICHKEIT vor Wunschergebnis: gemessene Loops, Konvergenzzeiten, Flatter-Raten
 und Kontroll-Budget werden so berichtet wie sie fallen. GO nur wenn alle 5
 Gates bestehen.
 
+B1-REGRESSION (Loop-BLOCKER, Firmware-Review): drei Seqno-Varianten werden
+verglichen — (1) naiv (kein Feasibility), (2) B1-bug = Feasibility MIT
+pro-Annoncierer-Seqno (die fehlerhafte Firmware-Logik VOR dem Fix: ein globaler,
+je Annonce steigender Zaehler hebelt das Babel-Gate cand<fd aus), (3) fixed =
+Feasibility mit pro-Ziel-Seqno (Origin erhoeht, Relay propagiert unveraendert).
+ERWARTUNG: naiv + B1-bug loopen / akzeptieren die schlechtere Route, fixed nicht.
+Das gefixte Logik-Verdikt (GO/NO-GO) bezieht sich auf die fixed-Variante.
+
 Reproduzierbar: Seed 42, >=5 Seeds. Daten read-only.
 """
 
@@ -268,6 +276,9 @@ class DVNode:
                  "fd", "seqno_seen", "fbackup",
                  "my_seqno", "region_seqno", "adv_table", "neigh_etx",
                  "_best_cache",    # dest_key -> (origin, route-dict) | None ; lazy
+                 # ---- B1-REGRESSION (Seqno-Variante) ----
+                 "seqno_mode",     # "per_dest" (FIXED) | "per_announcer" (B1-BUG)
+                 "announce_seqno", # B1-BUG: EIN globaler, je Annonce steigender Zaehler
                  # ---- CHURN-HAERTUNG (Teil 2) ----
                  "hardened",       # bool: Trigger-on-change + Hold-down/Poisoning aktiv
                  "dirty",          # bool: Metrik/Next-Hop hat sich geaendert -> Trigger faellig
@@ -275,11 +286,25 @@ class DVNode:
                  "holddown",       # dest_key -> tick_until: in dieser Zeit keine SCHLECHTERE Alt.
                  "agg_fd")         # ("R",dreg) -> origin-UNABHAENGIGE feasible distance (Babel f. H1)
 
-    def __init__(self, pk, region, is_border, use_feasibility, hardened=False):
+    def __init__(self, pk, region, is_border, use_feasibility, hardened=False,
+                 seqno_mode="per_dest"):
         self.pk = pk
         self.region = region
         self.is_border = is_border
         self.use_feasibility = use_feasibility
+        # ---- B1-REGRESSION ----
+        # "per_dest"      = FIXED (Firmware nach Fix): Seqno wird PRO ZIEL gefuehrt,
+        #                   vom Origin erhoeht und vom Relay UNVERAENDERT propagiert
+        #                   (genau die hier modellierte Default-Logik).
+        # "per_announcer" = B1-BUG (Firmware VOR Fix): jeder Knoten fuehrt EINEN
+        #                   globalen Seqno-Zaehler, der bei JEDER Annonce steigt und
+        #                   im Header fuer ALLE Entries gilt. Folge: beim Empfaenger ist
+        #                   die Wire-Seqno fast immer hoeher als die gespeicherte ->
+        #                   der "frischere-Seqno"-Zweig greift -> das Feasibility-Gate
+        #                   (cand<fd) wird umgangen -> strikt schlechtere Loop-Routen
+        #                   werden feasibel. Das ist der Review-Befund (Loop-BLOCKER B1).
+        self.seqno_mode = seqno_mode
+        self.announce_seqno = 0     # B1-BUG: globaler Annoncierer-Zaehler
         # source-specific Routen: (dest_key, origin) -> dict(nh, dist, seqno)
         self.src = {}
         self.by_dest = defaultdict(set)
@@ -409,6 +434,18 @@ class DVNode:
                         self._set((dk, origin), {"nh": self.pk, "dist": INF, "seqno": sq})
                         self.seqno_seen[(dk, origin)] = sq
                         adv[(dk, origin)] = (INF, sq)   # Retraction annoncieren
+        # ---- B1-BUG (per_announcer): genau die fehlerhafte Firmware-Logik VOR dem Fix.
+        # Statt der pro-Ziel/Origin gefuehrten Seqno traegt der DV-HEADER EINEN globalen
+        # Annoncierer-Zaehler, der bei JEDER Annonce steigt — und der gilt fuer ALLE
+        # Entries im Paket. Damit ist beim Empfaenger der eintreffende Seqno-Wert fast
+        # immer hoeher als der zuletzt gespeicherte -> der "frischere-Seqno"-Zweig in
+        # receive() greift -> das Babel-Feasibility-Gate (cand<fd) wird umgangen ->
+        # strikt schlechtere (Loop-)Routen werden feasibel. (Der FIXED-Modus laesst die
+        # pro-Ziel-Seqno oben unveraendert -> Relay propagiert die Origin-Seqno 1:1.)
+        if self.seqno_mode == "per_announcer" and adv:
+            self.announce_seqno += 1
+            sq = self.announce_seqno
+            adv = {k: (dist, sq) for k, (dist, _old_sq) in adv.items()}
         self.adv_table = dict(adv)
         return adv
 
@@ -599,13 +636,17 @@ class DVSim:
     """Verteilte, getickte DV-Simulation auf der realen Topologie."""
 
     def __init__(self, nodes, adj, region_of, border, backbone_set,
-                 use_feasibility=True, seed=42, hardened=False):
+                 use_feasibility=True, seed=42, hardened=False,
+                 seqno_mode="per_dest"):
         self.nodes = list(nodes)
         self.adj = adj
         self.region_of = region_of
         self.all_regions = sorted(set(region_of.values()))
         self.border = border
         self.hardened = hardened    # Churn-Haertung (Trigger-on-change + Hold-down)
+        # Seqno-Variante: "per_dest" (FIXED) | "per_announcer" (B1-BUG). Steuert die
+        # B1-Regression (siehe DVNode). Nur relevant, wenn use_feasibility=True.
+        self.seqno_mode = seqno_mode
         self.backbone = set(backbone_set)     # backbone-faehige Knoten (DV aktiv)
         # DETERMINISTISCHE Verarbeitungsreihenfolge: ueber ein SORTIERTES Knoten-
         # Listenobjekt iterieren, NIE direkt ueber ein set. Set-Iterationsreihenfolge
@@ -623,7 +664,7 @@ class DVSim:
         self.dv = {}
         for pk in self.order:
             d = DVNode(pk, region_of[pk], pk in border, use_feasibility,
-                       hardened=hardened)
+                       hardened=hardened, seqno_mode=seqno_mode)
             # nur backbone-Nachbarn zaehlen fuers DV (Stock-Knoten machen kein DV) —
             # in sortierter Reihenfolge fuer stabile Annoncen-Iteration
             d.neigh_etx = {v: w for v in sorted(adj[pk]) if v in self.backbone
@@ -893,12 +934,15 @@ def pick_articulation(sim, border, bb_list):
 def run_convergence_episode(nodes, adj, region_of, border, backbone_set,
                             use_feasibility, seed,
                             disturb_at=None, disturb_kind="kill_node",
-                            max_ticks=120, loop_sample=None):
+                            max_ticks=120, loop_sample=None,
+                            seqno_mode="per_dest"):
     """Faehrt eine Episode: Kaltstart -> Konvergenz -> optional Stoerung ->
     Re-Konvergenz. Misst Loops je Tick, Konvergenz-Ticks, Routenwechsel je Tick.
-    Rueckgabe dict mit Zeitreihen."""
+    Rueckgabe dict mit Zeitreihen. seqno_mode steuert die B1-Regression
+    ("per_dest"=FIXED | "per_announcer"=B1-BUG)."""
     sim = DVSim(nodes, adj, region_of, border, backbone_set,
-                use_feasibility=use_feasibility, seed=seed)
+                use_feasibility=use_feasibility, seed=seed,
+                seqno_mode=seqno_mode)
 
     loops_ts = []
     changes_ts = []
@@ -1001,16 +1045,18 @@ def run_convergence_episode(nodes, adj, region_of, border, backbone_set,
 # ======================================================================================
 def run_churn_episode(nodes, adj, region_of, border, backbone_set, NODE,
                       use_feasibility, seed, max_ticks=200, churn_rate=0.02,
-                      hardened=False):
+                      hardened=False, seqno_mode="per_dest"):
     """Knoten gehen nach advert_count-Profil an/aus (instabile Knoten flattern
     mehr); zusaetzlich sporadischer Linkausfall. Misst Routen-Wechselrate je Tick
     und prueft, ob es wieder konvergiert oder dauerhaft schwingt.
 
     hardened=True aktiviert die Churn-Haertung (Trigger-on-change + Hold-down/
     Route-Poisoning + origin-unabhaengige Aggregat-Feasibility) — direkt
-    vergleichbar mit hardened=False (ALT: nur periodisch)."""
+    vergleichbar mit hardened=False (ALT: nur periodisch).
+    seqno_mode steuert die B1-Regression ("per_dest"=FIXED | "per_announcer"=B1-BUG)."""
     sim = DVSim(nodes, adj, region_of, border, backbone_set,
-                use_feasibility=use_feasibility, seed=seed, hardened=hardened)
+                use_feasibility=use_feasibility, seed=seed, hardened=hardened,
+                seqno_mode=seqno_mode)
     rng = random.Random(seed + 99)
 
     # Instabilitaets-Wahrscheinlichkeit je Knoten aus advert_count.
@@ -1402,6 +1448,74 @@ def loopfree_unit_test():
     return out
 
 
+def b1_section3a_loop_test():
+    """GEZIELTER §3a-Mini-Loop-Testfall (Review-Befund B1) in DREI Modi.
+
+    Topologie (eine Region, ETX=1000/Hop), Ziel = R (Origin der Seqno fuer R):
+
+        R --- C --- A --- B
+              |___________|   (Zusatzkante A-B; B haengt nur an A und C-fern)
+
+    Konkret: R-C, C-A, A-B (Linie). A erreicht R am besten ueber C (Dist 2000).
+    B erreicht R nur ueber A (Dist 3000). Jetzt faellt die GUTE Kante C-A aus
+    (Aequivalent zu '§3a: R via C wird bruechig'): A verliert seine 2000er-Route.
+    B annonciert weiter "R erreichbar, Dist 3000" zurueck an A — das ist eine
+    STRIKT SCHLECHTERE Route, die ueber A SELBST laeuft (Loop A->B->A->...).
+
+      - FIXED (per-Ziel-Seqno): B's Annonce traegt die UNVERAENDERT propagierte
+        Origin-Seqno von R. A hat fuer (R, origin=R) dieselbe Seqno gespeichert ->
+        Babel-Gate greift: cand(3000+1000) < fd? NEIN -> A LEHNT B ab. Kein Loop.
+      - B1-BUG (per-Annoncierer-Seqno): B's Annonce traegt B's globalen, je Annonce
+        steigenden Zaehler. Der ist beim Empfaenger A fast immer > der gespeicherten
+        Seqno -> 'frischere Seqno' -> Feasibility wird UMGANGEN -> A akzeptiert die
+        schlechtere Route ueber B -> Loop A<->B.
+      - naiv (kein Feasibility): akzeptiert die schlechtere Route ebenfalls -> Loop.
+
+    Rueckgabe je Modus: {loops, accepted_worse_route} (B akzeptiert ja/nein)."""
+    out = {}
+    nodes = ["R", "C", "A", "B"]
+    a = {"R": {"C": 1000}, "C": {"R": 1000, "A": 1000},
+         "A": {"C": 1000, "B": 1000}, "B": {"A": 1000}}
+    for u in list(a):
+        for v in a[u]:
+            a.setdefault(v, {})[u] = a[u][v]
+    region_of = {n: 0 for n in nodes}
+
+    modes = [
+        ("naive",  dict(use_feasibility=False, seqno_mode="per_dest")),
+        ("b1bug",  dict(use_feasibility=True,  seqno_mode="per_announcer")),
+        ("fixed",  dict(use_feasibility=True,  seqno_mode="per_dest")),
+    ]
+    for name, kw in modes:
+        sim = DVSim(nodes, a, region_of, set(), set(nodes), seed=42, **kw)
+        for pk in sim.adv_phase:
+            sim.adv_phase[pk] = 0
+        # Konvergieren: A lernt R via C (2000), B via A (3000).
+        for _ in range(30):
+            sim.step()
+        # Stoerung: gute Kante C-A faellt aus -> A verliert die 2000er-Route zu R.
+        sim.dead_edges.add(frozenset(("C", "A")))
+        sim.detect_failures()
+        # KEIN globaler Seqno-Bump: realistisch propagiert die neue Generation
+        # hop-by-hop. In genau diesem Fenster muss die Feasibility die schlechtere
+        # Loop-Route (A ueber B) ablehnen.
+        loops = 0
+        accepted_worse = False
+        for _ in range(40):
+            sim.step()
+            stA, _ = sim.trace_path("A", "R")
+            stB, _ = sim.trace_path("B", "R")
+            if stA == "loop" or stB == "loop":
+                loops += 1
+            # 'akzeptiert schlechtere Route' = A's Next-Hop zu R zeigt auf B
+            # (B liegt vom Ziel R WEG -> strikt schlechtere, loopende Route).
+            rec = sim.dv["A"].src.get(("R", "R"))
+            if rec is not None and rec["nh"] == "B" and rec["dist"] < INF:
+                accepted_worse = True
+        out[name] = {"loops": loops, "accepted_worse_route": bool(accepted_worse)}
+    return out
+
+
 # ======================================================================================
 # MAIN
 # ======================================================================================
@@ -1470,19 +1584,33 @@ def main():
         f"feasibility={unit['feasibility']} Loop-Ticks "
         f"(erwartet: naiv>0, feasibility=0)")
 
-    g1 = {"feasibility": [], "naive": []}
+    # B1-REGRESSION: gezielter §3a-Mini-Loop-Testfall (R-C-A-B) in drei Modi.
+    b1unit = b1_section3a_loop_test()
+    log(f"  [§3a-Mini-Loop B1] naiv: Loops={b1unit['naive']['loops']}, "
+        f"schlechte Route akzeptiert={b1unit['naive']['accepted_worse_route']} | "
+        f"B1-bug: Loops={b1unit['b1bug']['loops']}, "
+        f"akzeptiert={b1unit['b1bug']['accepted_worse_route']} | "
+        f"fixed: Loops={b1unit['fixed']['loops']}, "
+        f"akzeptiert={b1unit['fixed']['accepted_worse_route']} "
+        f"(erwartet: naiv/B1-bug loopen+akzeptieren, fixed lehnt ab)")
+
+    g1 = {"feasibility": [], "naive": [], "b1bug": []}
     g2 = {"cold": [], "after_disturb": []}
     feas_cold_loops = []        # Loops waehrend Kaltstart-Phase (vor Stoerung)
     naive_cold_loops = []
+    b1_cold_loops = []          # B1-BUG: Loops Kaltphase
     feas_persistent = []        # Loops im letzten Tick (nach Re-Konvergenz)
     naive_persistent = []
+    b1_persistent = []          # B1-BUG: persistente Loops (Endtick)
+    b1_max_loops = []           # B1-BUG: max Loops/Tick je Seed
 
     seed_subset = SEEDS if not FAST else SEEDS[:2]
-    # GEGENPROBE (naiv) ist NUR ein Mechanismus-Beleg (naiv loopt, Feasibility nicht).
-    # Sie braucht NICHT alle Seeds — 2 Seeds zeigen den Kontrast robust und halten die
-    # Laufzeit unter dem ~5-min-Richtwert. Feasibility (das eigentliche Gate) laeuft auf
-    # ALLEN Seeds. Der isolierte count-to-infinity-Unittest belegt den Mechanismus ohnehin.
+    # GEGENPROBE (naiv) und B1-REGRESSION (B1-bug) sind NUR Mechanismus-/Regressions-
+    # Belege (beide loopen, FIXED nicht). Sie brauchen NICHT alle Seeds — 2 Seeds zeigen
+    # den Kontrast robust und halten die Laufzeit im Budget. FIXED (das eigentliche Gate)
+    # laeuft auf ALLEN Seeds. Der isolierte §3a-Mini-Loop-Test belegt den Mechanismus ohnehin.
     naive_seeds = set(seed_subset[:2])
+    b1_seeds = set(seed_subset[:2])      # B1-BUG-Regression auf 2 Seeds (Laufzeit)
     # Kaltstart braucht ~6-7 Annoncen-Perioden bis stabil -> Stoerung erst spaeter,
     # damit die Kaltstart-Konvergenz sauber gemessen werden kann.
     disturb_at = max_ticks - 4 * ADV_PERIOD_TICKS
@@ -1522,6 +1650,22 @@ def main():
                 f"max Loops/Tick={ep_n['max_loops_seen']}, "
                 f"persistente Loops (Endtick)={ep_n['persistent_loops_final']}")
 
+        # B1-REGRESSION: Feasibility MIT pro-Annoncierer-Seqno (die fehlerhafte
+        # Firmware-Logik VOR dem Fix) — nur auf b1_seeds. ERWARTET: massive Loops,
+        # weil die Annoncierer-Seqno die Feasibility aushebelt.
+        if seed in b1_seeds:
+            ep_b1 = run_convergence_episode(
+                nodes, adj, region_of, border_full, backbone_full,
+                use_feasibility=True, seed=seed, seqno_mode="per_announcer",
+                disturb_at=disturb_at, disturb_kind="kill_node", max_ticks=max_ticks)
+            g1["b1bug"].append(ep_b1["loops_ts"])
+            b1_cold_loops.append(int(sum(ep_b1["loops_ts"][:disturb_at])))
+            b1_persistent.append(int(ep_b1["persistent_loops_final"]))
+            b1_max_loops.append(int(ep_b1["max_loops_seen"]))
+            log(f"     B1-BUG (Feas.+pro-Annoncierer-Seqno): Loops Kaltphase={b1_cold_loops[-1]}, "
+                f"max Loops/Tick={ep_b1['max_loops_seen']}, "
+                f"persistente Loops (Endtick)={ep_b1['persistent_loops_final']}")
+
     def agg_ts(list_of_ts):
         L = min(len(x) for x in list_of_ts)
         arr = np.array([x[:L] for x in list_of_ts], dtype=float)
@@ -1529,24 +1673,37 @@ def main():
 
     feas_mean, feas_max = agg_ts(g1["feasibility"])
     naive_mean, naive_max = agg_ts(g1["naive"])
+    b1_mean, b1_max = agg_ts(g1["b1bug"])
     total_feas_loops = int(sum(int(x) for ts in g1["feasibility"] for x in ts))
     total_naive_loops = int(sum(int(x) for ts in g1["naive"] for x in ts))
+    total_b1_loops = int(sum(int(x) for ts in g1["b1bug"] for x in ts))
 
     cold_vals = [c for c in g2["cold"] if c is not None]
     after_vals = [c for c in g2["after_disturb"] if c is not None]
 
     feas_cold_total = int(sum(feas_cold_loops))
     naive_cold_total = int(sum(naive_cold_loops))
+    b1_cold_total = int(sum(b1_cold_loops))
     feas_persist_total = int(sum(feas_persistent))
     naive_persist_total = int(sum(naive_persistent))
+    b1_persist_total = int(sum(b1_persistent))
 
-    # GO-Kriterium Gate 1 (ehrlich):
-    #  (a) Kaltstart komplett schleifenfrei mit Feasibility,
-    #  (b) keine PERSISTENTEN Loops nach Re-Konvergenz mit Feasibility,
-    #  (c) Gegenprobe belegt den Mechanismus (naiv hat klar MEHR Loops).
+    # GO-Kriterium Gate 1 (ehrlich) — FIXED = Feasibility mit pro-Ziel-Seqno:
+    #  (a) Kaltstart komplett schleifenfrei (FIXED),
+    #  (b) keine PERSISTENTEN Loops nach Re-Konvergenz (FIXED),
+    #  (c) Gegenprobe belegt den Mechanismus (naiv hat MEHR Loops),
+    #  (d) B1-Regression belegt: die fehlerhafte pro-Annoncierer-Seqno (B1-bug) loopt
+    #      massiv (Feasibility ausgehebelt) — der Fix (pro-Ziel-Seqno) behebt es.
     gate1_pass = (feas_cold_total == 0 and feas_persist_total == 0 and
                   total_naive_loops > total_feas_loops and
                   unit["naive"] > 0 and unit["feasibility"] == 0)
+    # B1-Regression reproduziert den Befund, wenn der Bug (Mini-Test ODER reale Topo)
+    # loopt und die schlechte Route akzeptiert, der Fix aber nicht.
+    b1_repro = (b1unit["b1bug"]["loops"] > 0 and
+                b1unit["b1bug"]["accepted_worse_route"] and
+                b1unit["fixed"]["loops"] == 0 and
+                not b1unit["fixed"]["accepted_worse_route"] and
+                total_b1_loops > total_feas_loops)
     results["gate1_loops"] = {
         "unit_test_count_to_infinity": unit,
         "feasibility_cold_loops": feas_cold_total,
@@ -1566,6 +1723,41 @@ def main():
         "disturb_tick": disturb_at,
         "verdict": "PASS" if gate1_pass else "FAIL",
         "gegenprobe_proves_mechanism": total_naive_loops > total_feas_loops,
+        # ---- B1-REGRESSION: Modus-Vergleich naiv / B1-bug / fixed ----
+        "b1_regression": {
+            "description": ("B1 = DV-Seqno war pro-Annoncierer (globaler Zaehler je "
+                            "Knoten, je Annonce steigend) statt pro-Ziel -> seqno_newer "
+                            "fast immer wahr -> Babel-Feasibility-Gate (cand<fd) umgangen "
+                            "-> strikt schlechtere Loop-Routen werden feasibel. Fix: "
+                            "pro-Ziel-Seqno (Origin erhoeht, Relay propagiert unveraendert)."),
+            "section3a_mini_loop_test": b1unit,   # naiv/b1bug/fixed: loops + accepted_worse
+            # reale Topologie (FIXED = Gate-Variante, alle Seeds; naiv/B1-bug = 2 Seeds):
+            "fixed": {
+                "cold_loops": feas_cold_total,
+                "total_loops": total_feas_loops,
+                "persistent_loops_final": feas_persist_total,
+                "max_loops_any_tick": int(feas_max.max()) if len(feas_max) else 0,
+                "n_seeds": len(g1["feasibility"]),
+                "accepts_worse_route": bool(b1unit["fixed"]["accepted_worse_route"]),
+            },
+            "b1bug": {
+                "cold_loops": b1_cold_total,
+                "total_loops": total_b1_loops,
+                "persistent_loops_final": b1_persist_total,
+                "max_loops_any_tick": int(b1_max.max()) if len(b1_max) else 0,
+                "n_seeds": len(g1["b1bug"]),
+                "accepts_worse_route": bool(b1unit["b1bug"]["accepted_worse_route"]),
+            },
+            "naive": {
+                "cold_loops": naive_cold_total,
+                "total_loops": total_naive_loops,
+                "persistent_loops_final": naive_persist_total,
+                "max_loops_any_tick": int(naive_max.max()) if len(naive_max) else 0,
+                "n_seeds": len(g1["naive"]),
+                "accepts_worse_route": bool(b1unit["naive"]["accepted_worse_route"]),
+            },
+            "b1_reproduces_finding": bool(b1_repro),
+        },
     }
     results["gate2_convergence"] = {
         "cold_converge_ticks": cold_vals,
@@ -1580,10 +1772,14 @@ def main():
                               len(after_vals) == len(seed_subset)) else "FAIL",
     }
     json.dump(results, open(OUT_JSON, "w"), indent=2)
-    log(f"\n  [GATE1] Feasibility: Kaltphase-Loops={feas_cold_total}, "
+    log(f"\n  [GATE1] FIXED (Feas.+pro-Ziel-Seqno): Kaltphase-Loops={feas_cold_total}, "
         f"gesamt={total_feas_loops}, persistent(Endtick)={feas_persist_total}")
+    log(f"  [GATE1] B1-BUG (Feas.+pro-Annoncierer-Seqno): Kaltphase-Loops={b1_cold_total}, "
+        f"gesamt={total_b1_loops}, persistent(Endtick)={b1_persist_total}")
     log(f"  [GATE1] Naiv (Gegenprobe): Kaltphase-Loops={naive_cold_total}, "
         f"gesamt={total_naive_loops}, persistent(Endtick)={naive_persist_total}")
+    log(f"  [GATE1] B1-Regression reproduziert Befund: "
+        f"{results['gate1_loops']['b1_regression']['b1_reproduces_finding']}")
     log(f"  [GATE1] Verdikt: {results['gate1_loops']['verdict']}")
     log(f"  [GATE2] Konvergenz kalt: {results['gate2_convergence']['cold_converge_s_mean']} s (Mittel)")
     log(f"  [GATE2] Konvergenz nach Stoerung: {results['gate2_convergence']['after_disturb_converge_s_mean']} s (Mittel)")
@@ -1591,7 +1787,7 @@ def main():
     # Plot Gate1
     fig, ax = plt.subplots(figsize=(8, 4.5))
     ax.plot(naive_mean, label="naiv (ohne Feasibility)", color="crimson", lw=2)
-    ax.plot(feas_mean, label="mit Babel-Feasibility", color="seagreen", lw=2)
+    ax.plot(feas_mean, label="FIXED (Feasibility, pro-Ziel-Seqno)", color="seagreen", lw=2)
     ax.axvline(disturb_at, color="gray", ls="--", alpha=0.6,
                label=f"Stoerung @tick {disturb_at}")
     ax.set_xlabel("Tick (30 s)")
@@ -1601,6 +1797,23 @@ def main():
     ax.grid(alpha=0.3)
     fig.tight_layout()
     fig.savefig(os.path.join(HERE, "fig_p2_loops.png"), dpi=110)
+    plt.close(fig)
+
+    # Plot B1-REGRESSION: Loops naiv vs B1-bug vs fixed ueber Zeit (Kernbeleg B1).
+    fig, ax = plt.subplots(figsize=(8, 4.5))
+    ax.plot(b1_mean, label="B1-BUG (Feas.+pro-Annoncierer-Seqno)", color="crimson", lw=2)
+    ax.plot(naive_mean, label="naiv (kein Feasibility)", color="darkorange",
+            lw=1.6, ls="--")
+    ax.plot(feas_mean, label="FIXED (Feas.+pro-Ziel-Seqno)", color="seagreen", lw=2)
+    ax.axvline(disturb_at, color="gray", ls="--", alpha=0.6,
+               label=f"Stoerung @tick {disturb_at}")
+    ax.set_xlabel("Tick (30 s)")
+    ax.set_ylabel("Loop-Vorkommnisse / Tick (Mittel ueber Seeds)")
+    ax.set_title("B1-Regression: pro-Annoncierer- vs. pro-Ziel-Seqno (Loops/Tick)")
+    ax.legend(fontsize=8)
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(os.path.join(HERE, "fig_p2_b1_regression.png"), dpi=110)
     plt.close(fig)
 
     # Plot Gate2 — Seed-42-Episode (bereits oben gefahren) wiederverwenden
@@ -1634,12 +1847,13 @@ def main():
     log("       (GEHAERTET = Trigger-on-change + Hold-down/Poisoning + Aggregat-FD)")
     log("=" * 78)
 
-    def run_churn_variant(hardened, label, seeds):
+    def run_churn_variant(hardened, label, seeds, seqno_mode="per_dest"):
         runs = []
         for seed in seeds:
             ch = run_churn_episode(nodes, adj, region_of, border_full, backbone_full,
                                    NODE, use_feasibility=True, seed=seed,
-                                   max_ticks=churn_ticks, hardened=hardened)
+                                   max_ticks=churn_ticks, hardened=hardened,
+                                   seqno_mode=seqno_mode)
             runs.append(ch)
             log(f"  [{label}] Seed {seed}: max Loops(transient)={ch['max_loops']}, "
                 f"Flatter Tail {ch['mean_flap_rate_tail']*100:.2f}%/Tick "
@@ -1673,9 +1887,17 @@ def main():
     # durchfaellt) — wie die Feasibility-Gegenprobe genuegen dafuer 2 Seeds (Laufzeit).
     # Die GEHAERTETE Variante ist die massgebliche und laeuft auf ALLEN Seeds.
     alt_seeds = seed_subset[:2]
+    b1_churn_seeds = seed_subset[:2]    # B1-BUG-Churn: 2 Seeds (Regressions-Beleg)
     log(f"\n -- ALT (nur periodisch, keine Haertung) — Seeds {alt_seeds} (Negativbaseline) --")
     g3_alt = run_churn_variant(hardened=False, label="ALT ", seeds=alt_seeds)
-    log("\n -- GEHAERTET (Trigger-on-change + Hold-down/Poisoning + Aggregat-FD) — alle Seeds --")
+    # B1-BUG unter Churn: GEHAERTET (gleiche Haertung wie FIXED), aber pro-Annoncierer-
+    # Seqno -> isoliert den Seqno-Effekt: zeigt, dass selbst die volle Churn-Haertung
+    # den B1-Loop NICHT auffaengt (das Feasibility-Gate ist ausgehebelt).
+    log(f"\n -- B1-BUG (GEHAERTET + pro-Annoncierer-Seqno) — Seeds {b1_churn_seeds} --")
+    g3_b1 = run_churn_variant(hardened=True, label="B1  ", seeds=b1_churn_seeds,
+                              seqno_mode="per_announcer")
+    log("\n -- FIXED/GEHAERTET (Trigger-on-change + Hold-down/Poisoning + Aggregat-FD,"
+        " pro-Ziel-Seqno) — alle Seeds --")
     g3_hard = run_churn_variant(hardened=True, label="HART", seeds=seed_subset)
 
     # Das GATE-Verdikt richtet sich nach der GEHAERTETEN Variante (die jetzt Pflicht ist).
@@ -1702,6 +1924,14 @@ def main():
             "settle_flaps_final", "re_settles_after_churn", "mean_flap_rate_tail",
             "mean_flap_rate_all", "tail_le_overall", "flatter_stable",
             "settle_loops_per_seed", "settle_flaps_per_seed", "verdict")},
+        # ---- B1-REGRESSION unter Churn: gleiche Haertung, pro-Annoncierer-Seqno ----
+        # Belegt: die Churn-Haertung allein reicht NICHT; nur der Seqno-Fix (pro-Ziel)
+        # macht Gate 3 bestehen. B1-bug ist hier direkt vergleichbar mit FIXED/GEHAERTET.
+        "b1bug_hardened": {k: g3_b1[k] for k in (
+            "max_loops_under_churn_transient", "settle_loops_final",
+            "settle_flaps_final", "re_settles_after_churn", "mean_flap_rate_tail",
+            "mean_flap_rate_all", "tail_le_overall", "flatter_stable",
+            "settle_loops_per_seed", "settle_flaps_per_seed", "verdict")},
         # Aktive (massgebliche) Werte = die der GEHAERTETEN Variante:
         "max_loops_under_churn_transient": g3_hard["max_loops_under_churn_transient"],
         "settle_loops_final": g3_hard["settle_loops_final"],
@@ -1721,10 +1951,14 @@ def main():
         "verdict": g3_hard["verdict"],
     }
     json.dump(results, open(OUT_JSON, "w"), indent=2)
-    log(f"\n  [GATE3] ALT:       Restloops nach Churn-Stopp={g3_alt['settle_loops_final']}, "
+    log(f"\n  [GATE3] ALT:        Restloops nach Churn-Stopp={g3_alt['settle_loops_final']}, "
         f"Wechsel={g3_alt['settle_flaps_final']}, re-konv.={g3_alt['re_settles_after_churn']} "
         f"-> {g3_alt['verdict']}")
-    log(f"  [GATE3] GEHAERTET: Restloops nach Churn-Stopp={g3_hard['settle_loops_final']}, "
+    log(f"  [GATE3] B1-BUG:     Restloops nach Churn-Stopp={g3_b1['settle_loops_final']}, "
+        f"Wechsel={g3_b1['settle_flaps_final']}, re-konv.={g3_b1['re_settles_after_churn']}, "
+        f"max transient={g3_b1['max_loops_under_churn_transient']} "
+        f"-> {g3_b1['verdict']}")
+    log(f"  [GATE3] FIXED/HART: Restloops nach Churn-Stopp={g3_hard['settle_loops_final']}, "
         f"Wechsel={g3_hard['settle_flaps_final']}, re-konv.={g3_hard['re_settles_after_churn']} "
         f"-> {g3_hard['verdict']}")
 
@@ -1940,18 +2174,25 @@ def write_markdown(R):
       f"LoRa {m['lora']}, DATA-ToA {m['data_toa_ms']:.1f} ms.\n")
 
     A("---\n")
-    A(f"## GESAMT-VERDIKT: **{ov['verdict']}** — darf Phase 2 codiert werden?\n")
+    A(f"## GESAMT-VERDIKT: **{ov['verdict']}** — darf Phase 2 (gefixte Logik) codiert werden?\n")
     if ov["verdict"] == "GO":
-        A("**GO.** Alle fuenf Gate-Punkte bestehen: null transiente Schleifen mit "
-          "Feasibility (waehrend die Gegenprobe ohne Feasibility Loops zeigt), endliche "
-          "Konvergenz kalt und nach Stoerung, vollstaendige Re-Konvergenz unter Churn "
-          "**mit der jetzt pflichtigen Churn-Haertung** (Trigger-on-change + Hold-down/"
-          "Route-Poisoning + origin-unabhaengige Aggregat-Feasibility — Gate 3 ging damit "
-          "von FAIL auf PASS), Mixed-FW graceful und nie schlechter als Baseline, und das "
-          "Kontroll-Budget passt locker ins 10%-Duty-Cycle-Sub-Band.\n")
+        A("**GO fuer die GEFIXTE Logik (pro-Ziel-Seqno).** Alle fuenf Gate-Punkte "
+          "bestehen mit der gefixten Seqno-Variante: null transiente Schleifen mit "
+          "Feasibility (waehrend Gegenprobe OHNE Feasibility und die **B1-bug-Variante** "
+          "MIT pro-Annoncierer-Seqno Loops zeigen), endliche Konvergenz kalt und nach "
+          "Stoerung, vollstaendige Re-Konvergenz unter Churn **mit der jetzt pflichtigen "
+          "Churn-Haertung** (Trigger-on-change + Hold-down/Route-Poisoning + origin-"
+          "unabhaengige Aggregat-Feasibility — Gate 3 ging damit von FAIL auf PASS), "
+          "Mixed-FW graceful und nie schlechter als Baseline, und das Kontroll-Budget "
+          "passt locker ins 10%-Duty-Cycle-Sub-Band. Die **B1-Regression** (Abschnitt "
+          "unter Gate 1) belegt zusaetzlich: der behobene Loop-BLOCKER B1 (pro-Annoncierer-"
+          "Seqno hebelt das Feasibility-Gate aus) loopt reproduzierbar, der Fix beseitigt "
+          "ihn.\n")
     else:
         fails = [k for k, v in ov["gates"].items() if v != "PASS"]
-        A(f"**NO-GO.** Gefallene Gates: {', '.join(fails)}. Begruendung je Punkt unten.\n")
+        A(f"**NO-GO.** Gefallene Gates: {', '.join(fails)}. Die gefixte Logik besteht "
+          "damit NICHT alle 5 Gates — der Firmware-Fix ist unvollstaendig. Begruendung "
+          "je Punkt unten.\n")
     A("| Gate | Inhalt | Ergebnis |")
     A("|---|---|---|")
     A(f"| 1 | Schleifenfreiheit (Feasibility) | {yn(g1['verdict'])} |")
@@ -1989,6 +2230,60 @@ def write_markdown(R):
       "(Linie D-X-A-B, X getoetet) den Mechanismus isoliert: naiv = 40/40 Loop-Ticks "
       "(A<->B count-to-infinity), Feasibility = 0.\n")
 
+    # ---- B1-REGRESSION ----
+    br = g1.get("b1_regression")
+    if br is not None:
+        s3 = br["section3a_mini_loop_test"]
+
+        def jn(v):
+            return "ja" if v else "nein"
+
+        A("### B1-Regression — pro-Annoncierer- vs. pro-Ziel-Seqno (Loop-BLOCKER B1)\n")
+        A("Der Firmware-Review fand **B1**: die DV-Seqno war **pro-Annoncierer** (ein "
+          "globaler Zaehler je Knoten, im Header fuer alle Entries, steigt bei jeder "
+          "Annonce) statt **pro-Ziel**. Folge: `seqno_newer` ist fast immer wahr -> das "
+          "Babel-Feasibility-Gate `cand<fd` wird umgangen -> strikt schlechtere Loop-"
+          "Routen werden feasibel. Der Fix (in der Firmware umgesetzt): **pro-Ziel-Seqno**, "
+          "vom Origin erhoeht, vom Relay unveraendert propagiert. Hier validiert als "
+          "Regression in drei Modi auf der realen Topologie (FIXED = Gate-Variante, alle "
+          f"Seeds; naiv/B1-bug = {br['b1bug']['n_seeds']} Seeds, reiner Mechanismus-Beleg).\n")
+        A("| Modus | Loops gesamt (real) | max Loops/Tick | persistent (Endtick) | "
+          "Kaltphase-Loops | akzeptiert schlechte Route (§3a) |")
+        A("|---|---|---|---|---|---|")
+        A(f"| **naiv** (kein Feasibility) | {br['naive']['total_loops']} | "
+          f"{br['naive']['max_loops_any_tick']} | {br['naive']['persistent_loops_final']} | "
+          f"{br['naive']['cold_loops']} | {jn(br['naive']['accepts_worse_route'])} |")
+        A(f"| **B1-bug** (Feas.+pro-Annoncierer-Seqno) | {br['b1bug']['total_loops']} | "
+          f"{br['b1bug']['max_loops_any_tick']} | {br['b1bug']['persistent_loops_final']} | "
+          f"{br['b1bug']['cold_loops']} | {jn(br['b1bug']['accepts_worse_route'])} |")
+        A(f"| **fixed** (Feas.+pro-Ziel-Seqno) | {br['fixed']['total_loops']} | "
+          f"{br['fixed']['max_loops_any_tick']} | {br['fixed']['persistent_loops_final']} | "
+          f"{br['fixed']['cold_loops']} | {jn(br['fixed']['accepts_worse_route'])} |")
+        A("")
+        A("**§3a-Mini-Loop-Testfall** (isolierte Topologie R-C-A-B, eine Region; Ziel R; "
+          "die gute Kante C-A faellt aus, B reannonciert R mit hoeherer Metrik ueber den "
+          "Loop zurueck an A):\n")
+        A("| Modus | Loop-Ticks (40) | akzeptiert B (schlechtere Loop-Route) |")
+        A("|---|---|---|")
+        A(f"| naiv   | {s3['naive']['loops']} | {jn(s3['naive']['accepted_worse_route'])} |")
+        A(f"| B1-bug | {s3['b1bug']['loops']} | {jn(s3['b1bug']['accepted_worse_route'])} |")
+        A(f"| fixed  | {s3['fixed']['loops']} | {jn(s3['fixed']['accepted_worse_route'])} |")
+        A("")
+        if br["b1_reproduces_finding"]:
+            A("- **B1-bug reproduziert den Review-Befund:** die pro-Annoncierer-Seqno "
+              "hebelt die Feasibility aus -> B1-bug akzeptiert die strikt schlechtere "
+              "Route (§3a) und loopt sowohl im Mini-Test als auch massiv auf der realen "
+              "Topologie. **fixed lehnt B ab** (pro-Ziel-Seqno laesst das `cand<fd`-Gate "
+              "greifen) und bleibt schleifenfrei. Naiv loopt im Mini-Test ebenfalls, "
+              "zeigt auf der grossen Topologie aber WENIGER Loops als B1-bug: B1 ist sogar "
+              "schlimmer als gar keine Feasibility, weil es Feasibility VORTAEUSCHT, aber "
+              "umgeht.")
+        else:
+            A("- **Achtung:** die B1-Regression reproduziert den Befund nicht wie erwartet "
+              "(siehe Zahlen oben) — der Firmware-Fix waere damit unvollstaendig "
+              "beschrieben. Ehrlich zu pruefen.")
+        A("- Beleg: `fig_p2_b1_regression.png` (Loops/Tick naiv vs. B1-bug vs. fixed).\n")
+
     def fmt_s(x):
         return f"{x:.0f} s" if isinstance(x, (int, float)) else "n/a"
 
@@ -2024,29 +2319,64 @@ def write_markdown(R):
       "Hysterese >=15 % bleibt aktiv.\n")
     alt = g3["alt"]
     hd = g3["hardened"]
+    b1 = g3.get("b1bug_hardened")
 
     def b(v):
         return "ja" if v else "**NEIN**"
 
-    A("| Metrik (max/Mittel ueber Seeds) | ALT (nur periodisch) | GEHAERTET |")
-    A("|---|---|---|")
-    A(f"| Re-Konvergenz nach Churn-Stopp (Loops=0 UND Wechsel=0) | "
-      f"{b(alt['re_settles_after_churn'])} | {b(hd['re_settles_after_churn'])} |")
-    A(f"| Restschleifen nach Churn-Stopp (Settle, max ueber Seeds) | "
-      f"**{alt['settle_loops_final']}** | **{hd['settle_loops_final']}** |")
-    A(f"| Restschleifen je Seed (Settle) | "
-      f"{alt['settle_loops_per_seed']} | {hd['settle_loops_per_seed']} |")
-    A(f"| Restwechsel nach Churn-Stopp (Settle, max) | "
-      f"{alt['settle_flaps_final']} | {hd['settle_flaps_final']} |")
-    A(f"| Routen-Wechselrate Tail (eingeschwungen) | "
-      f"{alt['mean_flap_rate_tail']*100:.2f}%/Tick | {hd['mean_flap_rate_tail']*100:.2f}%/Tick |")
-    A(f"| Wechselrate gesamt | {alt['mean_flap_rate_all']*100:.2f}%/Tick | "
-      f"{hd['mean_flap_rate_all']*100:.2f}%/Tick |")
-    A(f"| transiente Loops max (waehrend Churn) | "
-      f"{alt['max_loops_under_churn_transient']} | {hd['max_loops_under_churn_transient']} |")
-    A(f"| Tail <= Gesamt (schwingt nicht auf) | {b(alt['tail_le_overall'])} | "
-      f"{b(hd['tail_le_overall'])} |")
-    A(f"| **Gate-3-Verdikt** | {yn(alt['verdict'])} | {yn(hd['verdict'])} |")
+    # Drei-Spalten-Tabelle: ALT (Negativbaseline) | B1-bug (gehaertet, pro-Annoncierer-
+    # Seqno) | FIXED/GEHAERTET (pro-Ziel-Seqno = Gate-Variante). B1-bug isoliert: selbst
+    # mit voller Churn-Haertung faengt der Seqno-Bug den Loop NICHT auf.
+    if b1 is not None:
+        A("| Metrik (max/Mittel ueber Seeds) | ALT (nur periodisch) | "
+          "B1-bug (gehaertet, pro-Annoncierer-Seqno) | FIXED/GEHAERTET (pro-Ziel-Seqno) |")
+        A("|---|---|---|---|")
+        A(f"| Re-Konvergenz nach Churn-Stopp (Loops=0 UND Wechsel=0) | "
+          f"{b(alt['re_settles_after_churn'])} | {b(b1['re_settles_after_churn'])} | "
+          f"{b(hd['re_settles_after_churn'])} |")
+        A(f"| Restschleifen nach Churn-Stopp (Settle, max ueber Seeds) | "
+          f"**{alt['settle_loops_final']}** | **{b1['settle_loops_final']}** | "
+          f"**{hd['settle_loops_final']}** |")
+        A(f"| Restschleifen je Seed (Settle) | "
+          f"{alt['settle_loops_per_seed']} | {b1['settle_loops_per_seed']} | "
+          f"{hd['settle_loops_per_seed']} |")
+        A(f"| Restwechsel nach Churn-Stopp (Settle, max) | "
+          f"{alt['settle_flaps_final']} | {b1['settle_flaps_final']} | "
+          f"{hd['settle_flaps_final']} |")
+        A(f"| Routen-Wechselrate Tail (eingeschwungen) | "
+          f"{alt['mean_flap_rate_tail']*100:.2f}%/Tick | "
+          f"{b1['mean_flap_rate_tail']*100:.2f}%/Tick | "
+          f"{hd['mean_flap_rate_tail']*100:.2f}%/Tick |")
+        A(f"| transiente Loops max (waehrend Churn) | "
+          f"{alt['max_loops_under_churn_transient']} | "
+          f"{b1['max_loops_under_churn_transient']} | "
+          f"{hd['max_loops_under_churn_transient']} |")
+        A(f"| **Gate-3-Verdikt** | {yn(alt['verdict'])} | {yn(b1['verdict'])} | "
+          f"{yn(hd['verdict'])} |")
+        A("")
+        A("- B1-bug laeuft mit der **gleichen vollen Churn-Haertung** wie FIXED, nur mit "
+          "der fehlerhaften pro-Annoncierer-Seqno -> isoliert: der Seqno-Bug ist der "
+          "Loop-Treiber, nicht die fehlende Haertung. Selbst gehaertet faellt B1-bug durch.")
+    else:
+        A("| Metrik (max/Mittel ueber Seeds) | ALT (nur periodisch) | GEHAERTET |")
+        A("|---|---|---|")
+        A(f"| Re-Konvergenz nach Churn-Stopp (Loops=0 UND Wechsel=0) | "
+          f"{b(alt['re_settles_after_churn'])} | {b(hd['re_settles_after_churn'])} |")
+        A(f"| Restschleifen nach Churn-Stopp (Settle, max ueber Seeds) | "
+          f"**{alt['settle_loops_final']}** | **{hd['settle_loops_final']}** |")
+        A(f"| Restschleifen je Seed (Settle) | "
+          f"{alt['settle_loops_per_seed']} | {hd['settle_loops_per_seed']} |")
+        A(f"| Restwechsel nach Churn-Stopp (Settle, max) | "
+          f"{alt['settle_flaps_final']} | {hd['settle_flaps_final']} |")
+        A(f"| Routen-Wechselrate Tail (eingeschwungen) | "
+          f"{alt['mean_flap_rate_tail']*100:.2f}%/Tick | {hd['mean_flap_rate_tail']*100:.2f}%/Tick |")
+        A(f"| Wechselrate gesamt | {alt['mean_flap_rate_all']*100:.2f}%/Tick | "
+          f"{hd['mean_flap_rate_all']*100:.2f}%/Tick |")
+        A(f"| transiente Loops max (waehrend Churn) | "
+          f"{alt['max_loops_under_churn_transient']} | {hd['max_loops_under_churn_transient']} |")
+        A(f"| Tail <= Gesamt (schwingt nicht auf) | {b(alt['tail_le_overall'])} | "
+          f"{b(hd['tail_le_overall'])} |")
+        A(f"| **Gate-3-Verdikt** | {yn(alt['verdict'])} | {yn(hd['verdict'])} |")
     A("")
     A("- Beleg: `fig_p2_churn_stability.png` (Wechselrate ALT vs. GEHAERTET, Seed 42).\n")
 
