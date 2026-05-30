@@ -1,120 +1,116 @@
-## About MeshCore
+# MeshCore-NHR-advanced Routing V1
 
-MeshCore is a lightweight, portable C++ library that enables multi-hop packet routing for embedded projects using LoRa and other packet radios. It is designed for developers who want to create resilient, decentralized communication networks that work without the internet.
+Ein **Fork von [meshcore-dev/MeshCore](https://github.com/meshcore-dev/MeshCore)** (MIT) V1.15 mit dem Ziel, die Pfadfindung robuster zu machen und die durch zufällige Flood-Umwege verursachte Airtime-Last zu senken.
 
-## 🔍 What is MeshCore?
+> ⚠️ **Experimentell & auf Hardware ungetestet.** Umgesetzt sind **Phase 0 + Phase 1** (konservativ, reversibel). Flashe **zuerst auf ein Ersatz-/Bench-Gerät**, nicht auf produktive Repeater. Das weitergehende proaktive Backbone-Redesign (Phase 2, „NHR v2") ist in `docs/NHR/` als **Design** beschrieben, aber **noch nicht** im Code.
 
-MeshCore now supports a range of LoRa devices, allowing for easy flashing without the need to compile firmware manually. Users can flash a pre-built binary using tools like Adafruit ESPTool and interact with the network through a serial console.
-MeshCore provides the ability to create wireless mesh networks, similar to Meshtastic and Reticulum but with a focus on lightweight multi-hop packet routing for embedded projects. Unlike Meshtastic, which is tailored for casual LoRa communication, or Reticulum, which offers advanced networking, MeshCore balances simplicity with scalability, making it ideal for custom embedded solutions., where devices (nodes) can communicate over long distances by relaying messages through intermediate nodes. This is especially useful in off-grid, emergency, or tactical situations where traditional communication infrastructure is unavailable.
+---
 
-## ⚡ Key Features
+## 🇩🇪 Kernvorteile
 
-* Multi-Hop Packet Routing
-  * Devices can forward messages across multiple nodes, extending range beyond a single radio's reach.
-  * Supports up to a configurable number of hops to balance network efficiency and prevent excessive traffic.
-  * Nodes use fixed roles where "Companion" nodes are not repeating messages at all to prevent adverse routing paths from being used.
-* Supports LoRa Radios – Works with Heltec, RAK Wireless, and other LoRa-based hardware.
-* Decentralized & Resilient – No central server or internet required; the network is self-healing.
-* Low Power Consumption – Ideal for battery-powered or solar-powered devices.
-* Simple to Deploy – Pre-built example applications make it easy to get started.
+### Was ist NHR-MeshCore?
+Ein Fork von **[meshcore-dev/MeshCore](https://github.com/meshcore-dev/MeshCore)** (MIT), der die **Pfadfindung** im LoRa-Mesh robuster macht und die durch zufällige Flood-Umwege verursachte **Airtime-Last** senkt. MeshCore ist ein hybrides Mesh-Routing-Protokoll für LoRa-Funkgeräte (ESP32/nRF52, C++/PlatformIO).
 
-## 🎯 What Can You Use MeshCore For?
+### Das Problem
+MeshCore nutzt **kein** metrik-basiertes Routing. Die erste Nachricht an einen Kontakt wird geflutet, der dabei entstehende Pfad wird gecacht, und **alle weiteren Pakete laufen fest über genau diesen einen Pfad**. Entscheidend: Es gewinnt **nicht der kürzeste oder beste Pfad, sondern derjenige, dessen Flood-Kopie zufällig zuerst beim Ziel ankommt** („first packet wins"). Die signalqualitäts-gewichtete Ausbreitung ist per Default abgeschaltet. Folge: In der Analyse echter Netzdaten landeten **~60 % der Pfadaufbauten auf einem Umweg** — das frisst Airtime, den eigentlichen Engpass im geteilten Halbduplex-Funkkanal.
 
-* Off-Grid Communication: Stay connected even in remote areas.
-* Emergency Response & Disaster Recovery: Set up instant networks where infrastructure is down.
-* Outdoor Activities: Hiking, camping, and adventure racing communication.
-* Tactical & Security Applications: Military, law enforcement, and private security use cases.
-* IoT & Sensor Networks: Collect data from remote sensors and relay it back to a central location.
+### Die Lösung
+NHR richtet die Flood-Ausbreitung an der **Linkqualität (SNR)** aus — an beiden Stufen:
+- **RX-Seite:** Knoten mit starkem Empfang leiten zuerst weiter und unterdrücken redundante Umweg-Kopien (per Default aktiviert).
+- **TX-Seite:** Eine Kopie mit starkem SNR (meist ein kurzer, direkter Link) zieht ihre zufällige Sendeverzögerung aus einem zu null hin geschrumpften Fenster → sie sendet früher und „gewinnt" den Pfad.
+- **Pfad-Adoption:** Ein später eintreffender **längerer** Umweg überschreibt einen guten kurzen Pfad nicht mehr.
+- **EWMA-Link-Sensing:** geglättete Nachbar-SNR als stabile Linkqualitäts-Schätzung — Fundament für eine spätere ETX-Metrik.
 
-## 🚀 How to Get Started
+### Warum es sicher ist
+Alle Eingriffe sind **lokal, additiv und reversibel** (zur Laufzeit per CLI ab-/zuschaltbar, ohne Reflash). **Kein Paketformat-Eingriff, keine Änderung der Duplikat-Erkennung** → NHR läuft im **gemischten Netz neben unveränderten Upstream-Knoten** und ist **nie schlechter als das Original** (bei abgeschalteten Parametern bit-identisch zu Upstream).
 
-- Watch the [MeshCore QuickStart Playlist](https://www.youtube.com/watch?v=iaFltojJrAc&list=PLshzThxhw4O4WU_iZo3NmNZOv6KMrUuF9) by The Comms Channel
-- Watch the [MeshCore Technical Presentation](https://www.youtube.com/watch?v=OwmkVkZQTf4) by Liam Cottle.
-- Read through our [Frequently Asked Questions](./docs/faq.md) and [Documentation](https://docs.meshcore.io).
-- Flash the MeshCore firmware on a supported device.
-- Connect with a supported client.
+### Belege
+Simulation auf **echter 25-Knoten-Topologie**: **−82 % Airtime**, Umwege deutlich reduziert. Unter Störung bleibt der Gewinn stabil — Pfad-Flattern **78 % → 17 %**, Re-Discovery bei Linkausfall **≤ 1,6 % statt bis 49,5 %**, bei Netz-Partition **−98 % Airtime** statt Endlos-Flood. Build verifiziert; GitHub Actions baut die flashbare **Heltec-V4-Firmware (.bin)** automatisch. Details & Belege in `docs/NHR/`.
 
-For developers;
+---
 
-- Install [PlatformIO](https://docs.platformio.org) in [Visual Studio Code](https://code.visualstudio.com).
-- Clone and open the MeshCore repository in Visual Studio Code.
-- See the example applications you can modify and run:
-  - [Companion Radio](./examples/companion_radio) - For use with an external chat app, over BLE, USB or WiFi.
-  - [KISS Modem](./examples/kiss_modem) - Serial KISS protocol bridge for host applications. ([protocol docs](./docs/kiss_modem_protocol.md))
-  - [Simple Repeater](./examples/simple_repeater) - Extends network coverage by relaying messages.
-  - [Simple Room Server](./examples/simple_room_server) - A simple BBS server for shared Posts.
-  - [Simple Secure Chat](./examples/simple_secure_chat) - Secure terminal based text communication between devices.
-  - [Simple Sensor](./examples/simple_sensor) - Remote sensor node with telemetry and alerting.
+## 🇬🇧 Core advantages
 
-The Simple Secure Chat example can be interacted with through the Serial Monitor in Visual Studio Code, or with a Serial USB Terminal on Android.
+### What is NHR-MeshCore?
+A fork of **[meshcore-dev/MeshCore](https://github.com/meshcore-dev/MeshCore)** (MIT) that makes **path-finding** in the LoRa mesh more robust and cuts the **airtime** wasted on random flood detours. MeshCore is a hybrid mesh-routing protocol for LoRa radios (ESP32/nRF52, C++/PlatformIO).
 
-## ⚡️ MeshCore Flasher
+### The problem
+MeshCore uses **no** metric-based routing. The first message to a contact is flooded, the resulting path is cached, and **every following packet is pinned to that one path**. Crucially, the winner is **not the shortest or best path, but whichever flood copy happens to reach the destination first** ("first packet wins"), while signal-quality-weighted propagation is off by default. From analysis of real network data: **~60 % of path setups end up on a detour** — burning airtime, the real bottleneck on a shared half-duplex radio channel.
 
-We have prebuilt firmware ready to flash on supported devices.
+### The solution
+NHR aligns flood propagation with **link quality (SNR)** at both stages:
+- **RX side:** nodes with strong reception rebroadcast first, suppressing redundant detour copies (on by default).
+- **TX side:** a copy with strong SNR (usually a short, direct link) draws its random backoff from a window shrunk toward zero → it rebroadcasts earlier and "wins" the path.
+- **Path adoption:** a later-arriving **longer** detour no longer overwrites a good short path.
+- **EWMA link sensing:** smoothed neighbour SNR as a stable link-quality estimate — the foundation for a future ETX metric.
 
-- Launch https://meshcore.io/flasher
-- Select a supported device
-- Flash one of the firmware types:
-  - Companion, Repeater or Room Server
-- Once flashing is complete, you can connect with one of the MeshCore clients below.
+### Why it's safe
+All changes are **local, additive and reversible** (toggle at runtime via CLI, no reflash). **No packet-format change, no change to duplicate detection** → NHR runs in a **mixed network alongside unmodified upstream nodes** and is **never worse than the original** (with the parameters disabled it behaves bit-identically to upstream).
 
-## 📱 MeshCore Clients
+### Evidence
+Simulation on a **real 25-node topology**: **−82 % airtime**, detours markedly reduced. The gains hold under stress — path-flapping **78 % → 17 %**, link-failure re-discovery **≤ 1.6 % vs. up to 49.5 %**, network-partition airtime **−98 %** instead of endless flooding. Build verified; GitHub Actions builds the flashable **Heltec V4 firmware (.bin)** automatically. Details & evidence in `docs/NHR/`.
 
-**Companion Firmware**
+---
 
-The companion firmware can be connected to via BLE, USB or WiFi depending on the firmware type you flashed.
+## Was wurde geändert
 
-- Web: https://app.meshcore.nz
-- Android: https://play.google.com/store/apps/details?id=com.liamcottle.meshcore.android
-- iOS: https://apps.apple.com/us/app/meshcore/id6742354151?platform=iphone
-- NodeJS: https://github.com/liamcottle/meshcore.js
-- Python: https://github.com/fdlamotte/meshcore-cli
+Minimale, rückwärts­kompatible, reversible Eingriffe — alle als `// NHR:` im Code markiert, kein Paketformat-Eingriff, keine Dedup-Änderung (mixed-firmware-safe). Build verifiziert (`pio run -e heltec_v4_repeater` → SUCCESS). Details in `docs/NHR/CHANGES_NHR.md`.
 
-**Repeater and Room Server Firmware**
+**Phase 0**
+1. **SNR-gewichtete Flutung als Default an** (`examples/simple_repeater/MyMesh.cpp`): `rx_delay_base` von `0.0` auf `10.0`. Starke (kurze) Links senden zuerst und unterdrücken Umweg-Kopien. **Reversibel:** `set rxdelay 0`.
+2. **Pfad nur bei Verbesserung übernehmen** (`src/helpers/BaseChatMesh.cpp`): ein später eintreffender **längerer** Pfad überschreibt einen guten kurzen nicht mehr. Nie schlechter als Upstream.
 
-The repeater and room server firmwares can be setup via USB in the web config tool.
+**Phase 1** (neu)
+3. **SNR-gewichtetes TX-Retransmit-Delay** (`getRetransmitDelay`): ergänzt Patch 1 um die Sendeseite — starke Empfänger senden Flood-Kopien früher (aus zufallserhaltendem, geschrumpftem Fenster), schwache später. Neuer reversibler Parameter `tx_snr_weight` (Default 0.5, `set txsnrweight 0` = Upstream).
+4. **EWMA-geglättete Nachbar-SNR** (`putNeighbour`): stabile Linkqualitäts-Schätzung (L0 Link-Sensing) statt verrauschtem Momentanwert — Fundament für ETX.
 
-- https://config.meshcore.io
+Adversarial reviewt (Persistenz-Kompatibilität, Integer-Arithmetik, EWMA, CLI) — keine Bugs.
 
-They can also be managed via LoRa in the mobile app by using the Remote Management feature.
+## Firmware bauen
 
-## 🛠 Hardware Compatibility
+### Variante A — automatisch via GitHub Actions (empfohlen)
+Nach dem Push in dein privates Repo baut `.github/workflows/build.yml` die Firmware selbst. Unter **Actions → Build NHR firmware → Artifacts** liegt anschließend `heltec_v4_repeater-firmware.bin` (+ `-factory.bin`) zum Download. Weitere Ziele im Workflow einfach einkommentieren.
 
-MeshCore is designed for devices listed in the [MeshCore Flasher](https://meshcore.io/flasher)
+### Variante B — lokal mit PlatformIO
+```bash
+pip install platformio
+pio run -e heltec_v4_repeater
+# Ergebnis: .pio/build/heltec_v4_repeater/firmware.bin
+```
 
-## 📜 License
+## Flashen (Heltec V4, ESP32-S3 → .bin)
 
-MeshCore is open-source software released under the MIT License. You are free to use, modify, and distribute it for personal and commercial projects.
+- Bequem über den **MeshCore Web-Flasher** (`https://flasher.meshcore.co.uk`, „Custom firmware") mit der `firmware.bin`, **oder**
+- per esptool:
+  ```bash
+  python -m esptool --chip esp32s3 write_flash 0x10000 heltec_v4_repeater-firmware.bin
+  # alternativ das Factory-Image @0x0:
+  python -m esptool --chip esp32s3 write_flash 0x0 heltec_v4_repeater-factory.bin
+  ```
 
-## Contributing
+**Hinweis:** `.uf2` gibt es nur für nRF52-Boards (z. B. RAK4631); Heltec V4 ist ESP32 → `.bin`.
 
-Please submit PR's using 'dev' as the base branch!
-For minor changes just submit your PR and we'll try to review it, but for anything more 'impactful' please open an Issue first and start a discussion. Is better to sound out what it is you want to achieve first, and try to come to a consensus on what the best approach is, especially when it impacts the structure or architecture of this codebase.
+### Wieder zurück / deaktivieren
+- Patch 1 ohne Reflash abschalten: am Repeater `set rxdelay 0`.
+- Komplett zurück: Upstream-Firmware neu flashen.
 
-Here are some general principals you should try to adhere to:
-* Keep it simple. Please, don't think like a high-level lang programmer. Think embedded, and keep code concise, without any unnecessary layers.
-* No dynamic memory allocation, except during setup/begin functions.
-* Use the same brace and indenting style that's in the core source modules. (A .clang-format is prob going to be added soon, but please do NOT retroactively re-format existing code. This just creates unnecessary diffs that make finding problems harder)
+## Eigenes privates GitHub-Repo
 
-Help us prioritize! Please react with thumbs-up to issues/PRs you care about most. We look at reaction counts when planning work.
+```bash
+cd NHR-MeshCore
+# (Git ist bereits initialisiert und committet)
+git remote add origin git@github.com:<DEIN-USER>/NHR-MeshCore.git
+git branch -M main
+git push -u origin main
+```
+Lege das Repo auf GitHub vorher als **Private** an. (Ich kann das nicht für dich tun — Account/Push erfordern deine Anmeldedaten.)
 
-## Road-Map / To-Do
+## Roadmap
 
-There are a number of fairly major features in the pipeline, with no particular time-frames attached yet. In very rough chronological order:
-- [X] Companion radio: UI redesign
-- [X] Repeater + Room Server: add ACL's (like Sensor Node has)
-- [X] Standardise Bridge mode for repeaters
-- [ ] Repeater/Bridge: Standardise the Transport Codes for zoning/filtering
-- [X] Core + Repeater: enhanced zero-hop neighbour discovery
-- [ ] Core: round-trip manual path support
-- [ ] Companion + Apps: support for multiple sub-meshes (and 'off-grid' client repeat mode)
-- [ ] Core + Apps: support for LZW message compression
-- [ ] Core: dynamic CR (Coding Rate) for weak vs strong hops
-- [ ] Core: new framework for hosting multiple virtual nodes on one physical device
-- [ ] V2 protocol spec: discussion and consensus around V2 packet protocol, including path hashes, new encryption specs, etc
+- **Phase 0**: konservativer Patch (RX-SNR-Flutung + prefer-shorter) ✅
+- **Phase 1** (teilweise ✅): TX-SNR-Flutung + EWMA-Link-Sensing umgesetzt; Stress-Sim validiert (`docs/NHR/sim/nhr_sim_v2.py`). Noch offen: echtes Best-of-N am Ziel + ETX-Kostenmetrik → `docs/NHR/MeshCore_Hybrid_Routing_Entwurf.md`
+- **Phase 2**: proaktiver Regions-Backbone, gehärtet → `docs/NHR/MeshCore_Hybrid_Routing_v2_Robustheit.md`
 
-## 📞 Get Support
+## Lizenz & Attribution
 
-- Report bugs and request features on the [GitHub Issues](https://github.com/ripplebiz/MeshCore/issues) page.
-- Find additional guides and components on [my site](https://buymeacoffee.com/ripplebiz).
-- Join [MeshCore Discord](https://meshcore.gg) to chat with the developers and get help from the community.
+MIT (wie Upstream, siehe `license.txt`). Dieser Fork basiert auf **meshcore-dev/MeshCore**; das ursprüngliche README liegt als `README.upstream.md` bei. Alle Marken-/Projektrechte an MeshCore verbleiben beim Upstream-Projekt.

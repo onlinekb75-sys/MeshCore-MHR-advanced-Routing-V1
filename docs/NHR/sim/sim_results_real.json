@@ -1,0 +1,470 @@
+{
+  "summary": {
+    "n_pairs": 19,
+    "mean_opt_hops": 1.7894736842105263,
+    "mean_mc_hops": 2.205915498484334,
+    "worst_mc_hops": 8,
+    "mean_detour_ratio": 1.3545517391248356,
+    "pct_pairs_detour": 100.0,
+    "mean_detour_rate": 60.20245362532673,
+    "mean_mc_tx": 15.303570234612044,
+    "mean_nhr_tx": 2.789473684210526,
+    "airtime_red_pct": 81.77239924118112,
+    "mean_mc_rel": 0.5803721363090162,
+    "mean_nhr_rel": 0.6630038215190366
+  },
+  "detail": [
+    {
+      "pair": [
+        "Cli ZORT",
+        "Cli Rheinb-OS"
+      ],
+      "ra": "53343 Zuelligh.",
+      "rb": "51143-SOLAR",
+      "opt_hops": 3,
+      "opt_etx": 5.611404716108232,
+      "mc_hops_mean": 3.54040404040404,
+      "mc_hops_max": 6,
+      "mc_etx_mean": 7.105536215517853,
+      "detour_ratio": 1.2662669286926556,
+      "frac_detour": 0.7676767676767676,
+      "mc_tx_mean": 15.671717171717171,
+      "nhr_tx": 4,
+      "mc_rel": 0.33678215733071615,
+      "nhr_rel": 0.43140686269151013,
+      "opt_path": [
+        "53343 Zuelligh.",
+        "BN-Ruengsdorf",
+        "Pending-Bonn",
+        "51143-SOLAR"
+      ]
+    },
+    {
+      "pair": [
+        "Cli ZORT",
+        "Cli Ulli/p"
+      ],
+      "ra": "53343 Zuelligh.",
+      "rb": "MakiAlfter",
+      "opt_hops": 2,
+      "opt_etx": 3.3437150148022656,
+      "mc_hops_mean": 2.385,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 4.267162454740122,
+      "detour_ratio": 1.2761740865623579,
+      "frac_detour": 0.755,
+      "mc_tx_mean": 15.945,
+      "nhr_tx": 3,
+      "mc_rel": 0.49299595410432606,
+      "nhr_rel": 0.6242018921155221,
+      "opt_path": [
+        "53343 Zuelligh.",
+        "BN-Ruengsdorf",
+        "MakiAlfter"
+      ]
+    },
+    {
+      "pair": [
+        "Cli ZORT",
+        "Cli PXTiny"
+      ],
+      "ra": "53343 Zuelligh.",
+      "rb": "Bonn-Nord Solar",
+      "opt_hops": 2,
+      "opt_etx": 2.9047010161526075,
+      "mc_hops_mean": 2.251256281407035,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 3.7137275085283563,
+      "detour_ratio": 1.2785231553529515,
+      "frac_detour": 0.6482412060301508,
+      "mc_tx_mean": 15.869346733668342,
+      "nhr_tx": 3,
+      "mc_rel": 0.6997176032241993,
+      "nhr_rel": 0.6997176032241993,
+      "opt_path": [
+        "53343 Zuelligh.",
+        "BN-Ruengsdorf",
+        "Bonn-Nord Solar"
+      ]
+    },
+    {
+      "pair": [
+        "Cli ZORT",
+        "Cli LordWhopper"
+      ],
+      "ra": "53343 Zuelligh.",
+      "rb": "SU-SGB",
+      "opt_hops": 2,
+      "opt_etx": 3.666933350372794,
+      "mc_hops_mean": 2.3618090452261304,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 4.986315795277525,
+      "detour_ratio": 1.3598054065451168,
+      "frac_detour": 0.7688442211055276,
+      "mc_tx_mean": 14.909547738693467,
+      "nhr_tx": 3,
+      "mc_rel": 0.37151606876162324,
+      "nhr_rel": 0.5458891224214767,
+      "opt_path": [
+        "53343 Zuelligh.",
+        "Bonn-Oberkassel",
+        "SU-SGB"
+      ]
+    },
+    {
+      "pair": [
+        "Cli ZORT",
+        "Cli DL4FP"
+      ],
+      "ra": "53343 Zuelligh.",
+      "rb": "MakiAlfter",
+      "opt_hops": 2,
+      "opt_etx": 3.3437150148022656,
+      "mc_hops_mean": 2.336683417085427,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 4.188488426480357,
+      "detour_ratio": 1.2526451590337009,
+      "frac_detour": 0.7688442211055276,
+      "mc_tx_mean": 15.969849246231156,
+      "nhr_tx": 3,
+      "mc_rel": 0.5106677100165762,
+      "nhr_rel": 0.6242018921155221,
+      "opt_path": [
+        "53343 Zuelligh.",
+        "BN-Ruengsdorf",
+        "MakiAlfter"
+      ]
+    },
+    {
+      "pair": [
+        "Cli ZORT",
+        "Cli Marcus-E"
+      ],
+      "ra": "53343 Zuelligh.",
+      "rb": "SU-SGB",
+      "opt_hops": 2,
+      "opt_etx": 3.666933350372794,
+      "mc_hops_mean": 2.321608040201005,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 4.780553593580195,
+      "detour_ratio": 1.303692523643547,
+      "frac_detour": 0.7135678391959799,
+      "mc_tx_mean": 14.733668341708542,
+      "nhr_tx": 3,
+      "mc_rel": 0.5458891224214767,
+      "nhr_rel": 0.5458891224214767,
+      "opt_path": [
+        "53343 Zuelligh.",
+        "Bonn-Oberkassel",
+        "SU-SGB"
+      ]
+    },
+    {
+      "pair": [
+        "Cli Rheinb-OS",
+        "Cli Ulli/p"
+      ],
+      "ra": "51143-SOLAR",
+      "rb": "MakiAlfter",
+      "opt_hops": 2,
+      "opt_etx": 3.9461033116606536,
+      "mc_hops_mean": 2.676767676767677,
+      "mc_hops_max": 7,
+      "mc_etx_mean": 4.980384054661694,
+      "detour_ratio": 1.2621017903775509,
+      "frac_detour": 0.3484848484848485,
+      "mc_tx_mean": 15.97979797979798,
+      "nhr_tx": 3,
+      "mc_rel": 0.5311458870088078,
+      "nhr_rel": 0.5690557599980797,
+      "opt_path": [
+        "51143-SOLAR",
+        "Bonn-Nord Solar",
+        "MakiAlfter"
+      ]
+    },
+    {
+      "pair": [
+        "Cli Rheinb-OS",
+        "Cli PXTiny"
+      ],
+      "ra": "51143-SOLAR",
+      "rb": "Bonn-Nord Solar",
+      "opt_hops": 1,
+      "opt_etx": 2.8701803902294336,
+      "mc_hops_mean": 1.898477157360406,
+      "mc_hops_max": 8,
+      "mc_etx_mean": 3.95340455935774,
+      "detour_ratio": 1.3774063026894685,
+      "frac_detour": 0.49238578680203043,
+      "mc_tx_mean": 15.776649746192893,
+      "nhr_tx": 2,
+      "mc_rel": 0.5902627862810308,
+      "nhr_rel": 0.5902627862810308,
+      "opt_path": [
+        "51143-SOLAR",
+        "Bonn-Nord Solar"
+      ]
+    },
+    {
+      "pair": [
+        "Cli Rheinb-OS",
+        "Cli LordWhopper"
+      ],
+      "ra": "51143-SOLAR",
+      "rb": "SU-SGB",
+      "opt_hops": 2,
+      "opt_etx": 3.3074653131978273,
+      "mc_hops_mean": 2.35678391959799,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 4.523402189391908,
+      "detour_ratio": 1.367634052379056,
+      "frac_detour": 0.6683417085427136,
+      "mc_tx_mean": 14.582914572864322,
+      "nhr_tx": 3,
+      "mc_rel": 0.3852857500698049,
+      "nhr_rel": 0.6169424220010181,
+      "opt_path": [
+        "51143-SOLAR",
+        "CGN1",
+        "SU-SGB"
+      ]
+    },
+    {
+      "pair": [
+        "Cli Rheinb-OS",
+        "Cli DL4FP"
+      ],
+      "ra": "51143-SOLAR",
+      "rb": "MakiAlfter",
+      "opt_hops": 2,
+      "opt_etx": 3.9461033116606536,
+      "mc_hops_mean": 2.7373737373737375,
+      "mc_hops_max": 7,
+      "mc_etx_mean": 5.120434083943362,
+      "detour_ratio": 1.2975925057036863,
+      "frac_detour": 0.3838383838383838,
+      "mc_tx_mean": 15.924242424242424,
+      "nhr_tx": 3,
+      "mc_rel": 0.5690557599980797,
+      "nhr_rel": 0.5690557599980797,
+      "opt_path": [
+        "51143-SOLAR",
+        "Bonn-Nord Solar",
+        "MakiAlfter"
+      ]
+    },
+    {
+      "pair": [
+        "Cli Rheinb-OS",
+        "Cli Marcus-E"
+      ],
+      "ra": "51143-SOLAR",
+      "rb": "SU-SGB",
+      "opt_hops": 2,
+      "opt_etx": 3.3074653131978273,
+      "mc_hops_mean": 2.2462311557788945,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 4.413151661259378,
+      "detour_ratio": 1.3343002097858787,
+      "frac_detour": 0.6482412060301508,
+      "mc_tx_mean": 14.020100502512562,
+      "nhr_tx": 3,
+      "mc_rel": 0.6169424220010181,
+      "nhr_rel": 0.6169424220010181,
+      "opt_path": [
+        "51143-SOLAR",
+        "CGN1",
+        "SU-SGB"
+      ]
+    },
+    {
+      "pair": [
+        "Cli Ulli/p",
+        "Cli PXTiny"
+      ],
+      "ra": "MakiAlfter",
+      "rb": "Bonn-Nord Solar",
+      "opt_hops": 1,
+      "opt_etx": 1.0759229214312198,
+      "mc_hops_mean": 1.215,
+      "mc_hops_max": 3,
+      "mc_etx_mean": 1.4025767243087985,
+      "detour_ratio": 1.3036033496182566,
+      "frac_detour": 0.205,
+      "mc_tx_mean": 15.905,
+      "nhr_tx": 2,
+      "mc_rel": 0.5214019421253755,
+      "nhr_rel": 0.9640718900532987,
+      "opt_path": [
+        "MakiAlfter",
+        "Bonn-Nord Solar"
+      ]
+    },
+    {
+      "pair": [
+        "Cli Ulli/p",
+        "Cli LordWhopper"
+      ],
+      "ra": "MakiAlfter",
+      "rb": "SU-SGB",
+      "opt_hops": 2,
+      "opt_etx": 2.7649744445644044,
+      "mc_hops_mean": 2.285,
+      "mc_hops_max": 5,
+      "mc_etx_mean": 4.20109602163236,
+      "detour_ratio": 1.5193977759509465,
+      "frac_detour": 0.795,
+      "mc_tx_mean": 14.595,
+      "nhr_tx": 3,
+      "mc_rel": 0.6292843965662971,
+      "nhr_rel": 0.7264109866175735,
+      "opt_path": [
+        "MakiAlfter",
+        "Pending-Bonn",
+        "SU-SGB"
+      ]
+    },
+    {
+      "pair": [
+        "Cli Ulli/p",
+        "Cli Marcus-E"
+      ],
+      "ra": "MakiAlfter",
+      "rb": "SU-SGB",
+      "opt_hops": 2,
+      "opt_etx": 2.7649744445644044,
+      "mc_hops_mean": 2.345,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 4.300324690058399,
+      "detour_ratio": 1.5552855103280616,
+      "frac_detour": 0.76,
+      "mc_tx_mean": 14.68,
+      "nhr_tx": 3,
+      "mc_rel": 0.6409724690350618,
+      "nhr_rel": 0.7264109866175735,
+      "opt_path": [
+        "MakiAlfter",
+        "Pending-Bonn",
+        "SU-SGB"
+      ]
+    },
+    {
+      "pair": [
+        "Cli PXTiny",
+        "Cli LordWhopper"
+      ],
+      "ra": "Bonn-Nord Solar",
+      "rb": "SU-SGB",
+      "opt_hops": 1,
+      "opt_etx": 2.2622473485293324,
+      "mc_hops_mean": 1.495,
+      "mc_hops_max": 3,
+      "mc_etx_mean": 2.8256231647521024,
+      "detour_ratio": 1.249033695006435,
+      "frac_detour": 0.41,
+      "mc_tx_mean": 14.895,
+      "nhr_tx": 2,
+      "mc_rel": 0.6648596185079367,
+      "nhr_rel": 0.6648596185079367,
+      "opt_path": [
+        "Bonn-Nord Solar",
+        "SU-SGB"
+      ]
+    },
+    {
+      "pair": [
+        "Cli PXTiny",
+        "Cli DL4FP"
+      ],
+      "ra": "Bonn-Nord Solar",
+      "rb": "MakiAlfter",
+      "opt_hops": 1,
+      "opt_etx": 1.0759229214312198,
+      "mc_hops_mean": 1.325,
+      "mc_hops_max": 3,
+      "mc_etx_mean": 1.5308040574117951,
+      "detour_ratio": 1.4227822708484368,
+      "frac_detour": 0.315,
+      "mc_tx_mean": 15.96,
+      "nhr_tx": 2,
+      "mc_rel": 0.8880478682584072,
+      "nhr_rel": 0.9640718900532987,
+      "opt_path": [
+        "Bonn-Nord Solar",
+        "MakiAlfter"
+      ]
+    },
+    {
+      "pair": [
+        "Cli PXTiny",
+        "Cli Marcus-E"
+      ],
+      "ra": "Bonn-Nord Solar",
+      "rb": "SU-SGB",
+      "opt_hops": 1,
+      "opt_etx": 2.2622473485293324,
+      "mc_hops_mean": 1.58,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 3.0086409619259236,
+      "detour_ratio": 1.329934573194136,
+      "frac_detour": 0.43,
+      "mc_tx_mean": 14.82,
+      "nhr_tx": 2,
+      "mc_rel": 0.6648596185079367,
+      "nhr_rel": 0.6648596185079367,
+      "opt_path": [
+        "Bonn-Nord Solar",
+        "SU-SGB"
+      ]
+    },
+    {
+      "pair": [
+        "Cli LordWhopper",
+        "Cli DL4FP"
+      ],
+      "ra": "SU-SGB",
+      "rb": "MakiAlfter",
+      "opt_hops": 2,
+      "opt_etx": 2.7649744445644044,
+      "mc_hops_mean": 2.32,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 4.162462328345878,
+      "detour_ratio": 1.5054252441749547,
+      "frac_detour": 0.81,
+      "mc_tx_mean": 15.955,
+      "nhr_tx": 3,
+      "mc_rel": 0.7264109866175735,
+      "nhr_rel": 0.7264109866175735,
+      "opt_path": [
+        "SU-SGB",
+        "Pending-Bonn",
+        "MakiAlfter"
+      ]
+    },
+    {
+      "pair": [
+        "Cli DL4FP",
+        "Cli Marcus-E"
+      ],
+      "ra": "MakiAlfter",
+      "rb": "SU-SGB",
+      "opt_hops": 2,
+      "opt_etx": 2.7649744445644044,
+      "mc_hops_mean": 2.235,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 4.078001370972533,
+      "detour_ratio": 1.47487850348468,
+      "frac_detour": 0.75,
+      "mc_tx_mean": 14.575,
+      "nhr_tx": 3,
+      "mc_rel": 0.6409724690350618,
+      "nhr_rel": 0.7264109866175735,
+      "opt_path": [
+        "MakiAlfter",
+        "Pending-Bonn",
+        "SU-SGB"
+      ]
+    }
+  ]
+}

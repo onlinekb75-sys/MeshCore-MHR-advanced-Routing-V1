@@ -1,0 +1,721 @@
+{
+  "summary": {
+    "n_pairs": 29,
+    "mean_opt_hops": 1.2413793103448276,
+    "mean_mc_hops": 1.5208495015065342,
+    "worst_mc_hops": 5,
+    "mean_detour_ratio": 1.2040930565136223,
+    "pct_pairs_with_detour": 100.0,
+    "mean_detour_event_rate": 28.116198206262887,
+    "mean_mc_tx": 5.705890435261542,
+    "mean_nhr_tx": 2.2413793103448274,
+    "airtime_reduction_pct": 60.71815020328043,
+    "mean_mc_rel": 0.7245702622966806,
+    "mean_nhr_rel": 0.7689637625319417
+  },
+  "detail": [
+    {
+      "pair": [
+        "Cli-Koeln-Sued",
+        "Cli-Koeln-Nord"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 1.01007550314386,
+      "mc_hops_mean": 1.2,
+      "mc_hops_max": 2,
+      "mc_etx_mean": 1.3107410862024327,
+      "detour_ratio": 1.2976664438675634,
+      "frac_detour": 0.2,
+      "mc_tx_mean": 5.65,
+      "nhr_tx": 2,
+      "mc_rel": 0.995,
+      "nhr_rel": 0.995,
+      "deliv_ratio_flood": 1.0,
+      "ra": "Deutz-Hochhaus",
+      "rb": "Colonius-Koeln",
+      "opt_path": [
+        "Deutz-Hochhaus",
+        "Colonius-Koeln"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Koeln-Sued",
+        "Cli-Ehrenfeld"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 1.01007550314386,
+      "mc_hops_mean": 1.145,
+      "mc_hops_max": 2,
+      "mc_etx_mean": 1.2085437814774211,
+      "detour_ratio": 1.196488557257184,
+      "frac_detour": 0.145,
+      "mc_tx_mean": 5.605,
+      "nhr_tx": 2,
+      "mc_rel": 0.995,
+      "nhr_rel": 0.995,
+      "deliv_ratio_flood": 1.0,
+      "ra": "Deutz-Hochhaus",
+      "rb": "Colonius-Koeln",
+      "opt_path": [
+        "Deutz-Hochhaus",
+        "Colonius-Koeln"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Koeln-Sued",
+        "Cli-Leverkusen"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 3.6316589085287547,
+      "mc_hops_mean": 1.6032608695652173,
+      "mc_hops_max": 3,
+      "mc_etx_mean": 4.155767642900606,
+      "detour_ratio": 1.1443166188159934,
+      "frac_detour": 0.4891304347826087,
+      "mc_tx_mean": 5.815217391304348,
+      "nhr_tx": 2,
+      "mc_rel": 0.5247439908817799,
+      "nhr_rel": 0.5247439908817799,
+      "deliv_ratio_flood": 0.92,
+      "ra": "Deutz-Hochhaus",
+      "rb": "Leverkusen",
+      "opt_path": [
+        "Deutz-Hochhaus",
+        "Leverkusen"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Koeln-Sued",
+        "Cli-BergGladbach"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 2.8632040358851922,
+      "mc_hops_mean": 1.3515151515151516,
+      "mc_hops_max": 3,
+      "mc_etx_mean": 3.1902026991110053,
+      "detour_ratio": 1.1142072514314256,
+      "frac_detour": 0.30303030303030304,
+      "mc_tx_mean": 5.890909090909091,
+      "nhr_tx": 2,
+      "mc_rel": 0.5909814526755975,
+      "nhr_rel": 0.5909814526755975,
+      "deliv_ratio_flood": 0.825,
+      "ra": "Deutz-Hochhaus",
+      "rb": "Bergisch-Gladbach",
+      "opt_path": [
+        "Deutz-Hochhaus",
+        "Bergisch-Gladbach"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Koeln-Sued",
+        "Cli-Huerth"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 1.0110633420360622,
+      "mc_hops_mean": 1.165,
+      "mc_hops_max": 2,
+      "mc_etx_mean": 1.186528775745533,
+      "detour_ratio": 1.1735454411353907,
+      "frac_detour": 0.165,
+      "mc_tx_mean": 5.745,
+      "nhr_tx": 2,
+      "mc_rel": 0.9945138089500605,
+      "nhr_rel": 0.9945138089500605,
+      "deliv_ratio_flood": 1.0,
+      "ra": "Deutz-Hochhaus",
+      "rb": "Lindenthal",
+      "opt_path": [
+        "Deutz-Hochhaus",
+        "Lindenthal"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Koeln-Sued",
+        "Cli-Roesrath"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 1.01007550314386,
+      "mc_hops_mean": 1.205,
+      "mc_hops_max": 3,
+      "mc_etx_mean": 1.3389120519618558,
+      "detour_ratio": 1.3255564042435364,
+      "frac_detour": 0.2,
+      "mc_tx_mean": 5.54,
+      "nhr_tx": 2,
+      "mc_rel": 0.995,
+      "nhr_rel": 0.995,
+      "deliv_ratio_flood": 1.0,
+      "ra": "Deutz-Hochhaus",
+      "rb": "Colonius-Koeln",
+      "opt_path": [
+        "Deutz-Hochhaus",
+        "Colonius-Koeln"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Koeln-Sued",
+        "Cli-Eifel-Bad-M"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 1.01007550314386,
+      "mc_hops_mean": 1.225,
+      "mc_hops_max": 3,
+      "mc_etx_mean": 1.2912220170424067,
+      "detour_ratio": 1.2783420774224088,
+      "frac_detour": 0.22,
+      "mc_tx_mean": 5.625,
+      "nhr_tx": 2,
+      "mc_rel": 0.995,
+      "nhr_rel": 0.995,
+      "deliv_ratio_flood": 1.0,
+      "ra": "Deutz-Hochhaus",
+      "rb": "Colonius-Koeln",
+      "opt_path": [
+        "Deutz-Hochhaus",
+        "Colonius-Koeln"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Koeln-Nord",
+        "Cli-Deutz"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 1.01007550314386,
+      "mc_hops_mean": 1.205,
+      "mc_hops_max": 2,
+      "mc_etx_mean": 1.270710014580956,
+      "detour_ratio": 1.258034682185511,
+      "frac_detour": 0.205,
+      "mc_tx_mean": 5.365,
+      "nhr_tx": 2,
+      "mc_rel": 0.995,
+      "nhr_rel": 0.995,
+      "deliv_ratio_flood": 1.0,
+      "ra": "Colonius-Koeln",
+      "rb": "Deutz-Hochhaus",
+      "opt_path": [
+        "Colonius-Koeln",
+        "Deutz-Hochhaus"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Koeln-Nord",
+        "Cli-Leverkusen"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 3.004633642018813,
+      "mc_hops_mean": 1.4725274725274726,
+      "mc_hops_max": 3,
+      "mc_etx_mean": 3.749971554117941,
+      "detour_ratio": 1.248062825921877,
+      "frac_detour": 0.41208791208791207,
+      "mc_tx_mean": 5.868131868131868,
+      "nhr_tx": 2,
+      "mc_rel": 0.522120270927371,
+      "nhr_rel": 0.5769049126178564,
+      "deliv_ratio_flood": 0.91,
+      "ra": "Colonius-Koeln",
+      "rb": "Leverkusen",
+      "opt_path": [
+        "Colonius-Koeln",
+        "Leverkusen"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Koeln-Nord",
+        "Cli-BergGladbach"
+      ],
+      "opt_hops": 2,
+      "opt_etx": 3.7696086048903896,
+      "mc_hops_mean": 2.2048192771084336,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 4.147329420419601,
+      "detour_ratio": 1.100201600516082,
+      "frac_detour": 0.18674698795180722,
+      "mc_tx_mean": 5.9397590361445785,
+      "nhr_tx": 3,
+      "mc_rel": 0.5880265454122195,
+      "nhr_rel": 0.5866567351561857,
+      "deliv_ratio_flood": 0.83,
+      "ra": "Colonius-Koeln",
+      "rb": "Bergisch-Gladbach",
+      "opt_path": [
+        "Colonius-Koeln",
+        "Koeln-Muelheim",
+        "Bergisch-Gladbach"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Koeln-Nord",
+        "Cli-Huerth"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 1.01007550314386,
+      "mc_hops_mean": 1.155,
+      "mc_hops_max": 2,
+      "mc_etx_mean": 1.193157342308302,
+      "detour_ratio": 1.1812555978187766,
+      "frac_detour": 0.155,
+      "mc_tx_mean": 5.745,
+      "nhr_tx": 2,
+      "mc_rel": 0.9895412399053102,
+      "nhr_rel": 0.995,
+      "deliv_ratio_flood": 1.0,
+      "ra": "Colonius-Koeln",
+      "rb": "Lindenthal",
+      "opt_path": [
+        "Colonius-Koeln",
+        "Lindenthal"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Deutz",
+        "Cli-Ehrenfeld"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 1.01007550314386,
+      "mc_hops_mean": 1.2,
+      "mc_hops_max": 2,
+      "mc_etx_mean": 1.357520488118777,
+      "detour_ratio": 1.3439792212497923,
+      "frac_detour": 0.2,
+      "mc_tx_mean": 5.635,
+      "nhr_tx": 2,
+      "mc_rel": 0.995,
+      "nhr_rel": 0.995,
+      "deliv_ratio_flood": 1.0,
+      "ra": "Deutz-Hochhaus",
+      "rb": "Colonius-Koeln",
+      "opt_path": [
+        "Deutz-Hochhaus",
+        "Colonius-Koeln"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Deutz",
+        "Cli-Leverkusen"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 3.6316589085287547,
+      "mc_hops_mean": 1.5268817204301075,
+      "mc_hops_max": 3,
+      "mc_etx_mean": 4.048618302779633,
+      "detour_ratio": 1.1148123776909973,
+      "frac_detour": 0.43010752688172044,
+      "mc_tx_mean": 5.854838709677419,
+      "nhr_tx": 2,
+      "mc_rel": 0.5247439908817799,
+      "nhr_rel": 0.5247439908817799,
+      "deliv_ratio_flood": 0.93,
+      "ra": "Deutz-Hochhaus",
+      "rb": "Leverkusen",
+      "opt_path": [
+        "Deutz-Hochhaus",
+        "Leverkusen"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Deutz",
+        "Cli-BergGladbach"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 2.8632040358851922,
+      "mc_hops_mean": 1.388235294117647,
+      "mc_hops_max": 3,
+      "mc_etx_mean": 3.279692505810412,
+      "detour_ratio": 1.1454623787565519,
+      "frac_detour": 0.3235294117647059,
+      "mc_tx_mean": 5.858823529411764,
+      "nhr_tx": 2,
+      "mc_rel": 0.5909814526755975,
+      "nhr_rel": 0.5909814526755975,
+      "deliv_ratio_flood": 0.85,
+      "ra": "Deutz-Hochhaus",
+      "rb": "Bergisch-Gladbach",
+      "opt_path": [
+        "Deutz-Hochhaus",
+        "Bergisch-Gladbach"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Deutz",
+        "Cli-Huerth"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 1.0110633420360622,
+      "mc_hops_mean": 1.225,
+      "mc_hops_max": 3,
+      "mc_etx_mean": 1.2899997831951513,
+      "detour_ratio": 1.2758842394556327,
+      "frac_detour": 0.21,
+      "mc_tx_mean": 5.745,
+      "nhr_tx": 2,
+      "mc_rel": 0.9945138089500605,
+      "nhr_rel": 0.9945138089500605,
+      "deliv_ratio_flood": 1.0,
+      "ra": "Deutz-Hochhaus",
+      "rb": "Lindenthal",
+      "opt_path": [
+        "Deutz-Hochhaus",
+        "Lindenthal"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Deutz",
+        "Cli-Roesrath"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 1.01007550314386,
+      "mc_hops_mean": 1.26,
+      "mc_hops_max": 3,
+      "mc_etx_mean": 1.4459325361099167,
+      "detour_ratio": 1.4315093590622203,
+      "frac_detour": 0.255,
+      "mc_tx_mean": 5.61,
+      "nhr_tx": 2,
+      "mc_rel": 0.9895412399053102,
+      "nhr_rel": 0.995,
+      "deliv_ratio_flood": 1.0,
+      "ra": "Deutz-Hochhaus",
+      "rb": "Colonius-Koeln",
+      "opt_path": [
+        "Deutz-Hochhaus",
+        "Colonius-Koeln"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Deutz",
+        "Cli-Eifel-Bad-M"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 1.01007550314386,
+      "mc_hops_mean": 1.165,
+      "mc_hops_max": 3,
+      "mc_etx_mean": 1.2297151578011398,
+      "detour_ratio": 1.2174487491020736,
+      "frac_detour": 0.16,
+      "mc_tx_mean": 5.61,
+      "nhr_tx": 2,
+      "mc_rel": 0.995,
+      "nhr_rel": 0.995,
+      "deliv_ratio_flood": 1.0,
+      "ra": "Deutz-Hochhaus",
+      "rb": "Colonius-Koeln",
+      "opt_path": [
+        "Deutz-Hochhaus",
+        "Colonius-Koeln"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Ehrenfeld",
+        "Cli-Leverkusen"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 3.004633642018813,
+      "mc_hops_mean": 1.4917127071823204,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 3.7704839224302242,
+      "detour_ratio": 1.2548897375377974,
+      "frac_detour": 0.4088397790055249,
+      "mc_tx_mean": 5.745856353591161,
+      "nhr_tx": 2,
+      "mc_rel": 0.5769049126178564,
+      "nhr_rel": 0.5769049126178564,
+      "deliv_ratio_flood": 0.905,
+      "ra": "Colonius-Koeln",
+      "rb": "Leverkusen",
+      "opt_path": [
+        "Colonius-Koeln",
+        "Leverkusen"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Ehrenfeld",
+        "Cli-BergGladbach"
+      ],
+      "opt_hops": 2,
+      "opt_etx": 3.7696086048903896,
+      "mc_hops_mean": 2.1717791411042944,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 4.184212806781686,
+      "detour_ratio": 1.1099860079249135,
+      "frac_detour": 0.1656441717791411,
+      "mc_tx_mean": 5.932515337423313,
+      "nhr_tx": 3,
+      "mc_rel": 0.5866567351561857,
+      "nhr_rel": 0.5866567351561857,
+      "deliv_ratio_flood": 0.815,
+      "ra": "Colonius-Koeln",
+      "rb": "Bergisch-Gladbach",
+      "opt_path": [
+        "Colonius-Koeln",
+        "Koeln-Muelheim",
+        "Bergisch-Gladbach"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Ehrenfeld",
+        "Cli-Huerth"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 1.01007550314386,
+      "mc_hops_mean": 1.23,
+      "mc_hops_max": 2,
+      "mc_etx_mean": 1.2848260745892697,
+      "detour_ratio": 1.2720099344952418,
+      "frac_detour": 0.23,
+      "mc_tx_mean": 5.81,
+      "nhr_tx": 2,
+      "mc_rel": 0.995,
+      "nhr_rel": 0.995,
+      "deliv_ratio_flood": 1.0,
+      "ra": "Colonius-Koeln",
+      "rb": "Lindenthal",
+      "opt_path": [
+        "Colonius-Koeln",
+        "Lindenthal"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Leverkusen",
+        "Cli-BergGladbach"
+      ],
+      "opt_hops": 2,
+      "opt_etx": 6.243280587308141,
+      "mc_hops_mean": 2.4465408805031448,
+      "mc_hops_max": 5,
+      "mc_etx_mean": 6.762661259257438,
+      "detour_ratio": 1.0831903459545191,
+      "frac_detour": 0.3522012578616352,
+      "mc_tx_mean": 6.0,
+      "nhr_tx": 3,
+      "mc_rel": 0.0,
+      "nhr_rel": 0.3234644137412438,
+      "deliv_ratio_flood": 0.795,
+      "ra": "Leverkusen",
+      "rb": "Bergisch-Gladbach",
+      "opt_path": [
+        "Leverkusen",
+        "Koeln-Muelheim",
+        "Bergisch-Gladbach"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Leverkusen",
+        "Cli-Huerth"
+      ],
+      "opt_hops": 2,
+      "opt_etx": 4.014709145162673,
+      "mc_hops_mean": 2.1123595505617976,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 4.619075086194419,
+      "detour_ratio": 1.1505379142496406,
+      "frac_detour": 0.6348314606741573,
+      "mc_tx_mean": 5.859550561797753,
+      "nhr_tx": 3,
+      "mc_rel": 0.0,
+      "nhr_rel": 0.5740203880547671,
+      "deliv_ratio_flood": 0.89,
+      "ra": "Leverkusen",
+      "rb": "Lindenthal",
+      "opt_path": [
+        "Leverkusen",
+        "Colonius-Koeln",
+        "Lindenthal"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Leverkusen",
+        "Cli-Roesrath"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 3.004633642018813,
+      "mc_hops_mean": 1.4175824175824177,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 3.661311171324468,
+      "detour_ratio": 1.2185549413153856,
+      "frac_detour": 0.35714285714285715,
+      "mc_tx_mean": 4.967032967032967,
+      "nhr_tx": 2,
+      "mc_rel": 0.5102931536194911,
+      "nhr_rel": 0.5769049126178564,
+      "deliv_ratio_flood": 0.91,
+      "ra": "Leverkusen",
+      "rb": "Colonius-Koeln",
+      "opt_path": [
+        "Leverkusen",
+        "Colonius-Koeln"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Leverkusen",
+        "Cli-Eifel-Bad-M"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 3.004633642018813,
+      "mc_hops_mean": 1.5,
+      "mc_hops_max": 3,
+      "mc_etx_mean": 3.7866627412297613,
+      "detour_ratio": 1.2602743603328301,
+      "frac_detour": 0.4375,
+      "mc_tx_mean": 5.363636363636363,
+      "nhr_tx": 2,
+      "mc_rel": 0.5192558193700173,
+      "nhr_rel": 0.5769049126178564,
+      "deliv_ratio_flood": 0.88,
+      "ra": "Leverkusen",
+      "rb": "Colonius-Koeln",
+      "opt_path": [
+        "Leverkusen",
+        "Colonius-Koeln"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-BergGladbach",
+        "Cli-Huerth"
+      ],
+      "opt_hops": 2,
+      "opt_etx": 3.8742673779212544,
+      "mc_hops_mean": 2.281437125748503,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 4.294298820567074,
+      "detour_ratio": 1.1084157084871071,
+      "frac_detour": 0.5748502994011976,
+      "mc_tx_mean": 5.910179640718563,
+      "nhr_tx": 3,
+      "mc_rel": 0.5877392155192485,
+      "nhr_rel": 0.5877392155192485,
+      "deliv_ratio_flood": 0.835,
+      "ra": "Bergisch-Gladbach",
+      "rb": "Lindenthal",
+      "opt_path": [
+        "Bergisch-Gladbach",
+        "Deutz-Hochhaus",
+        "Lindenthal"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-BergGladbach",
+        "Cli-Roesrath"
+      ],
+      "opt_hops": 2,
+      "opt_etx": 3.7696086048903896,
+      "mc_hops_mean": 2.2083333333333335,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 4.113278687160519,
+      "detour_ratio": 1.0911686379918273,
+      "frac_detour": 0.19642857142857142,
+      "mc_tx_mean": 5.732142857142857,
+      "nhr_tx": 3,
+      "mc_rel": 0.5866567351561857,
+      "nhr_rel": 0.5866567351561857,
+      "deliv_ratio_flood": 0.84,
+      "ra": "Bergisch-Gladbach",
+      "rb": "Colonius-Koeln",
+      "opt_path": [
+        "Bergisch-Gladbach",
+        "Koeln-Muelheim",
+        "Colonius-Koeln"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-BergGladbach",
+        "Cli-Eifel-Bad-M"
+      ],
+      "opt_hops": 2,
+      "opt_etx": 3.7696086048903896,
+      "mc_hops_mean": 2.1626506024096384,
+      "mc_hops_max": 4,
+      "mc_etx_mean": 4.040365930866948,
+      "detour_ratio": 1.0718263762517148,
+      "frac_detour": 0.1566265060240964,
+      "mc_tx_mean": 5.807228915662651,
+      "nhr_tx": 3,
+      "mc_rel": 0.5866567351561857,
+      "nhr_rel": 0.5866567351561857,
+      "deliv_ratio_flood": 0.83,
+      "ra": "Bergisch-Gladbach",
+      "rb": "Colonius-Koeln",
+      "opt_path": [
+        "Bergisch-Gladbach",
+        "Koeln-Muelheim",
+        "Colonius-Koeln"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Huerth",
+        "Cli-Roesrath"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 1.01007550314386,
+      "mc_hops_mean": 1.17,
+      "mc_hops_max": 2,
+      "mc_etx_mean": 1.2030518638868566,
+      "detour_ratio": 1.1910514215445853,
+      "frac_detour": 0.17,
+      "mc_tx_mean": 5.65,
+      "nhr_tx": 2,
+      "mc_rel": 0.7936664988434787,
+      "nhr_rel": 0.995,
+      "deliv_ratio_flood": 1.0,
+      "ra": "Lindenthal",
+      "rb": "Colonius-Koeln",
+      "opt_path": [
+        "Lindenthal",
+        "Colonius-Koeln"
+      ]
+    },
+    {
+      "pair": [
+        "Cli-Huerth",
+        "Cli-Eifel-Bad-M"
+      ],
+      "opt_hops": 1,
+      "opt_etx": 1.01007550314386,
+      "mc_hops_mean": 1.215,
+      "mc_hops_max": 3,
+      "mc_etx_mean": 1.2727147565732777,
+      "detour_ratio": 1.2600194268764593,
+      "frac_detour": 0.21,
+      "mc_tx_mean": 5.59,
+      "nhr_tx": 2,
+      "mc_rel": 0.995,
+      "nhr_rel": 0.995,
+      "deliv_ratio_flood": 1.0,
+      "ra": "Lindenthal",
+      "rb": "Colonius-Koeln",
+      "opt_path": [
+        "Lindenthal",
+        "Colonius-Koeln"
+      ]
+    }
+  ]
+}

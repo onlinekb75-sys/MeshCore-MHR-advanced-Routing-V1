@@ -1,0 +1,44 @@
+name: Build NHR firmware
+
+on:
+  push:
+    branches: [ main, nhr ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        env:
+          - heltec_v4_repeater          # Hauptziel (Heltec V4, ESP32-S3 -> .bin)
+          # weitere Ziele bei Bedarf einkommentieren:
+          # - heltec_v3_repeater
+          # - heltec_v4_companion_radio_ble
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install PlatformIO
+        run: pip install --upgrade platformio
+      - name: Build ${{ matrix.env }}
+        run: pio run -e ${{ matrix.env }}
+      - name: Collect binaries
+        run: |
+          mkdir -p artifacts
+          B=.pio/build/${{ matrix.env }}
+          cp "$B/firmware.bin"   "artifacts/${{ matrix.env }}-firmware.bin"   || true
+          cp "$B/bootloader.bin" "artifacts/${{ matrix.env }}-bootloader.bin" || true
+          cp "$B/partitions.bin" "artifacts/${{ matrix.env }}-partitions.bin" || true
+          # optionales Factory-Image (direkt @0x0 flashbar) via esptool merge.
+          # WICHTIG: boot_app0.bin @0xe000 (otadata) muss enthalten sein, sonst bootet das
+          # Image nicht zuverlaessig in den App-Slot.
+          BOOTAPP=$(python -c "import glob;print((glob.glob('$HOME/.platformio/packages/framework-arduinoespressif32*/tools/partitions/boot_app0.bin') or [''])[0])")
+          python -m esptool --chip esp32s3 merge_bin -o "artifacts/${{ matrix.env }}-factory.bin" \
+            0x0 "$B/bootloader.bin" 0x8000 "$B/partitions.bin" 0xe000 "$BOOTAPP" 0x10000 "$B/firmware.bin" || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.env }}
+          path: artifacts/

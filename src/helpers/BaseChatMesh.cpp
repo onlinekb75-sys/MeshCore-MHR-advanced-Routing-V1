@@ -302,10 +302,18 @@ bool BaseChatMesh::onPeerPathRecv(mesh::Packet* packet, int sender_idx, const ui
 }
 
 bool BaseChatMesh::onContactPathRecv(ContactInfo& from, uint8_t* in_path, uint8_t in_path_len, uint8_t* out_path, uint8_t out_path_len, uint8_t extra_type, uint8_t* extra, uint8_t extra_len) {
-  // NOTE: default impl, we just replace the current 'out_path' regardless, whenever sender sends us a new out_path.
-  // FUTURE: could store multiple out_paths per contact, and try to find which is the 'best'(?)
-  from.out_path_len = mesh::Packet::copyPath(from.out_path, out_path, out_path_len);  // store a copy of path, for sendDirect()
-  from.lastmod = getRTCClock()->getCurrentTime();
+  // NHR: prefer-shorter path adoption. We only replace the cached 'out_path' if the newly offered
+  //      path is NOT longer (>= as short) than the one we already have, or if we have none yet.
+  //      Hop count is the low 6 bits of path_len. This prevents a later-arriving longer detour from
+  //      overwriting a good short path. A genuinely broken path triggers resetPathTo() elsewhere,
+  //      which sets out_path_len = OUT_PATH_UNKNOWN, so we never get permanently stuck on a stale path.
+  //      Behaviour is never worse than upstream: with a single offered path it is identical.
+  bool nhr_adopt = (from.out_path_len == OUT_PATH_UNKNOWN)
+                   || ((out_path_len & 0x3F) <= (from.out_path_len & 0x3F));
+  if (nhr_adopt) {
+    from.out_path_len = mesh::Packet::copyPath(from.out_path, out_path, out_path_len);  // store a copy of path, for sendDirect()
+    from.lastmod = getRTCClock()->getCurrentTime();
+  }
 
   onContactPathUpdated(from);
 
