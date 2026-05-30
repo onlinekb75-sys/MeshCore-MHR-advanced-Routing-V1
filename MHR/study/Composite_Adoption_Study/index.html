@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://meshcore-dev.github.io/meshcore/MHR/study/Backbone_Phase2_Study/">
+        <link rel="canonical" href="https://meshcore-dev.github.io/meshcore/MHR/study/Composite_Adoption_Study/">
       
       
-        <link rel="prev" href="../Adaptive_Controller_Design/">
+        <link rel="prev" href="../Backbone_Phase2_Study/">
       
       
-        <link rel="next" href="../Composite_Adoption_Study/">
+        <link rel="next" href="../Invisible_Optimizing_Layer/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Backbone Phase 2 — Proaktiver Regions-/Backbone-Control-Plane: Nutzen vs. Verlust vs. NETTO-Airtime - MeshCore Docs</title>
+        <title>Komposit-Adoptions-Studie — die gesamte node-lokale MHR-Schicht auf echten CoreScope-Daten - MeshCore Docs</title>
       
     
     
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#backbone-phase-2-proaktiver-regions-backbone-control-plane-nutzen-vs-verlust-vs-netto-airtime" class="md-skip">
+        <a href="#komposit-adoptions-studie-die-gesamte-node-lokale-mhr-schicht-auf-echten-corescope-daten" class="md-skip">
           Skip to content
         </a>
       
@@ -105,7 +105,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Backbone Phase 2 — Proaktiver Regions-/Backbone-Control-Plane: Nutzen vs. Verlust vs. NETTO-Airtime
+              Komposit-Adoptions-Studie — die gesamte node-lokale MHR-Schicht auf echten CoreScope-Daten
             
           </span>
         </div>
@@ -1007,6 +1007,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../Backbone_Phase2_Study/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backbone Phase 2 — Proaktiver Regions-/Backbone-Control-Plane: Nutzen vs. Verlust vs. NETTO-Airtime
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1026,7 +1054,7 @@
   <span class="md-ellipsis">
     
   
-    Backbone Phase 2 — Proaktiver Regions-/Backbone-Control-Plane: Nutzen vs. Verlust vs. NETTO-Airtime
+    Komposit-Adoptions-Studie — die gesamte node-lokale MHR-Schicht auf echten CoreScope-Daten
   
 
     
@@ -1044,7 +1072,7 @@
   <span class="md-ellipsis">
     
   
-    Backbone Phase 2 — Proaktiver Regions-/Backbone-Control-Plane: Nutzen vs. Verlust vs. NETTO-Airtime
+    Komposit-Adoptions-Studie — die gesamte node-lokale MHR-Schicht auf echten CoreScope-Daten
   
 
     
@@ -1070,10 +1098,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-methodik-ehrlich-getrennt-gemessen" class="md-nav__link">
+  <a href="#die-gemessene-schicht-kombiniert-auf-neu-firmware-knoten" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Methodik (ehrlich, getrennt gemessen)
+        Die gemessene „Schicht" (kombiniert auf Neu-Firmware-Knoten)
       
     </span>
   </a>
@@ -1081,22 +1109,66 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-daten-vs-kontroll-vs-netto-airtime-zahlen" class="md-nav__link">
+  <a href="#a-verbesserungs-tabelle-je-adoption-ebene-a-rollout-top-traffic-repeater-zuerst" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Daten- vs. Kontroll- vs. NETTO-Airtime (Zahlen)
+        (a) Verbesserungs-Tabelle je Adoption (Ebene A, Rollout „Top-Traffic-Repeater zuerst")
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="2. Daten- vs. Kontroll- vs. NETTO-Airtime (Zahlen)">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#b-wendepunkt-lohnt-sich-schwelle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (b) Wendepunkt &amp; „lohnt sich"-Schwelle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#c-beitrags-zerlegung-der-4-mechanismen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (c) Beitrags-Zerlegung der 4 Mechanismen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#d-monotonie-safety-uberall-gehalten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (d) Monotonie &amp; Safety — überall gehalten?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e-verhalten-unter-storung-robust" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (e) Verhalten unter Störung (robust?)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="(e) Verhalten unter Störung (robust?)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#2a-uber-backbone-groe-flaches-dv-dv-300-s-adoption-100-2000-floods24-h" class="md-nav__link">
+  <a href="#ebene-a-single-flood-unter-storung-komposit-vs-gestorter-baseline" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2a. Über Backbone-Größe (FLACHES DV, DV 300 s, Adoption 100 %, 2000 Floods/24 h)
+        Ebene A (Single-Flood) unter Störung, Komposit vs. gestörter Baseline
       
     </span>
   </a>
@@ -1104,21 +1176,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2b-uber-dv-periode-backbone-35-flach" class="md-nav__link">
+  <a href="#ebene-b-multi-tick-m4-reinforcement-gegen-re-discovery-floods-voll-adoptiert" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2b. Über DV-Periode (Backbone 35 %, flach)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2c-flaches-dv-vs-regions-hierarchie-h1-der-rettungsanker-bei-groem-backbone" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2c. Flaches DV vs. Regions-Hierarchie (H1) — der Rettungsanker bei großem Backbone
+        Ebene B (Multi-Tick) — M4-Reinforcement gegen Re-Discovery-Floods (voll adoptiert)
       
     </span>
   </a>
@@ -1131,49 +1192,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-go-no-go" class="md-nav__link">
+  <a href="#f-bugs-auffalligkeiten-beim-erstellen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. GO / NO-GO
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="3. GO / NO-GO">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#go-aber-bedingt-kein-freifahrtschein" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ✅ GO — aber bedingt, kein Freifahrtschein.
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#wann-no-go" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Wann NO-GO:
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-amortisation-traffic-sensitivitat-backbone-35-300-s-flach" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Amortisation (Traffic-Sensitivität, Backbone 35 %/300 s flach)
+        (f) Bugs / Auffälligkeiten beim Erstellen
       
     </span>
   </a>
@@ -1181,10 +1203,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-delivery-pfad-optimalitat-konvergenz-mixed-firmware" class="md-nav__link">
+  <a href="#g-dateien-alle-unter-docsmhrstudy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Delivery, Pfad-Optimalität, Konvergenz, Mixed-Firmware
+        (g) Dateien (alle unter docs/MHR/study/)
       
     </span>
   </a>
@@ -1192,10 +1214,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-bugs-fehler-wahrend-der-entwicklung" class="md-nav__link">
+  <a href="#h-ehrliche-limitierungen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. Bugs / Fehler während der Entwicklung
+        (h) Ehrliche Limitierungen
       
     </span>
   </a>
@@ -1203,32 +1225,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-dateien" class="md-nav__link">
+  <a href="#fazit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. Dateien
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#8-limitierungen-ehrlich" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8. Limitierungen (ehrlich)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#9-einordnung-gegenuber-der-unsichtbaren-schicht" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        9. Einordnung gegenüber der unsichtbaren Schicht
+        Fazit
       
     </span>
   </a>
@@ -1239,34 +1239,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../Composite_Adoption_Study/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Komposit-Adoptions-Studie — die gesamte node-lokale MHR-Schicht auf echten CoreScope-Daten
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -1538,10 +1510,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-methodik-ehrlich-getrennt-gemessen" class="md-nav__link">
+  <a href="#die-gemessene-schicht-kombiniert-auf-neu-firmware-knoten" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Methodik (ehrlich, getrennt gemessen)
+        Die gemessene „Schicht" (kombiniert auf Neu-Firmware-Knoten)
       
     </span>
   </a>
@@ -1549,22 +1521,66 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-daten-vs-kontroll-vs-netto-airtime-zahlen" class="md-nav__link">
+  <a href="#a-verbesserungs-tabelle-je-adoption-ebene-a-rollout-top-traffic-repeater-zuerst" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Daten- vs. Kontroll- vs. NETTO-Airtime (Zahlen)
+        (a) Verbesserungs-Tabelle je Adoption (Ebene A, Rollout „Top-Traffic-Repeater zuerst")
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="2. Daten- vs. Kontroll- vs. NETTO-Airtime (Zahlen)">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#b-wendepunkt-lohnt-sich-schwelle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (b) Wendepunkt &amp; „lohnt sich"-Schwelle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#c-beitrags-zerlegung-der-4-mechanismen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (c) Beitrags-Zerlegung der 4 Mechanismen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#d-monotonie-safety-uberall-gehalten" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (d) Monotonie &amp; Safety — überall gehalten?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e-verhalten-unter-storung-robust" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (e) Verhalten unter Störung (robust?)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="(e) Verhalten unter Störung (robust?)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#2a-uber-backbone-groe-flaches-dv-dv-300-s-adoption-100-2000-floods24-h" class="md-nav__link">
+  <a href="#ebene-a-single-flood-unter-storung-komposit-vs-gestorter-baseline" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2a. Über Backbone-Größe (FLACHES DV, DV 300 s, Adoption 100 %, 2000 Floods/24 h)
+        Ebene A (Single-Flood) unter Störung, Komposit vs. gestörter Baseline
       
     </span>
   </a>
@@ -1572,21 +1588,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2b-uber-dv-periode-backbone-35-flach" class="md-nav__link">
+  <a href="#ebene-b-multi-tick-m4-reinforcement-gegen-re-discovery-floods-voll-adoptiert" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2b. Über DV-Periode (Backbone 35 %, flach)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2c-flaches-dv-vs-regions-hierarchie-h1-der-rettungsanker-bei-groem-backbone" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2c. Flaches DV vs. Regions-Hierarchie (H1) — der Rettungsanker bei großem Backbone
+        Ebene B (Multi-Tick) — M4-Reinforcement gegen Re-Discovery-Floods (voll adoptiert)
       
     </span>
   </a>
@@ -1599,49 +1604,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-go-no-go" class="md-nav__link">
+  <a href="#f-bugs-auffalligkeiten-beim-erstellen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. GO / NO-GO
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="3. GO / NO-GO">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#go-aber-bedingt-kein-freifahrtschein" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ✅ GO — aber bedingt, kein Freifahrtschein.
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#wann-no-go" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Wann NO-GO:
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-amortisation-traffic-sensitivitat-backbone-35-300-s-flach" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Amortisation (Traffic-Sensitivität, Backbone 35 %/300 s flach)
+        (f) Bugs / Auffälligkeiten beim Erstellen
       
     </span>
   </a>
@@ -1649,10 +1615,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-delivery-pfad-optimalitat-konvergenz-mixed-firmware" class="md-nav__link">
+  <a href="#g-dateien-alle-unter-docsmhrstudy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Delivery, Pfad-Optimalität, Konvergenz, Mixed-Firmware
+        (g) Dateien (alle unter docs/MHR/study/)
       
     </span>
   </a>
@@ -1660,10 +1626,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-bugs-fehler-wahrend-der-entwicklung" class="md-nav__link">
+  <a href="#h-ehrliche-limitierungen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. Bugs / Fehler während der Entwicklung
+        (h) Ehrliche Limitierungen
       
     </span>
   </a>
@@ -1671,32 +1637,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-dateien" class="md-nav__link">
+  <a href="#fazit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. Dateien
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#8-limitierungen-ehrlich" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8. Limitierungen (ehrlich)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#9-einordnung-gegenuber-der-unsichtbaren-schicht" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        9. Einordnung gegenüber der unsichtbaren Schicht
+        Fazit
       
     </span>
   </a>
@@ -1720,7 +1664,7 @@
 
 
   
-    <a href="https://github.com/meshcore-dev/meshcore/edit/main/docs/MHR/study/Backbone_Phase2_Study.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/meshcore-dev/meshcore/edit/main/docs/MHR/study/Composite_Adoption_Study.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1728,424 +1672,407 @@
   
 
 
-<h1 id="backbone-phase-2-proaktiver-regions-backbone-control-plane-nutzen-vs-verlust-vs-netto-airtime">Backbone Phase 2 — Proaktiver Regions-/Backbone-Control-Plane: Nutzen vs. Verlust vs. NETTO-Airtime</h1>
-<p><em>Mechanismus A der Phase 2. Ehrliche, getrennte Airtime-Bilanz auf der ECHTEN Topologie.
-Skript: <code>backbone_sim.py</code> · Daten: <code>backbone_results.json</code> · Plots: <code>fig_bb_*.png</code>.
-Reproduzierbar (Seed 42, 6 Seeds, 120 Paare/Seed).</em></p>
+<h1 id="komposit-adoptions-studie-die-gesamte-node-lokale-mhr-schicht-auf-echten-corescope-daten">Komposit-Adoptions-Studie — die gesamte node-lokale MHR-Schicht auf echten CoreScope-Daten</h1>
+<p><strong>Frage:</strong> Wie verbessert sich das LoRa-Mesh, wenn <strong>1 % / 10 % / 25 % / 50 % / 75 % / 100 %</strong> der Knoten die <strong>GESAMTE</strong> node-lokale MHR-Optimierungs-Schicht (alle vier Mechanismen GEMEINSAM) nutzen — gegen die reine Upstream-Baseline (0 %)?</p>
+<p><strong>Ehrlich gemessen:</strong> der tatsächliche <strong>kombinierte</strong> Effekt der vier Mechanismen zusammen (nicht die Summe der Einzelgewinne), auf der echten, server-gemessenen Topologie, gemittelt über <strong>6 Seeds</strong> (Seed 42 als Master), <strong>120 Paare</strong> je Seed (Ebene A) bzw. <strong>32 Quellen × 4 Ziele × 50 Ticks</strong> (Ebene B).</p>
 <blockquote>
-<p><strong>Die Kernfrage:</strong> Spart ein proaktiver Backbone (stabile Repeater tauschen periodisch
-Distance-Vector-Updates aus, sodass DATA als <strong>Unicast</strong> statt netzweitem <strong>Flood</strong> läuft)
-<strong>NETTO</strong> Airtime — <strong>nach Abzug</strong> der Kontroll-Updates, die er selbst kostet? Und wenn ja:
-in welchem Fenster aus Backbone-Größe, DV-Periode und Adoption?</p>
+<p>Reproduzierbar: <code>python3 composite_adoption_sim.py</code> → <code>composite_adoption_results.json</code> + 5 Plots. Wiederverwendet die geprüften Kernfunktionen aus <code>mhr_sim_real_v4.py</code> (Topologie/Timing/flood.max/Metriken), <code>suppression_sim.py</code> (guarded Suppression G1–G5) und <code>reinforce_sim.py</code> (Pfad-Reinforcement). Keine neue Engine.</p>
 </blockquote>
 <hr />
-<h2 id="1-methodik-ehrlich-getrennt-gemessen">1. Methodik (ehrlich, getrennt gemessen)</h2>
-<p><strong>Topologie:</strong> echte <code>neighbor_graph.json</code> (1956 Kanten, ambiguous verworfen) → Riesenkomponente
-<strong>632 Knoten / 1577 Kanten</strong>, Ø-Grad 4,99. Per-Link-Reliability aus echtem <code>avg_snr</code> (logistisch
-um die Empfangsschwelle), ETX = 1/p². Identisch zu <code>mhr_sim_real_v4.py</code>.</p>
-<p><strong>Zwei Airtime-Einheiten</strong> — der entscheidende methodische Schritt:
-1. <strong>TX-Ereignisse</strong> (sendende Knoten) — vergleichbar mit der Vorarbeit (v4/Studie).
-2. <strong>Physische Time-on-Air (ms)</strong> per LoRa-ToA (Semtech-Formel, SF11/BW250k „long-fast").
-   Nötig, weil DATA-Pakete (≈40 B → <strong>494 ms</strong> ToA) und kleine DV-Kontroll-Pakete <strong>unterschiedlich
-   groß</strong> sind. <strong>Nur in ms lassen sich Daten-Ersparnis und Kontroll-Kosten ehrlich gegeneinander
-   aufrechnen</strong> — TX-Zählung allein würde die Kontroll-Kosten systematisch unterschätzen oder
-   überschätzen.</p>
-<p><strong>Backbone-Modell:</strong>
-- Auswahl stabiler Repeater nach <code>relay_count_24h</code> (aktiver Transit), Tie-Break Grad (Hub/Border).
-  Companions sind per Definition <strong>nicht</strong> backbone-fähig (leiten nicht weiter). 563 Kandidaten.
-- DATA: Endpunkte „kleben" via lokalem ≤2-Hop-Flood an den nächsten aktiven Backbone-Knoten
-  (Ingress/Egress); dazwischen <strong>ETX-kürzester, proaktiv bekannter Unicast-Pfad</strong> (0 Discovery-Airtime).
-  Nicht über den Backbone erreichbare Paare → <strong>Fallback auf heutiges Flood-and-cache</strong>.
-- <strong>Kontroll-Kosten (DV):</strong> jeder aktive Backbone-Knoten sendet je Periode <strong>einen Zero-Hop-Broadcast</strong>
-  (kein Flood, 1 TX). Paketgröße = Header + #Einträge × 4 B. ToA je Update per LoRa-Formel.</p>
-<p><strong>NETTO</strong> (über 24 h, Kernzahl):</p>
-<pre><code>NETTO = (Baseline-Daten-ToA − Backbone-Daten-ToA) × #Discovery-Floods  −  Kontroll-ToA
-        └──────────────── NUTZEN (gespart) ────────────────┘             └── VERLUST ──┘
-</code></pre>
-<p><strong>Baseline (reines Flood-and-cache):</strong> Lieferquote <strong>0,929</strong>, <strong>617 TX-Ereignisse/Zustellung</strong>
-(= <strong>304 s</strong> ToA bei 494 ms/Hop), Ø 5,0 Hops.</p>
-<p><strong>Zwei DV-Skalierungs-Modelle</strong> (beide gezeigt — ehrlich in beide Richtungen):
-- <strong>FLACHES DV</strong> (Default aller Sweeps): jeder Knoten trägt <strong>alle</strong> Ziele seiner Backbone-Komponente
-  → O(N). Pessimistische, aber faire Annahme für einen naiven Backbone.
-- <strong>REGIONS-HIERARCHIE (H1)</strong>: intra-Region auf ~20 Ziele gedeckelt + aggregierte Inter-Region-Einträge
-  → O(Regionsgröße). Die design-intendierte Variante.</p>
+<h2 id="die-gemessene-schicht-kombiniert-auf-neu-firmware-knoten">Die gemessene „Schicht" (kombiniert auf Neu-Firmware-Knoten)</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Mechanismus</th>
+<th>Wirkung</th>
+<th>Stufe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>M1</strong></td>
+<td>Hop-gewichtetes Flood-Rebroadcast-Delay (<code>TX_HOP_WEIGHT=0.6</code>)</td>
+<td>Kopien mit weniger akkumulierten Hops senden früher → kürzere Pfade „führen"</td>
+<td>Ebene A</td>
+</tr>
+<tr>
+<td><strong>M2</strong></td>
+<td><code>flood.max = 15</code> (Upstream: 64)</td>
+<td>Hop-Limit, kappt sinnlose Fern-Rebroadcasts</td>
+<td>Ebene A</td>
+</tr>
+<tr>
+<td><strong>M3</strong></td>
+<td>Guarded Suppression G1–G5 (sicherer Satz: <code>k_cover=2, min_degree=3, snr_floor=−6, prob=0.8</code>)</td>
+<td>Redundanten Rebroadcast unterdrücken — nur bei lokal bestätigter Mehrfach-Abdeckung</td>
+<td>Ebene A</td>
+</tr>
+<tr>
+<td><strong>M4</strong></td>
+<td>Pfad-Erfolgs-Reinforcement (EWMA <code>α=0.30</code>, <code>switch_thr=0.55</code>) + passiv gelernter Backup + proaktiver Switch</td>
+<td>Spart teure Re-Discovery-Floods bei Linkbruch</td>
+<td>Ebene B</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Stock-Knoten</strong> verhalten sich exakt wie Upstream: first-wins-Flood, voller Jitter, <code>flood.max=64</code>, keine Suppression, kein Reinforcement.</p>
+<p><strong>Zwei Mess-Ebenen</strong> (die Schicht wirkt auf beiden, getrennt gemessen):
+- <strong>Ebene A — Single-Delivery-Flood</strong> (ein Flood je Paar): hier wirken <strong>M1+M2+M3</strong>. Metriken: Airtime (Σ Sende-Ereignisse/Zustellung), Lieferquote, Hops, Detour-Ratio, Routen-Stabilität.
+- <strong>Ebene B — Multi-Tick-Unicast</strong> unter Linkausfall/Churn: hier wirkt zusätzlich <strong>M4</strong> gegen Re-Discovery-Floods. Metrik: Netto-Airtime (Unicast + Re-Floods), Lieferquote, Re-Flood-Ersparnis.</p>
+<p><strong>Topologie (echt):</strong> Kern-Graph 1034 Knoten / 1783 Kanten (173 ambiguous verworfen), Ø-Grad <strong>3,45</strong> (sparse, real). Simuliert auf der Riesenkomponente: <strong>632 Knoten / 1577 Kanten</strong>. Per-Link-SNR Median 4,17 dB. Link-Reliability logistisch aus echtem <code>avg_snr</code>.</p>
+<p><strong>Baseline (0 %):</strong> Lieferquote <strong>0,9292</strong>, Airtime <strong>616,9</strong> Sende-Ereignisse/Zustellung, Ø Hops <strong>5,02</strong>, Detour-Median <strong>1,00</strong>, Routen-Stabilität <strong>1,000</strong>, Pfad-Reliability 0,708.
+Rausch-Band (2·SEM, min): Lieferquote ±0,0165, Airtime ±3,08.</p>
 <hr />
-<h2 id="2-daten-vs-kontroll-vs-netto-airtime-zahlen">2. Daten- vs. Kontroll- vs. NETTO-Airtime (Zahlen)</h2>
-<h3 id="2a-uber-backbone-groe-flaches-dv-dv-300-s-adoption-100-2000-floods24-h">2a. Über Backbone-Größe (FLACHES DV, DV 300 s, Adoption 100 %, 2000 Floods/24 h)</h3>
+<h2 id="a-verbesserungs-tabelle-je-adoption-ebene-a-rollout-top-traffic-repeater-zuerst">(a) Verbesserungs-Tabelle je Adoption (Ebene A, Rollout „Top-Traffic-Repeater zuerst")</h2>
+<p>Alle %-Angaben <strong>vs. Baseline (0 %)</strong>. Negativ bei Airtime/Hops/Detour = besser; positiv bei Delivery = besser.</p>
 <table>
 <thead>
 <tr>
-<th>Backbone</th>
-<th>Knoten</th>
-<th>% über BB</th>
-<th>Daten-Ersparnis</th>
-<th>Kontroll-Kosten</th>
-<th><strong>NETTO</strong></th>
-<th>Liefer</th>
+<th style="text-align: right;">α</th>
+<th style="text-align: right;">Lieferquote</th>
+<th style="text-align: right;">Δ Liefer (abs / %)</th>
+<th style="text-align: right;">Airtime</th>
+<th style="text-align: right;">Δ Airtime %</th>
+<th style="text-align: right;">Ø Hops</th>
+<th style="text-align: right;">Δ Hops %</th>
+<th style="text-align: right;">Detour-Median</th>
+<th style="text-align: right;">Δ Detour %</th>
+<th style="text-align: right;">Routen-Stab.</th>
+<th style="text-align: center;">Safe?</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>5 %</td>
-<td>28</td>
-<td>4 %</td>
-<td>+29 194 s</td>
-<td>−2 447 s</td>
-<td><strong>+26 748 s</strong></td>
-<td>0,950</td>
+<td style="text-align: right;"><strong>0 %</strong></td>
+<td style="text-align: right;">0,9292</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">616,9</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">5,02</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">1,00</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">1,000</td>
+<td style="text-align: center;">—</td>
 </tr>
 <tr>
-<td>10 %</td>
-<td>56</td>
-<td>24 %</td>
-<td>+151 067 s</td>
-<td>−9 871 s</td>
-<td><strong>+141 196 s</strong></td>
-<td>0,967</td>
+<td style="text-align: right;"><strong>1 %</strong></td>
+<td style="text-align: right;">0,9347</td>
+<td style="text-align: right;">+0,0056 (+0,6 %)</td>
+<td style="text-align: right;">616,6</td>
+<td style="text-align: right;"><strong>−0,0 %</strong></td>
+<td style="text-align: right;">5,08</td>
+<td style="text-align: right;">+1,2 %</td>
+<td style="text-align: right;">1,00</td>
+<td style="text-align: right;">0,0 %</td>
+<td style="text-align: right;">1,000</td>
+<td style="text-align: center;">OK</td>
 </tr>
 <tr>
-<td>20 %</td>
-<td>113</td>
-<td>53 %</td>
-<td>+333 689 s</td>
-<td>−59 872 s</td>
-<td><strong>+273 817 s</strong> ✅ best</td>
-<td>0,958</td>
+<td style="text-align: right;"><strong>10 %</strong></td>
+<td style="text-align: right;">0,9389</td>
+<td style="text-align: right;">+0,0097 (+1,0 %)</td>
+<td style="text-align: right;">606,9</td>
+<td style="text-align: right;"><strong>−1,6 %</strong></td>
+<td style="text-align: right;">5,03</td>
+<td style="text-align: right;">+0,1 %</td>
+<td style="text-align: right;">1,00</td>
+<td style="text-align: right;">0,0 %</td>
+<td style="text-align: right;">1,000</td>
+<td style="text-align: center;">OK</td>
 </tr>
 <tr>
-<td>35 %</td>
-<td>197</td>
-<td>60 %</td>
-<td>+381 189 s</td>
-<td>−230 755 s</td>
-<td><strong>+150 434 s</strong></td>
-<td>0,954</td>
+<td style="text-align: right;"><strong>25 %</strong></td>
+<td style="text-align: right;">0,9375</td>
+<td style="text-align: right;">+0,0083 (+0,9 %)</td>
+<td style="text-align: right;">592,6</td>
+<td style="text-align: right;"><strong>−3,9 %</strong></td>
+<td style="text-align: right;">4,92</td>
+<td style="text-align: right;">−2,2 %</td>
+<td style="text-align: right;">1,00</td>
+<td style="text-align: right;">0,0 %</td>
+<td style="text-align: right;">1,000</td>
+<td style="text-align: center;">OK</td>
 </tr>
 <tr>
-<td>50 %</td>
-<td>282</td>
-<td>67 %</td>
-<td>+428 611 s</td>
-<td>−564 887 s</td>
-<td><strong>−136 277 s</strong> ❌</td>
-<td>0,949</td>
+<td style="text-align: right;"><strong>50 %</strong></td>
+<td style="text-align: right;">0,9583</td>
+<td style="text-align: right;">+0,0292 (+3,1 %)</td>
+<td style="text-align: right;">575,4</td>
+<td style="text-align: right;"><strong>−6,7 %</strong></td>
+<td style="text-align: right;">4,85</td>
+<td style="text-align: right;">−3,5 %</td>
+<td style="text-align: right;">1,00</td>
+<td style="text-align: right;">0,0 %</td>
+<td style="text-align: right;">1,000</td>
+<td style="text-align: center;">OK</td>
 </tr>
 <tr>
-<td>70 %</td>
-<td>394</td>
-<td>80 %</td>
-<td>+497 560 s</td>
-<td>−1 371 112 s</td>
-<td><strong>−873 552 s</strong> ❌</td>
-<td>0,976</td>
+<td style="text-align: right;"><strong>75 %</strong></td>
+<td style="text-align: right;">0,9472</td>
+<td style="text-align: right;">+0,0181 (+1,9 %)</td>
+<td style="text-align: right;">548,1</td>
+<td style="text-align: right;"><strong>−11,1 %</strong></td>
+<td style="text-align: right;">4,76</td>
+<td style="text-align: right;">−5,3 %</td>
+<td style="text-align: right;">1,00</td>
+<td style="text-align: right;">0,0 %</td>
+<td style="text-align: right;">1,000</td>
+<td style="text-align: center;">OK</td>
 </tr>
 <tr>
-<td>100 %</td>
-<td>563</td>
-<td>98 %</td>
-<td>+593 297 s</td>
-<td>−3 045 451 s</td>
-<td><strong>−2 452 154 s</strong> ❌</td>
-<td>0,999</td>
+<td style="text-align: right;"><strong>100 %</strong></td>
+<td style="text-align: right;">0,9556</td>
+<td style="text-align: right;">+0,0264 (+2,8 %)</td>
+<td style="text-align: right;">540,6</td>
+<td style="text-align: right;"><strong>−12,4 %</strong></td>
+<td style="text-align: right;">4,82</td>
+<td style="text-align: right;">−4,2 %</td>
+<td style="text-align: right;">1,00</td>
+<td style="text-align: right;">0,0 %</td>
+<td style="text-align: right;">1,000</td>
+<td style="text-align: center;">OK</td>
 </tr>
 </tbody>
 </table>
-<p>→ <strong>Die Daten-Ersparnis wächst sublinear (sättigt), die Kontroll-Kosten wachsen super­linear</strong>
-(mehr Knoten × größere DV-Tabellen). Beim flachen DV kippt NETTO <strong>oberhalb ~35–40 %</strong> ins Negative.
-Plot: <code>fig_bb_net_airtime.png</code>.</p>
-<h3 id="2b-uber-dv-periode-backbone-35-flach">2b. Über DV-Periode (Backbone 35 %, flach)</h3>
-<table>
-<thead>
-<tr>
-<th>DV-Periode</th>
-<th>Kontroll-Kosten</th>
-<th><strong>NETTO</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>30 s</td>
-<td>−2 307 551 s</td>
-<td><strong>−1 926 362 s</strong> ❌</td>
-</tr>
-<tr>
-<td>60 s</td>
-<td>−1 153 775 s</td>
-<td><strong>−772 587 s</strong> ❌</td>
-</tr>
-<tr>
-<td>120 s</td>
-<td>−576 888 s</td>
-<td><strong>−195 699 s</strong> ❌</td>
-</tr>
-<tr>
-<td><strong>300 s</strong></td>
-<td>−230 755 s</td>
-<td><strong>+150 434 s</strong> ✅</td>
-</tr>
-<tr>
-<td>600 s</td>
-<td>−115 378 s</td>
-<td><strong>+265 811 s</strong> ✅</td>
-</tr>
-<tr>
-<td>1800 s</td>
-<td>−38 459 s</td>
-<td><strong>+342 730 s</strong> ✅</td>
-</tr>
-<tr>
-<td>3600 s</td>
-<td>−19 230 s</td>
-<td><strong>+361 959 s</strong> ✅</td>
-</tr>
-</tbody>
-</table>
-<p>→ <strong>Kipppunkt bei flachem 35 %-Backbone liegt zwischen 120 s und 300 s.</strong> Schneller als alle ~5 min
-zu aktualisieren frisst der Kontroll-Traffic den gesamten Nutzen. Plot: <code>fig_bb_dv_period.png</code>.</p>
-<h3 id="2c-flaches-dv-vs-regions-hierarchie-h1-der-rettungsanker-bei-groem-backbone">2c. Flaches DV vs. Regions-Hierarchie (H1) — der Rettungsanker bei großem Backbone</h3>
-<table>
-<thead>
-<tr>
-<th>Backbone</th>
-<th>FLACH Einträge</th>
-<th>FLACH NETTO</th>
-<th>H1 Einträge</th>
-<th><strong>H1 NETTO</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>35 %</td>
-<td>114</td>
-<td>+150 434 s</td>
-<td>21</td>
-<td><strong>+331 150 s</strong></td>
-</tr>
-<tr>
-<td>50 %</td>
-<td>204</td>
-<td>−136 277 s ❌</td>
-<td>27</td>
-<td><strong>+345 527 s</strong> ✅</td>
-</tr>
-<tr>
-<td>70 %</td>
-<td>354</td>
-<td>−873 552 s ❌</td>
-<td>36</td>
-<td><strong>+345 672 s</strong> ✅</td>
-</tr>
-<tr>
-<td>100 %</td>
-<td>552</td>
-<td>−2 452 154 s ❌</td>
-<td>47</td>
-<td><strong>+329 255 s</strong> ✅</td>
-</tr>
-</tbody>
-</table>
-<p>→ <strong>Genau der vom Design (H1) vorhergesagte Effekt:</strong> ohne Hierarchie skaliert ein flacher Backbone
-nicht (DV-Tabellen O(N), Pakete fragmentieren, Kontroll-Airtime explodiert). <strong>Mit</strong> Regions-Deckelung
-bleibt NETTO auch bei 100 % Backbone klar positiv und nahezu größeninvariant (~+330 000 s/24 h).</p>
+<p><strong>Random-Rollout</strong> (Kontrolle, gleiche Stufen): praktisch identische Airtime-Kurve (−0,1 / −1,5 / −3,6 / −6,8 / −10,2 / −12,4 %) und durchweg Lieferquote ≥ Baseline. Der Komposit-Gewinn hängt also <strong>nicht</strong> von der Auswahlstrategie ab — er skaliert mit dem reinen Anteil sendender Neu-Knoten.</p>
+<p><strong>Lesart:</strong>
+- <strong>Airtime</strong> ist der Haupt-Hebel: −12,4 % bei voller Adoption. Sie sinkt <strong>monoton</strong> mit der Adoption.
+- <strong>Lieferquote</strong> liegt bei <strong>jeder</strong> Stufe ≥ Baseline (Safety gehalten). Die Schwankung um +0,005…+0,029 ist Seed-Rauschen innerhalb des ±0,0165-Bands — kein echter Liefergewinn, aber wichtig: <strong>nie schlechter</strong>.
+- <strong>Detour-Median bleibt 1,00</strong>: der Median-Pfad war schon im Baseline-Flood der kürzeste; die Schicht macht ihn nicht länger. Hops sinken leicht (−4…−5 %) durch M1 (kürzere Pfade führen).
+- <strong>Routen-Stabilität bleibt 1,000</strong> (Ebene A, störungsfrei): Suppression/Timing erzeugen kein Pfad-Flattern.</p>
+<p><img alt="Airtime vs Adoption" src="../fig_comp_airtime_vs_adoption.png" /></p>
 <hr />
-<h2 id="3-go-no-go">3. GO / NO-GO</h2>
-<h3 id="go-aber-bedingt-kein-freifahrtschein">✅ <strong>GO — aber bedingt, kein Freifahrtschein.</strong></h3>
-<p>Der proaktive Backbone lohnt <strong>netto</strong>, <strong>wenn alle vier Bedingungen</strong> erfüllt sind:</p>
+<h2 id="b-wendepunkt-lohnt-sich-schwelle">(b) Wendepunkt &amp; „lohnt sich"-Schwelle</h2>
+<ul>
+<li><strong>„Lohnt sich"-Schwelle (≥ 2 % Airtime gespart): ab α = 25 %.</strong> Darunter (1 %, 10 %) ist der Gewinn ~0–1,6 % — strukturell erwartbar (siehe unten), kein Fehler.</li>
+<li><strong>Wendepunkt (steilster marginaler Airtime-Gewinn): zwischen 50 % → 75 %</strong> (−4,4 pp marginal, der größte Einzelsprung). Ab ~50 % Adoption „greift" die Suppression-Schicht spürbar, weil dann genug benachbarte Neu-Knoten gleichzeitig die G2-Cover-Bedingung erfüllen.</li>
+<li><strong>Praktische Empfehlung:</strong> Der Rollout zahlt sich ab <strong>25 %</strong> messbar aus und liefert ab <strong>50–75 %</strong> den Großteil des Gewinns. 100 % bringt nur noch +1,3 pp über 75 % — die Schicht ist „weitgehend gesättigt" bei hoher, aber nicht vollständiger Adoption.</li>
+</ul>
+<hr />
+<h2 id="c-beitrags-zerlegung-der-4-mechanismen">(c) Beitrags-Zerlegung der 4 Mechanismen</h2>
+<p>Kumulatives Zuschalten auf Ebene A (M2 → +M1 → +M3), Airtime-Ersparnis in <strong>pp vs. Baseline</strong>, top_traffic:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">α</th>
+<th style="text-align: right;">M2 (flood.max)</th>
+<th style="text-align: right;">+M1 (hop-Timing)</th>
+<th style="text-align: right;">+M3 (Suppression)</th>
+<th style="text-align: right;"><strong>Komposit</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1 %</td>
+<td style="text-align: right;">+0,0</td>
+<td style="text-align: right;">+0,2</td>
+<td style="text-align: right;">−0,1</td>
+<td style="text-align: right;">+0,0</td>
+</tr>
+<tr>
+<td style="text-align: right;">10 %</td>
+<td style="text-align: right;">+0,1</td>
+<td style="text-align: right;">+0,0</td>
+<td style="text-align: right;">+1,5</td>
+<td style="text-align: right;"><strong>+1,6</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">25 %</td>
+<td style="text-align: right;">+0,1</td>
+<td style="text-align: right;">+0,1</td>
+<td style="text-align: right;">+3,7</td>
+<td style="text-align: right;"><strong>+3,9</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">50 %</td>
+<td style="text-align: right;">+0,1</td>
+<td style="text-align: right;">+0,1</td>
+<td style="text-align: right;">+6,6</td>
+<td style="text-align: right;"><strong>+6,7</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">75 %</td>
+<td style="text-align: right;">+0,1</td>
+<td style="text-align: right;">+0,0</td>
+<td style="text-align: right;">+11,0</td>
+<td style="text-align: right;"><strong>+11,1</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">100 %</td>
+<td style="text-align: right;">+0,1</td>
+<td style="text-align: right;">−0,2</td>
+<td style="text-align: right;">+12,5</td>
+<td style="text-align: right;"><strong>+12,4</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Befund:</strong> <strong>M3 (guarded Suppression) trägt bei jeder Adoptionsstufe nahezu den gesamten Airtime-Gewinn.</strong> M2 und M1 liefern auf der Airtime-Achse fast nichts:
+- <strong>M2 (<code>flood.max=15</code>)</strong> spart hier kaum Airtime — der reale Netzdurchmesser ist klein genug, dass auf der Riesenkomponente fast kein Flood die 15-Hop-Grenze überhaupt erreicht. M2 ist eine <strong>Safety-/Worst-Case-Bremse</strong> (verhindert Hop-Runaway), kein Airtime-Sparer im Normalbetrieb.
+- <strong>M1 (hop-Timing)</strong> wirkt auf <strong>Hops/Pfad-Qualität</strong> (−4…−5 % Hops), nicht auf die Airtime der Flood-Menge.
+- <strong>M3</strong> wächst monoton mit der Adoption: bei 10 % +1,5 pp, bei 100 % +12,5 pp.</p>
+<p><strong>Interaktion (a = 1.0, isoliert vs. kombiniert):</strong>
+- Isoliert: M2 −0,1 %, M1 +0,1 %, M3 −11,7 %. <strong>Summe der Einzelgewinne = −11,6 %.</strong>
+- <strong>Komposit tatsächlich = −12,4 %.</strong> → <strong>Interaktion = −0,7 pp.</strong>
+- Vorzeichen negativ ⇒ die Mechanismen <strong>verstärken sich leicht</strong> (Komposit minimal besser als die Summe), statt sich zu dämpfen. Konkret: M1 verkürzt Pfade, wodurch M3 etwas mehr redundante Knoten zum Schweigen bringen kann. Die Interaktion ist <strong>klein</strong> (&lt; 1 pp) — die Mechanismen sind weitgehend orthogonal, dominiert von M3.</p>
+<p><img alt="Beitrags-Zerlegung" src="../fig_comp_contribution.png" /></p>
+<hr />
+<h2 id="d-monotonie-safety-uberall-gehalten">(d) Monotonie &amp; Safety — überall gehalten?</h2>
+<ul>
+<li><strong>Monotone Airtime-Ersparnis:</strong> <strong>Ja.</strong> Airtime fällt streng mit steigender Adoption (0 → −1,6 → −3,9 → −6,7 → −11,1 → −12,4 %), in beiden Rollouts.</li>
+<li><strong>Lieferquote ≥ Baseline bei JEDER Stufe:</strong> <strong>Ja.</strong> Schlechtester Δ über alle störungsfreien Stufen = <strong>+0,000</strong> (nie negativ). Die Guards G1 (Leaf-/Bridge-Schutz) und G3 (Nachbar-Abdeckung) verhindern Coverage-Verlust auch bei voller Adoption — genau das, woran naive Suppression (nur G2) kippt.</li>
+<li><strong>Pfad-Reliability</strong> bleibt über alle Stufen bei 0,70–0,71 (Baseline 0,708) — kein Reliability-Verlust durch die Schicht.</li>
+</ul>
+<p><img alt="Lieferquote &amp; Reliability" src="../fig_comp_delivery_reliability.png" />
+<img alt="Hops &amp; Detour" src="../fig_comp_hops_detour.png" /></p>
+<hr />
+<h2 id="e-verhalten-unter-storung-robust">(e) Verhalten unter Störung (robust?)</h2>
+<h3 id="ebene-a-single-flood-unter-storung-komposit-vs-gestorter-baseline">Ebene A (Single-Flood) unter Störung, Komposit vs. <strong>gestörter</strong> Baseline</h3>
+<table>
+<thead>
+<tr>
+<th>Störung</th>
+<th style="text-align: right;">Baseline-Liefer.</th>
+<th style="text-align: right;">α</th>
+<th style="text-align: right;">Komposit-Liefer. (Δ)</th>
+<th style="text-align: right;">Airtime Δ%</th>
+<th style="text-align: center;">Safe?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Churn (5 % instabile Knoten)</td>
+<td style="text-align: right;">0,890</td>
+<td style="text-align: right;">50 %</td>
+<td style="text-align: right;">0,905 (+0,015)</td>
+<td style="text-align: right;">−6,0 %</td>
+<td style="text-align: center;">OK</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">100 %</td>
+<td style="text-align: right;">0,903 (+0,014)</td>
+<td style="text-align: right;">−11,1 %</td>
+<td style="text-align: center;">OK</td>
+</tr>
+<tr>
+<td>Linkausfall 10 %</td>
+<td style="text-align: right;">0,864</td>
+<td style="text-align: right;">50 %</td>
+<td style="text-align: right;">0,857 (−0,007)</td>
+<td style="text-align: right;">−5,9 %</td>
+<td style="text-align: center;">OK</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">100 %</td>
+<td style="text-align: right;">0,869 (+0,006)</td>
+<td style="text-align: right;">−11,2 %</td>
+<td style="text-align: center;">OK</td>
+</tr>
+<tr>
+<td>Linkausfall 20 %</td>
+<td style="text-align: right;">0,775</td>
+<td style="text-align: right;">50 %</td>
+<td style="text-align: right;">0,767 (−0,008)</td>
+<td style="text-align: right;">−5,4 %</td>
+<td style="text-align: center;">OK</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">100 %</td>
+<td style="text-align: right;">0,767 (−0,008)</td>
+<td style="text-align: right;">−10,1 %</td>
+<td style="text-align: center;">OK</td>
+</tr>
+<tr>
+<td>Churn + Linkausfall 20 %</td>
+<td style="text-align: right;">0,661</td>
+<td style="text-align: right;">50 %</td>
+<td style="text-align: right;">0,667 (+0,006)</td>
+<td style="text-align: right;">−5,0 %</td>
+<td style="text-align: center;">OK</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">100 %</td>
+<td style="text-align: right;">0,667 (+0,006)</td>
+<td style="text-align: right;">−9,6 %</td>
+<td style="text-align: center;">OK</td>
+</tr>
+</tbody>
+</table>
+<p>Die Airtime-Ersparnis bleibt unter Störung erhalten (−5…−11 %). Die kleinen Liefer-Rückgänge (max −0,008) liegen <strong>innerhalb</strong> des Rausch-Bands (±0,0165) — Safety gilt als gehalten.</p>
+<h3 id="ebene-b-multi-tick-m4-reinforcement-gegen-re-discovery-floods-voll-adoptiert">Ebene B (Multi-Tick) — M4-Reinforcement gegen Re-Discovery-Floods (voll adoptiert)</h3>
+<table>
+<thead>
+<tr>
+<th>Störung</th>
+<th style="text-align: right;">Liefer. Base→Komposit (Δ)</th>
+<th style="text-align: right;">Netto-Airtime Δ%</th>
+<th style="text-align: right;">Re-Discovery-Airtime gespart</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linkausfall 10 %</td>
+<td style="text-align: right;">0,493 → 0,556 (<strong>+0,064</strong>)</td>
+<td style="text-align: right;"><strong>−21,5 %</strong></td>
+<td style="text-align: right;">23,8 %</td>
+</tr>
+<tr>
+<td>Linkausfall 20 %</td>
+<td style="text-align: right;">0,346 → 0,392 (<strong>+0,046</strong>)</td>
+<td style="text-align: right;"><strong>−17,2 %</strong></td>
+<td style="text-align: right;">18,4 %</td>
+</tr>
+<tr>
+<td>Churn 10 %</td>
+<td style="text-align: right;">0,408 → 0,462 (<strong>+0,054</strong>)</td>
+<td style="text-align: right;">−18,5 %</td>
+<td style="text-align: right;">20,1 %</td>
+</tr>
+<tr>
+<td>Churn 20 %</td>
+<td style="text-align: right;">0,334 → 0,382 (<strong>+0,048</strong>)</td>
+<td style="text-align: right;">−17,6 %</td>
+<td style="text-align: right;">18,8 %</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Hier liefert die Schicht ihren zweiten, eigenständigen Gewinn:</strong> Unter Linkausfall/Churn ersetzt M4 teure Re-Discovery-Floods durch den proaktiven Backup-Switch — das senkt die Netto-Airtime um −17…−22 % <strong>und</strong> hebt die Lieferquote spürbar (+0,05…+0,06). M4 skaliert ebenfalls monoton mit Adoption (lf 20 %: +0,9 → −2,8 → −6,3 → −10,3 → −17,2 % bei 1/10/25/50/100 %).</p>
+<p><img alt="Unter Störung" src="../fig_comp_under_stress.png" /></p>
+<hr />
+<h2 id="f-bugs-auffalligkeiten-beim-erstellen">(f) Bugs / Auffälligkeiten beim Erstellen</h2>
+<ul>
+<li><strong>Keine Laufzeitfehler.</strong> Skript lief im Smoke-Test (<code>COMP_FAST=1</code>) und im Vollmodus (6 Seeds, ~8 min) sauber durch.</li>
+<li>Reproduzierbarkeit gesichert über <code>numpy.default_rng(seed·…)</code> und <code>zlib.crc32</code>-Hash (Pythons <code>hash()</code> ist pro Prozess gesalzen und wurde bewusst gemieden — übernommen aus <code>reinforce_sim.py</code>).</li>
+<li>Common Random Numbers (gleiche Störsequenz für Baseline und Modus) auf Ebene B → gepaarter Vergleich, geringe Varianz.</li>
+</ul>
+<h2 id="g-dateien-alle-unter-docsmhrstudy">(g) Dateien (alle unter <code>docs/MHR/study/</code>)</h2>
+<ul>
+<li><code>composite_adoption_sim.py</code> — die Simulation (wiederverwendet v4/supp/reinforce-Kerne)</li>
+<li><code>composite_adoption_results.json</code> — alle Roh-/Aggregat-Ergebnisse</li>
+<li><code>fig_comp_airtime_vs_adoption.png</code>, <code>fig_comp_delivery_reliability.png</code>, <code>fig_comp_hops_detour.png</code>, <code>fig_comp_contribution.png</code>, <code>fig_comp_under_stress.png</code></li>
+<li><code>Composite_Adoption_Study.md</code> — dieser Bericht</li>
+</ul>
+<h2 id="h-ehrliche-limitierungen">(h) Ehrliche Limitierungen</h2>
 <ol>
-<li><strong>Regions-Hierarchie (H1) ist Pflicht, nicht optional.</strong> Ein flacher netzweiter DV ist nur in einem
-   engen Fenster (kleiner Backbone ≤ 35 % <strong>und</strong> DV-Periode ≥ 300 s) netto positiv und kippt sonst
-   stark negativ. Mit H1 ist NETTO über <strong>alle</strong> Backbone-Größen positiv (~+330 000 s/24 h).</li>
-<li><strong>DV-Periode ≥ 300 s</strong> (5 min). Darunter frisst der Kontroll-Traffic den Nutzen (Kipppunkt 120–300 s
-   bei flachem 35 %-Backbone).</li>
-<li><strong>Ausreichend DATA-Traffic.</strong> Der Backbone ist eine <strong>fixe</strong> Kontroll-Investition; sie amortisiert
-   erst ab <strong>~2000 netzweiten Discovery-Floods/24 h</strong> (bei 35 %/300 s flach — siehe §4). Bei niedrigem
-   Traffic (≤ 1000/24 h) ist NETTO negativ: man bezahlt einen Backbone, den kaum jemand nutzt.</li>
-<li><strong>Moderate Backbone-Größe.</strong> Ohne H1: 10–35 %. Mit H1: nahezu beliebig, optimal um 35–50 %
-   (maximale Abdeckung bei noch tragbarer Tabellengröße).</li>
-</ol>
-<p><strong>Bestes Fenster</strong> (gemessen):
-- <em>Ohne H1:</em> <strong>Backbone 20 %, DV ≥ 300 s</strong> → NETTO <strong>+273 817 s/24 h</strong> (= 4,6 h Funkbelegung gespart),
-  53 % der Paare über Backbone, Lieferquote 0,958 ≥ Baseline 0,929.
-- <em>Mit H1:</em> <strong>Backbone 35–50 %, DV 300–600 s</strong> → NETTO <strong>+330 000–345 000 s/24 h</strong>, 60–67 % über Backbone.</p>
-<h3 id="wann-no-go">Wann <strong>NO-GO</strong>:</h3>
-<ul>
-<li>DV-Periode &lt; 120 s (Kontroll-Traffic dominiert immer).</li>
-<li>Flacher Backbone &gt; 40 % (ohne H1 stark negativ).</li>
-<li>Geringes Daten-Aufkommen (&lt; ~1000 Floods/24 h) — fixe Kontroll-Kosten amortisieren nicht.</li>
-</ul>
-<hr />
-<h2 id="4-amortisation-traffic-sensitivitat-backbone-35-300-s-flach">4. Amortisation (Traffic-Sensitivität, Backbone 35 %/300 s flach)</h2>
-<table>
-<thead>
-<tr>
-<th>Floods/24 h</th>
-<th>Daten-Ersparnis</th>
-<th>Kontroll (fix)</th>
-<th><strong>NETTO</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>100</td>
-<td>+19 059 s</td>
-<td>−230 755 s</td>
-<td><strong>−211 696 s</strong> ❌</td>
-</tr>
-<tr>
-<td>500</td>
-<td>+95 297 s</td>
-<td>−230 755 s</td>
-<td><strong>−135 458 s</strong> ❌</td>
-</tr>
-<tr>
-<td>1000</td>
-<td>+190 594 s</td>
-<td>−230 755 s</td>
-<td><strong>−40 161 s</strong> ❌</td>
-</tr>
-<tr>
-<td><strong>2000</strong></td>
-<td>+381 189 s</td>
-<td>−230 755 s</td>
-<td><strong>+150 434 s</strong> ✅ break-even</td>
-</tr>
-<tr>
-<td>4000</td>
-<td>+762 377 s</td>
-<td>−230 755 s</td>
-<td><strong>+531 622 s</strong> ✅</td>
-</tr>
-<tr>
-<td>8000</td>
-<td>+1 524 755 s</td>
-<td>−230 755 s</td>
-<td><strong>+1 294 000 s</strong> ✅</td>
-</tr>
-</tbody>
-</table>
-<p>→ <strong>Break-even ≈ 2000 Discovery-Floods/24 h.</strong> Die Kontroll-Kosten sind fix (traffic-unabhängig),
-die Ersparnis skaliert linear mit dem Daten-Aufkommen. <strong>Mit H1 sinkt der Break-even drastisch</strong>
-(Kontroll-Kosten bei 35 % nur ~50 000 s statt 230 755 s → Break-even bei ~260 Floods/24 h).
-Plot: <code>fig_bb_traffic.png</code>.</p>
-<hr />
-<h2 id="5-delivery-pfad-optimalitat-konvergenz-mixed-firmware">5. Delivery, Pfad-Optimalität, Konvergenz, Mixed-Firmware</h2>
-<ul>
-<li><strong>Lieferquote (Safety):</strong> In allen NETTO-positiven Szenarien <strong>≥ Baseline (0,929)</strong> — Bereich
-  0,947–0,999. Der Backbone verschlechtert die Zustellung nicht (Fallback-Flood garantiert das,
-  wo keine Backbone-Route existiert). <strong>Safety-Invariante erfüllt.</strong></li>
-<li><strong>Pfad-Optimalität:</strong> Unicast über den ETX-kürzesten proaktiven Pfad → deterministisch, kein
-  Zufalls-Umweg. Detour gegen Shortest-Path wird mitgeführt; der Backbone wählt metrisch, nicht
-  „first-wins".</li>
-<li><strong>Konvergenz:</strong> im analytischen DV-Modell nicht zeitlich simuliert; das Design (H2: Babel-Feasibility</li>
-<li>Seqno) garantiert Schleifenfreiheit <em>während</em> der Konvergenz. Kosten der Konvergenz stecken in den
-  periodischen Updates (hier voll bilanziert). Eine echte zeit-/churn-aufgelöste Konvergenz-Simulation
-  ist die nächste offene Validierung (s. Limitierungen).</li>
-<li><strong>Mixed-Firmware (Adoption, Backbone 35 %/300 s, flach):</strong></li>
-</ul>
-<table>
-<thead>
-<tr>
-<th>Adoption</th>
-<th>aktive BB-Knoten</th>
-<th>% über BB</th>
-<th>Kontroll</th>
-<th><strong>NETTO</strong></th>
-<th>Liefer</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>10 %</td>
-<td>20</td>
-<td>11 %</td>
-<td>−1 703 s</td>
-<td><strong>+67 071 s</strong> ✅</td>
-<td>0,947</td>
-</tr>
-<tr>
-<td>25 %</td>
-<td>49</td>
-<td>14 %</td>
-<td>−5 589 s</td>
-<td><strong>+84 594 s</strong> ✅</td>
-<td>0,968</td>
-</tr>
-<tr>
-<td>50 %</td>
-<td>98</td>
-<td>32 %</td>
-<td>−26 951 s</td>
-<td><strong>+171 009 s</strong> ✅</td>
-<td>0,961</td>
-</tr>
-<tr>
-<td>75 %</td>
-<td>148</td>
-<td>54 %</td>
-<td>−109 053 s</td>
-<td><strong>+223 836 s</strong> ✅</td>
-<td>0,972</td>
-</tr>
-<tr>
-<td>100 %</td>
-<td>197</td>
-<td>60 %</td>
-<td>−230 755 s</td>
-<td><strong>+150 434 s</strong> ✅</td>
-<td>0,954</td>
-</tr>
-</tbody>
-</table>
-<p>→ <strong>Graceful &amp; monoton positiv ab dem ersten Knoten.</strong> Schon bei 10 % Adoption NETTO positiv;
-  Nicht-Adoptierer fluten weiter (sicherer Fallback), Lieferquote bleibt ≥ Baseline. Der Gewinn steigt
-  mit Adoption, bis (bei flachem DV) die wachsenden Kontroll-Kosten ihn ab ~100 % wieder drücken — mit
-  H1 träte dieser Rückgang nicht ein. Plot: <code>fig_bb_adoption.png</code>.</p>
-<hr />
-<h2 id="6-bugs-fehler-wahrend-der-entwicklung">6. Bugs / Fehler während der Entwicklung</h2>
-<ul>
-<li><strong>Einrückungs-Syntaxfehler</strong> (führendes Leerzeichen vor <code>in_bb = attach_repeater(...)</code>) — beim ersten
-  Schreiben eingebaut, sofort gefixt; Skript läuft seitdem fehlerfrei in einem Durchlauf.</li>
-<li>Keine Laufzeitfehler. <code>BB_FAST=1</code>-Smoke-Test und voller Lauf (6 Seeds) sauber.</li>
-</ul>
-<hr />
-<h2 id="7-dateien">7. Dateien</h2>
-<ul>
-<li><code>docs/MHR/study/backbone_sim.py</code> — Simulation (selbst ausgeführt, fehlerfrei).</li>
-<li><code>docs/MHR/study/backbone_results.json</code> — alle Roh-Sweeps + Kennzahlen-Summary.</li>
-<li><code>docs/MHR/study/fig_bb_net_airtime.png</code> — Daten/Kontroll/NETTO über Backbone-Größe (Kernplot).</li>
-<li><code>docs/MHR/study/fig_bb_adoption.png</code> — Mixed-Firmware: NETTO &amp; Abdeckung über Adoption.</li>
-<li><code>docs/MHR/study/fig_bb_dv_period.png</code> — Kipppunkt der DV-Periode.</li>
-<li><code>docs/MHR/study/fig_bb_traffic.png</code> — Amortisation über Daten-Aufkommen.</li>
-<li><code>docs/MHR/study/fig_bb_grid.png</code> — 2D-NETTO-Fenster (Größe × Periode).</li>
-</ul>
-<hr />
-<h2 id="8-limitierungen-ehrlich">8. Limitierungen (ehrlich)</h2>
-<ol>
-<li><strong>Idealisierter Flood ohne Kollisionen.</strong> Das Flood-Modell zählt sendende Knoten, modelliert aber
-   <strong>keine</strong> CSMA-Kollisionen/Capture. Realer Flood ist durch Kollisionen <em>teurer</em> → die Daten-Ersparnis
-   ist hier eher <strong>konservativ</strong> (untere Schranke des Nutzens).</li>
-<li><strong>DV-Kosten als analytisches Modell.</strong> Periode × ToA × #aktive Knoten, mit DV-Tabellengröße aus der
-   Komponenten-/Regionsgröße. Keine simulierte Retransmits/Verluste der DV-Pakete (die Kontroll-Kosten
-   wären real eher <em>höher</em> → NETTO-Schätzung hier eher <strong>optimistisch</strong> auf der Kostenseite). Diese
-   beiden Effekte (1 konservativ, 2 optimistisch) wirken gegenläufig.</li>
-<li><strong>neighbor-graph = nur GENUTZTE Links.</strong> Die echte Topologie enthält nur beobachtete Kanten; latente
-   Links fehlen. Backbone-Konnektivität und Attach-Hops könnten real günstiger sein.</li>
-<li><strong>Traffic-Annahme (#Floods/24 h) ist der dominierende freie Parameter.</strong> NETTO hängt linear davon ab;
-   der reale netzweite Discovery-Flood-Rate ist nicht direkt aus den Daten messbar (nur relay_count als
-   Proxy). Darum als expliziter Sweep geführt, nicht als feste Zahl behauptet.</li>
-<li><strong>Konvergenzzeit / Churn-Flattern nicht zeit-aufgelöst.</strong> Schleifenfreiheit &amp; Stabilität sind
-   Design-Argumente (H2/H3), hier nicht dynamisch simuliert. Offene nächste Validierung.</li>
-<li><strong>Regions-Zuordnung approximiert</strong> (region_cap als Deckel, nicht aus echten <code>region_map</code>-Grenzen) —
-   die H1-Zahlen sind die Größenordnung der Skalierung, nicht eine exakte Deployment-Vorhersage.</li>
+<li><strong>Gewinn bei niedriger Adoption ist ~0 — strukturell, kein Fehler.</strong> Bei 1–10 % dominieren Stock-Knoten den Flood; ein einzelner schweigender Neu-Knoten ändert die globale Sende-Menge kaum. Die Suppression (M3) braucht <strong>mehrere benachbarte</strong> Neu-Knoten, damit die G2-Cover-Bedingung greift — daher der überproportionale Sprung ab 50–75 %.</li>
+<li><strong>M2 (flood.max) zeigt im Normalbetrieb kaum Airtime-Effekt</strong>, weil die reale Riesenkomponente einen kleinen Durchmesser hat. M2 ist als <strong>Worst-Case-/Loop-Bremse</strong> zu verstehen, nicht als Airtime-Sparer — sein Wert liegt in der Robustheit, die hier (kurze Pfade) nicht gefordert wird.</li>
+<li><strong>Zwei getrennte Ebenen, nicht ein einziges End-to-End-Modell.</strong> Ebene A misst den einmaligen Flood, Ebene B den wiederholten Unicast-Betrieb. Ein vollständig integriertes Verkehrsmodell (Mischung aus Discovery-Floods und stehendem Unicast-Traffic mit realer Rate) würde die beiden Gewinne gewichten — die tatsächliche Netz-Ersparnis liegt je nach Traffic-Mix zwischen den beiden Zahlen.</li>
+<li><strong>Backup-Lernen idealisiert</strong> (passives Lernen mit <code>learn_loss=0.30</code> modelliert, Backup = 2.-bester ETX-Pfad im vollen Graphen). Reales passives Lernen ist lückenhafter; die M4-Gewinne sind daher eine <strong>obere</strong> Schätzung.</li>
+<li><strong>Link-Reliability aus <code>avg_snr</code></strong>, nicht aus Live-Paketverlust gemessen; logistische Kurve um die Empfangsschwelle ist ein Modell. Topologie ist server-aufgelöst (echte Kanten), aber Geo/Gelände nicht enthalten.</li>
+<li><strong>Suppression mit perfektem 2-Hop-Wissen (NBR)</strong> auf Ebene A — die Robustheit gegen lückenhaftes 2-Hop-Wissen wurde separat in <code>suppression_sim.py</code> (EXP 4, 60/80/100 %) belegt und hier nicht wiederholt.</li>
 </ol>
 <hr />
-<h2 id="9-einordnung-gegenuber-der-unsichtbaren-schicht">9. Einordnung gegenüber der unsichtbaren Schicht</h2>
-<p>Die unsichtbare, node-lokale Schicht (<code>Invisible_Optimizing_Layer.md</code>) spart Airtime zu <strong>0 Kontroll-Kosten</strong>
-und ist immer sicher. Der Backbone ist <strong>mächtiger</strong> (deterministische Unicast-Pfade, höhere Abdeckung),
-aber <strong>nicht gratis</strong>: er ist NETTO nur in einem definierten Fenster (H1 + DV ≥ 300 s + genug Traffic)
-ein Gewinn. <strong>Empfehlung:</strong> Backbone als optionale Phase-2-Kür <strong>mit Pflicht-H1</strong>, defaultmäßig konservative
-DV-Periode (≥ 300 s), und nur dort aktivieren, wo das Daten-Aufkommen die fixe Kontroll-Investition trägt —
-die unsichtbare Schicht bleibt das risikolose Fundament darunter.</p>
+<h2 id="fazit">Fazit</h2>
+<p>Die komplette node-lokale MHR-Schicht ist <strong>bei jeder Adoptionsstufe safe</strong> (Lieferquote nie unter Baseline) und liefert eine <strong>monoton mit der Adoption wachsende Airtime-Ersparnis</strong> — bis <strong>−12,4 %</strong> im einmaligen Flood (Ebene A) und zusätzlich <strong>−17…−22 %</strong> Netto-Airtime im gestörten Dauerbetrieb (Ebene B, M4). Den Airtime-Gewinn trägt fast vollständig <strong>M3 (guarded Suppression)</strong>; M1 verbessert die Hops, M2 ist die Sicherheitsbremse, M4 ist der eigenständige Robustheits-Hebel unter Störung. Die vier Mechanismen <strong>verstärken sich leicht</strong> (Interaktion −0,7 pp), dämpfen sich nicht. Der Rollout <strong>lohnt sich ab ~25 %</strong> und sättigt zwischen <strong>75–100 %</strong>.</p>
 
 
 
