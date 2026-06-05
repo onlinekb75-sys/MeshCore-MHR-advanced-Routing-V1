@@ -28,19 +28,28 @@ jobs:
         run: pip install --upgrade platformio
       - name: Build ${{ matrix.env }}
         run: pio run -e ${{ matrix.env }}
+      - name: Install esptool
+        run: pip install esptool
       - name: Collect binaries
         run: |
           mkdir -p artifacts
           B=.pio/build/${{ matrix.env }}
-          cp "$B/firmware.bin"   "artifacts/${{ matrix.env }}-firmware.bin"   || true
-          cp "$B/bootloader.bin" "artifacts/${{ matrix.env }}-bootloader.bin" || true
-          cp "$B/partitions.bin" "artifacts/${{ matrix.env }}-partitions.bin" || true
-          # optionales Factory-Image (direkt @0x0 flashbar) via esptool merge.
-          # WICHTIG: boot_app0.bin @0xe000 (otadata) muss enthalten sein, sonst bootet das
-          # Image nicht zuverlaessig in den App-Slot.
-          BOOTAPP=$(python -c "import glob;print((glob.glob('$HOME/.platformio/packages/framework-arduinoespressif32*/tools/partitions/boot_app0.bin') or [''])[0])")
-          python -m esptool --chip esp32s3 merge_bin -o "artifacts/${{ matrix.env }}-factory.bin" \
-            0x0 "$B/bootloader.bin" 0x8000 "$B/partitions.bin" 0xe000 "$BOOTAPP" 0x10000 "$B/firmware.bin" || true
+          cp "$B/firmware.bin"   "artifacts/${{ matrix.env }}-firmware.bin"
+          cp "$B/bootloader.bin" "artifacts/${{ matrix.env }}-bootloader.bin"
+          cp "$B/partitions.bin" "artifacts/${{ matrix.env }}-partitions.bin"
+          # Factory-Image (direkt @0x0 flashbar) via esptool merge.
+          # boot_app0.bin @0xe000 (otadata) ist zwingend, sonst bootet der App-Slot nicht.
+          BOOTAPP=$(find "$HOME/.platformio/packages" -name "boot_app0.bin" 2>/dev/null | head -1)
+          if [ -z "$BOOTAPP" ]; then
+            echo "ERROR: boot_app0.bin not found" && exit 1
+          fi
+          echo "Using boot_app0: $BOOTAPP"
+          python -m esptool --chip esp32s3 merge_bin \
+            -o "artifacts/${{ matrix.env }}-factory.bin" \
+            0x0     "$B/bootloader.bin" \
+            0x8000  "$B/partitions.bin" \
+            0xe000  "$BOOTAPP" \
+            0x10000 "$B/firmware.bin"
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.env }}
