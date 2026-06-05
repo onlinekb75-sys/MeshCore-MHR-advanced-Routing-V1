@@ -165,3 +165,174 @@ Interoperabilität ist Leitplanke: In einem gemischten Netz muss MHR **graceful 
 MHR ist kein Bruch mit MeshCore, sondern dessen konsequente Weiterentwicklung: das bestehende reaktive DSR bleibt das Fundament, bekommt aber eine **echte Metrik**, eine **Best-Path-Auswahl** und – ermöglicht durch die 10 %-Marge – einen **sparsamen proaktiven Backbone**, der die teuren netzweiten Floods überflüssig macht. Die Knotenklassen-Trennung (ZRP-Prinzip) ist der Trick, der proaktiv und reaktiv jeweils dort einsetzt, wo sie billig sind. Erwartetes Ergebnis: kürzere, deterministische Pfade und **trotz** zusätzlichem Kontroll-Traffic eine **niedrigere** Gesamt-Airtime.
 
 *Verwandtes Dokument: `MeshCore_Routing_Analyse_und_Optimierung.md` (Ursachenanalyse + Stufen A–D).*
+
+---
+## 🇬🇧 English Translation
+
+# MeshCore Hybrid Routing (MHR) – A Fused Routing Design for 10 % Duty-Cycle
+
+Design for a MeshCore fork. Built on the code analysis of `meshcore-dev/MeshCore` (`main`), fusing several routing theories into a single scheme that deliberately exploits the 10 % duty-cycle budget (sub-band 869.4–869.65 MHz) and eliminates today's detours.
+
+---
+
+## 1. Core Idea
+
+The decisive lever is a property that MeshCore currently does **not** exploit: the network consists of **two very different node classes**.
+
+- **Repeaters** – mostly mains-powered, fixed in place, always on; topology changes rarely.
+- **Clients/Companions** – mobile, battery-powered, sleeping, come and go.
+
+Today MeshCore treats both identically: every first contact is **flooded network-wide**, and the first-arriving (random) path is frozen. That is exactly what produces detours *and* the largest share of airtime consumption.
+
+**MHR core idea:** The 10 % headroom is *deliberately invested* to run a frugal, **proactive, metric-based** routing scheme on the **stable repeater backbone**. Once the backbone knows its own topology, the expensive network-wide flood collapses to "flood only until the nearest repeater — from there the backbone routes precisely". Clients stay **reactive** and thus sleep/mobile-friendly.
+
+Properly classified in theory, this is a **Zone Routing Protocol (ZRP)**, but instead of splitting by radius the split is by **node class**: proactive inside the backbone, reactive at the edge.
+
+Important: the additional control traffic of the backbone is **smaller** than the network-wide discovery floods it eliminates. Net airtime should **decrease**, not increase. The 10 % is the cushion that makes this investment risk-free.
+
+---
+
+## 2. Which Approaches Are Fused
+
+| Theory / Scheme | What is adopted | Where in MHR |
+|---|---|---|
+| **ZRP** (Zone Routing) | Hybrid proactive-inner / reactive-outer | Backbone ↔ Client separation |
+| **BATMAN / DSDV** (Distance-Vector) | Hop-by-hop vector exchange, no full topology image | Backbone routing (L1) |
+| **ETX / ETT** | Link metric from delivery rate × radio quality | Cost function |
+| **AODV** | Best-path selection + active route maintenance | Reactive edge + upgrade |
+| **Selective/Opportunistic Flooding** | SNR-weighted rebroadcast delay | Flood pruning (`rx_delay_base`) |
+| **Connected Dominating Set / Backbone** | Repeaters as load-bearing framework | Class definition |
+| **Geo-Routing (GPSR)** | Directional bias of discovery | optional scoped discovery |
+
+MHR invents nothing exotic — it combines proven building blocks along the lines of MeshCore's reality.
+
+---
+
+## 3. Architecture in Three Layers
+
+### L0 – Link Sensing (all nodes)
+Every node maintains, per directly heard neighbour:
+- **EWMA-SNR** (exponentially smoothed, margin above noise floor),
+- **Advert reception rate** over a time window (heard / expected zero-hop adverts) → estimator of delivery probability in *one* direction.
+
+MeshCore already provides the building blocks: `putNeighbour(id, timestamp, snr)` (`simple_repeater/MyMesh.cpp:641,824`) and the periodic zero-hop adverts (`advert.interval`, default 2 min). L0 only extends the neighbour table with those two measurements.
+
+### L1 – Repeater Backbone (proactive, Distance-Vector)
+Only repeaters participate. Each repeater **periodically broadcasts via zero-hop** (only direct neighbours hear it!) a compact **distance vector**:
+
+```
+{ seqno, [ (dest_repeater_hash, path_cost), ... ] }
+```
+
+Neighbours integrate via **Bellman-Ford** (`new cost = link cost + announced cost`), keep the cheapest next-hop per destination, and re-announce on the next cycle. The information travels **hop by hop exclusively via zero-hop broadcasts** through the backbone — **never a network-wide flood**. Airtime cost per repeater = one small broadcast per cycle, heard only locally ⇒ O(neighbours), not O(network).
+
+Loop protection: **sequence numbers** (DSDV) + **split-horizon/poisoned-reverse**. Self-healing occurs purely through the cycle — **no** re-flood on failure needed.
+
+*The 10 % permit a brisk update cadence here (e.g. every 1–3 min, density-adaptive — cf. MeshCore-Discussion #2053), and thus fast convergence and healing.*
+
+### L2 – Client Edge (reactive, AODV-like)
+Clients build **no** tables. A client "registers" implicitly with the nearest repeater via its zero-hop adverts; that **home repeater** inserts the client as a host route (`client_hash → self`) into its distance vector. When client A wants to reach client B:
+
+1. A floods a discovery — **but only until a backbone repeater hears it** (`flood.max` small, SNR backoff active).
+2. The first repeater with a known backbone route to B's home repeater **stops the flood** and forwards the discovery as a **directed unicast over the backbone**.
+3. B's home repeater delivers; the return path is handed back as a source route as usual.
+
+This turns an O(network)-flood into an **O(local)-flood + backbone unicast**. That is the central gain: less airtime *and* no random detour, because the backbone selects the cheapest path metrically.
+
+---
+
+## 4. The Fused Metric (ETX + SNR)
+
+Per link:
+
+```
+deliv = delivery_rate_forward × delivery_rate_reverse   // ETX idea, bidirectional (asymmetry!)
+etx   = 1 / max(deliv, ε)
+snr_pen = f(SNR margin)                                  // small penalty for marginal links
+link_cost = etx + α · snr_pen
+```
+
+Path cost = **sum** of link costs (additive ⇒ suitable for Bellman-Ford/Dijkstra). ETX provides **reliability** (avoids flapping/lossy hops); the SNR component breaks ties in favour of **robust margin**. Both quantities are delivered by L0 without extra traffic, since they are derived from adverts that are already running.
+
+This replaces today's "first packet wins" (`Mesh.cpp:138`) and "overwrite path unconditionally" (`BaseChatMesh.cpp:305`) with a genuine cost-based decision.
+
+---
+
+## 5. Message Flow – Today vs. MHR
+
+**Today:** A floods B network-wide (up to 64 hops). Dozens of repeaters rebroadcast with random delays. B takes the *first* copy → possibly a 4-hop detour instead of a 2-hop direct path. This detour is frozen until it fails 3 times.
+
+**With MHR:**
+1. A floods locally (small, SNR-pruned) → reaches repeater R1.
+2. R1 knows from the backbone DV the cheapest path to B's home repeater R4: `R1→R2→R4` (cost minimum). Flooding ends at R1.
+3. Discovery runs as backbone unicast `R1→R2→R4→B`.
+4. Return path = source route, metric-confirmed from B's side.
+
+Result: deterministically shortest/most-reliable path instead of chance; a fraction of the transmission events.
+
+---
+
+## 6. Use of the 10 % Budget (Airtime Balance)
+
+The budget is invested at **exactly two** points:
+
+- **Backbone DV cycle:** one small zero-hop broadcast per repeater every 1–3 min. Load is **local** and **constant**, scales not with network size but only with neighbour density.
+- **Best-of-N collection window** at the destination (a few airtimes of wait, once per path setup).
+
+Saved is the most expensive item today: **network-wide discovery floods** (every first contact, every path reset, every healing). In a network with many first contacts/resets this item dominates — its elimination more than compensates the DV overhead. The 10 % is a **safety margin**, not a sustained load: MHR aims to reduce *average* channel utilisation and smooth out load spikes (flood storms).
+
+Note on shared channel: since L1 only sends zero-hop, it does **not** load the entire shared medium network-wide, only the respective radio cell — that is why this proactive share scales despite the shared half-duplex channel.
+
+---
+
+## 7. Concrete Changes in the MeshCore Code
+
+| MHR element | Code anchor | Change |
+|---|---|---|
+| Link metric (L0) | `putNeighbour()`, Neighbour struct | Add SNR-EWMA + advert reception rate |
+| Backbone DV (L1) | new `PAYLOAD_TYPE_*` (repeater-only) or extended advert; new routing table | Send/integrate zero-hop vector (Bellman-Ford, seqno) |
+| Flood suppression | `routeRecvPacket()` `Mesh.cpp:330`; `allowPacketForward()` `MyMesh.cpp:429` | If backbone route known: do not forward-flood, instead backbone unicast |
+| Best-of-N + metric | `onPeerPathRecv()` / `Mesh.cpp:138` | Collection window, choose cheapest copy instead of first |
+| Path upgrade | `onContactPathRecv()` `BaseChatMesh.cpp:304` | overwrite only at lower cost + periodic refresh |
+| Opportunistic flood | `calcRxDelay()` / `rx_delay_base` `MyMesh.cpp:534,874` | enable (default >0) |
+| Scope/geo bias | `flood.max` `CommonCLI.cpp:599`; scoped adverts | small hop limit + optional direction filter |
+| Tuning knobs | `CommonCLI.cpp` | new `set` commands: `bb.interval`, `metric.mode`, `pathwin` |
+
+---
+
+## 8. Incremental Rollout (Compatibility-Preserving)
+
+- **Phase 0 – config only (immediate, backwards-compatible):** enable `rxdelay`, lower `flood.max`, enable loop detection. Already yields measurably fewer detours.
+- **Phase 1 – metric + best-of-N:** path selection at destination + upgrade at sender. Local change, interoperates with stock firmware (weaker nodes simply behave as before).
+- **Phase 2 – backbone DV:** proactive L1 between MHR repeaters. Stock repeaters do not participate but break nothing (DV packets are an unknown type for them → ignored).
+- **Phase 3 – discovery short-circuit + geo bias:** the actual airtime leap; requires a critical mass of MHR repeaters.
+
+Interoperability is the guiding constraint: in a mixed network MHR must **gracefully degrade** to today's flood-and-cache as soon as no backbone route is available.
+
+---
+
+## 9. Failure Modes & Risks (Honestly)
+
+- **DV loops / count-to-infinity:** manageable via sequence numbers + split-horizon/poisoned-reverse, but must be implemented carefully.
+- **Convergence time:** after a topology change the backbone needs several cycles; during the gap MHR falls back to flood.
+- **Asymmetric links:** bidirectional ETX measurement required; a pure SNR metric would be error-prone.
+- **Client state explosion:** host routes for very many clients can overflow backbone tables → announce only active/recently-heard clients; handle the rest via cheap repeater-only flood.
+- **Backbone partition:** separated repeater islands must fall back cleanly to reactive mode.
+- **Mixed-firmware network:** without a critical MHR mass the gain remains small.
+- **Mis-tuned metric:** ETX/SNR weights are network-dependent and must be calibrated empirically.
+
+---
+
+## 10. Validation
+
+- **Before/after** on reference links: `trace` command (real hop sequence), path-length distribution, airtime statistics (`Radio Stats`, `docs/cli_commands.md:133`), flood duplicates (`getNumFloodDups()`).
+- **Metrics:** mean hop count per delivery, share of "shortest path chosen", aggregate channel utilisation, delivery rate at path length ≥ 2 (today per community ~45 % unreliable).
+- **Simulation before field test:** discrete-event sim (e.g. ns-3/LoRaSim-style) with real topology to calibrate DV cadence and metric weights before firmware goes onto the live network.
+
+---
+
+## 11. Conclusion
+
+MHR is not a break with MeshCore but its consistent evolution: the existing reactive DSR remains the foundation, but gains a **real metric**, a **best-path selection**, and — enabled by the 10 % margin — a **frugal proactive backbone** that makes the expensive network-wide floods unnecessary. The node-class separation (ZRP principle) is the trick that deploys proactive and reactive routing exactly where each is cheap. Expected outcome: shorter, deterministic paths and — **despite** additional control traffic — **lower** total airtime.
+
+*Related document: `MeshCore_Routing_Analyse_und_Optimierung.md` (root-cause analysis + stages A–D).*

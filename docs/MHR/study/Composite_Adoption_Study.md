@@ -161,3 +161,170 @@ Die Airtime-Ersparnis bleibt unter Störung erhalten (−5…−11 %). Die klein
 ## Fazit
 
 Die komplette node-lokale MHR-Schicht ist **bei jeder Adoptionsstufe safe** (Lieferquote nie unter Baseline) und liefert eine **monoton mit der Adoption wachsende Airtime-Ersparnis** — bis **−12,4 %** im einmaligen Flood (Ebene A) und zusätzlich **−17…−22 %** Netto-Airtime im gestörten Dauerbetrieb (Ebene B, M4). Den Airtime-Gewinn trägt fast vollständig **M3 (guarded Suppression)**; M1 verbessert die Hops, M2 ist die Sicherheitsbremse, M4 ist der eigenständige Robustheits-Hebel unter Störung. Die vier Mechanismen **verstärken sich leicht** (Interaktion −0,7 pp), dämpfen sich nicht. Der Rollout **lohnt sich ab ~25 %** und sättigt zwischen **75–100 %**.
+
+---
+## 🇬🇧 English Translation
+
+# Composite Adoption Study — the complete node-local MHR layer on real CoreScope data
+
+**Question:** How much does the LoRa mesh improve when **1% / 10% / 25% / 50% / 75% / 100%** of nodes use the **ENTIRE** node-local MHR optimization layer (all four mechanisms TOGETHER) — compared to the pure upstream baseline (0%)?
+
+**Honestly measured:** the actual **combined** effect of all four mechanisms together (not the sum of individual gains), on the real, server-measured topology, averaged over **6 seeds** (seed 42 as master), **120 pairs** per seed (Layer A) or **32 sources × 4 destinations × 50 ticks** (Layer B).
+
+> Reproducible: `python3 composite_adoption_sim.py` → `composite_adoption_results.json` + 5 plots. Reuses the verified core functions from `mhr_sim_real_v4.py` (topology/timing/flood.max/metrics), `suppression_sim.py` (guarded suppression G1–G5) and `reinforce_sim.py` (path reinforcement). No new engine.
+
+---
+
+## The measured "layer" (combined on new-firmware nodes)
+
+| | Mechanism | Effect | Layer |
+|---|---|---|---|
+| **M1** | Hop-weighted flood rebroadcast delay (`TX_HOP_WEIGHT=0.6`) | Copies with fewer accumulated hops transmit earlier → shorter paths "lead" | Layer A |
+| **M2** | `flood.max = 15` (upstream: 64) | Hop limit, cuts off pointless long-range rebroadcasts | Layer A |
+| **M3** | Guarded Suppression G1–G5 (safe set: `k_cover=2, min_degree=3, snr_floor=−6, prob=0.8`) | Suppress redundant rebroadcast — only when locally confirmed multi-coverage | Layer A |
+| **M4** | Path success reinforcement (EWMA `α=0.30`, `switch_thr=0.55`) + passively learned backup + proactive switch | Saves costly re-discovery floods on link failure | Layer B |
+
+**Stock nodes** behave exactly like upstream: first-wins flood, full jitter, `flood.max=64`, no suppression, no reinforcement.
+
+**Two measurement layers** (the layer acts on both, measured separately):
+- **Layer A — Single-Delivery-Flood** (one flood per pair): **M1+M2+M3** apply here. Metrics: airtime (sum of transmit events/delivery), delivery rate, hops, detour ratio, route stability.
+- **Layer B — Multi-Tick-Unicast** under link failure/churn: **M4** additionally applies here against re-discovery floods. Metrics: net airtime (unicast + re-floods), delivery rate, re-flood savings.
+
+**Topology (real):** core graph 1034 nodes / 1783 edges (173 ambiguous discarded), mean degree **3.45** (sparse, real). Simulated on the giant component: **632 nodes / 1577 edges**. Per-link SNR median 4.17 dB. Link reliability logistic from real `avg_snr`.
+
+**Baseline (0%):** delivery rate **0.9292**, airtime **616.9** transmit events/delivery, mean hops **5.02**, detour median **1.00**, route stability **1.000**, path reliability 0.708.
+Noise band (2·SEM, min): delivery rate ±0.0165, airtime ±3.08.
+
+---
+
+## (a) Improvement table per adoption level (Layer A, rollout "top-traffic repeaters first")
+
+All % figures **vs. baseline (0%)**. Negative for airtime/hops/detour = better; positive for delivery = better.
+
+| α | Delivery Rate | Δ Delivery (abs / %) | Airtime | Δ Airtime % | Mean Hops | Δ Hops % | Detour Median | Δ Detour % | Route Stab. | Safe? |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:--:|
+| **0%** | 0.9292 | — | 616.9 | — | 5.02 | — | 1.00 | — | 1.000 | — |
+| **1%** | 0.9347 | +0.0056 (+0.6%) | 616.6 | **−0.0%** | 5.08 | +1.2% | 1.00 | 0.0% | 1.000 | OK |
+| **10%** | 0.9389 | +0.0097 (+1.0%) | 606.9 | **−1.6%** | 5.03 | +0.1% | 1.00 | 0.0% | 1.000 | OK |
+| **25%** | 0.9375 | +0.0083 (+0.9%) | 592.6 | **−3.9%** | 4.92 | −2.2% | 1.00 | 0.0% | 1.000 | OK |
+| **50%** | 0.9583 | +0.0292 (+3.1%) | 575.4 | **−6.7%** | 4.85 | −3.5% | 1.00 | 0.0% | 1.000 | OK |
+| **75%** | 0.9472 | +0.0181 (+1.9%) | 548.1 | **−11.1%** | 4.76 | −5.3% | 1.00 | 0.0% | 1.000 | OK |
+| **100%** | 0.9556 | +0.0264 (+2.8%) | 540.6 | **−12.4%** | 4.82 | −4.2% | 1.00 | 0.0% | 1.000 | OK |
+
+**Random rollout** (control, same levels): practically identical airtime curve (−0.1 / −1.5 / −3.6 / −6.8 / −10.2 / −12.4%) and consistently delivery rate ≥ baseline. The composite gain therefore does **not** depend on the selection strategy — it scales with the pure share of transmitting new nodes.
+
+**How to read:**
+- **Airtime** is the main lever: −12.4% at full adoption. It decreases **monotonically** with adoption.
+- **Delivery rate** is ≥ baseline at **every** level (safety maintained). The variation of +0.005…+0.029 is seed noise within the ±0.0165 band — no real delivery gain, but important: **never worse**.
+- **Detour median stays 1.00**: the median path was already the shortest in the baseline flood; the layer does not make it longer. Hops decrease slightly (−4…−5%) via M1 (shorter paths lead).
+- **Route stability stays 1.000** (Layer A, disturbance-free): suppression/timing does not cause path flapping.
+
+![Airtime vs Adoption](fig_comp_airtime_vs_adoption.png)
+
+---
+
+## (b) Tipping point & "worthwhile" threshold
+
+- **"Worthwhile" threshold (≥ 2% airtime saved): from α = 25% onward.** Below that (1%, 10%) the gain is ~0–1.6% — structurally expected (see below), not an error.
+- **Tipping point (steepest marginal airtime gain): between 50% → 75%** (−4.4 pp marginal, the largest single jump). From ~50% adoption the suppression layer "kicks in" noticeably, because enough neighboring new nodes then simultaneously satisfy the G2 cover condition.
+- **Practical recommendation:** The rollout pays off measurably from **25%** and delivers the bulk of the gain from **50–75%**. 100% adds only +1.3 pp over 75% — the layer is "largely saturated" at high but not complete adoption.
+
+---
+
+## (c) Contribution breakdown of the 4 mechanisms
+
+Cumulative activation on Layer A (M2 → +M1 → +M3), airtime savings in **pp vs. baseline**, top_traffic:
+
+| α | M2 (flood.max) | +M1 (hop timing) | +M3 (Suppression) | **Composite** |
+|---:|---:|---:|---:|---:|
+| 1% | +0.0 | +0.2 | −0.1 | +0.0 |
+| 10% | +0.1 | +0.0 | +1.5 | **+1.6** |
+| 25% | +0.1 | +0.1 | +3.7 | **+3.9** |
+| 50% | +0.1 | +0.1 | +6.6 | **+6.7** |
+| 75% | +0.1 | +0.0 | +11.0 | **+11.1** |
+| 100% | +0.1 | −0.2 | +12.5 | **+12.4** |
+
+**Finding:** **M3 (guarded suppression) contributes nearly all of the airtime gain at every adoption level.** M2 and M1 deliver almost nothing on the airtime axis:
+- **M2 (`flood.max=15`)** saves little airtime here — the real network diameter is small enough that on the giant component almost no flood actually reaches the 15-hop limit. M2 is a **safety/worst-case brake** (prevents hop runaway), not an airtime saver in normal operation.
+- **M1 (hop timing)** acts on **hops/path quality** (−4…−5% hops), not on the airtime of the flood volume.
+- **M3** grows monotonically with adoption: +1.5 pp at 10%, +12.5 pp at 100%.
+
+**Interaction (a = 1.0, isolated vs. combined):**
+- Isolated: M2 −0.1%, M1 +0.1%, M3 −11.7%. **Sum of individual gains = −11.6%.**
+- **Composite actual = −12.4%.** → **Interaction = −0.7 pp.**
+- Negative sign ⇒ the mechanisms **amplify each other slightly** (composite minimally better than the sum), rather than dampening each other. Specifically: M1 shortens paths, allowing M3 to silence somewhat more redundant nodes. The interaction is **small** (< 1 pp) — the mechanisms are largely orthogonal, dominated by M3.
+
+![Contribution Breakdown](fig_comp_contribution.png)
+
+---
+
+## (d) Monotonicity & safety — maintained throughout?
+
+- **Monotone airtime savings:** **Yes.** Airtime decreases strictly with increasing adoption (0 → −1.6 → −3.9 → −6.7 → −11.1 → −12.4%), in both rollouts.
+- **Delivery rate ≥ baseline at EVERY level:** **Yes.** Worst Δ across all disturbance-free levels = **+0.000** (never negative). Guards G1 (leaf/bridge protection) and G3 (neighbor coverage) prevent coverage loss even at full adoption — exactly the failure mode of naive suppression (G2 only).
+- **Path reliability** stays at 0.70–0.71 across all levels (baseline 0.708) — no reliability loss from the layer.
+
+![Delivery Rate & Reliability](fig_comp_delivery_reliability.png)
+![Hops & Detour](fig_comp_hops_detour.png)
+
+---
+
+## (e) Behavior under disturbance (robust?)
+
+### Layer A (Single-Flood) under disturbance, composite vs. **disturbed** baseline
+
+| Disturbance | Baseline Delivery | α | Composite Delivery (Δ) | Airtime Δ% | Safe? |
+|---|---:|---:|---:|---:|:--:|
+| Churn (5% unstable nodes) | 0.890 | 50% | 0.905 (+0.015) | −6.0% | OK |
+| | | 100% | 0.903 (+0.014) | −11.1% | OK |
+| Link failure 10% | 0.864 | 50% | 0.857 (−0.007) | −5.9% | OK |
+| | | 100% | 0.869 (+0.006) | −11.2% | OK |
+| Link failure 20% | 0.775 | 50% | 0.767 (−0.008) | −5.4% | OK |
+| | | 100% | 0.767 (−0.008) | −10.1% | OK |
+| Churn + link failure 20% | 0.661 | 50% | 0.667 (+0.006) | −5.0% | OK |
+| | | 100% | 0.667 (+0.006) | −9.6% | OK |
+
+The airtime savings are maintained under disturbance (−5…−11%). The small delivery drops (max −0.008) lie **within** the noise band (±0.0165) — safety is considered maintained.
+
+### Layer B (Multi-Tick) — M4 reinforcement against re-discovery floods (fully adopted)
+
+| Disturbance | Delivery Base→Composite (Δ) | Net Airtime Δ% | Re-Discovery Airtime Saved |
+|---|---:|---:|---:|
+| Link failure 10% | 0.493 → 0.556 (**+0.064**) | **−21.5%** | 23.8% |
+| Link failure 20% | 0.346 → 0.392 (**+0.046**) | **−17.2%** | 18.4% |
+| Churn 10% | 0.408 → 0.462 (**+0.054**) | −18.5% | 20.1% |
+| Churn 20% | 0.334 → 0.382 (**+0.048**) | −17.6% | 18.8% |
+
+**This is where the layer delivers its second, independent gain:** Under link failure/churn, M4 replaces costly re-discovery floods with the proactive backup switch — this reduces net airtime by −17…−22% **and** raises the delivery rate noticeably (+0.05…+0.06). M4 also scales monotonically with adoption (lf 20%: +0.9 → −2.8 → −6.3 → −10.3 → −17.2% at 1/10/25/50/100%).
+
+![Under Disturbance](fig_comp_under_stress.png)
+
+---
+
+## (f) Bugs / anomalies during creation
+
+- **No runtime errors.** Script ran cleanly in smoke-test mode (`COMP_FAST=1`) and in full mode (6 seeds, ~8 min).
+- Reproducibility ensured via `numpy.default_rng(seed·…)` and `zlib.crc32` hash (Python's `hash()` is salted per process and was deliberately avoided — carried over from `reinforce_sim.py`).
+- Common Random Numbers (same disturbance sequence for baseline and mode) on Layer B → paired comparison, low variance.
+
+## (g) Files (all under `docs/MHR/study/`)
+
+- `composite_adoption_sim.py` — the simulation (reuses v4/supp/reinforce cores)
+- `composite_adoption_results.json` — all raw/aggregate results
+- `fig_comp_airtime_vs_adoption.png`, `fig_comp_delivery_reliability.png`, `fig_comp_hops_detour.png`, `fig_comp_contribution.png`, `fig_comp_under_stress.png`
+- `Composite_Adoption_Study.md` — this report
+
+## (h) Honest limitations
+
+1. **Gain at low adoption is ~0 — structural, not an error.** At 1–10% stock nodes dominate the flood; a single silent new node barely changes the global transmit volume. Suppression (M3) needs **multiple neighboring** new nodes for the G2 cover condition to apply — hence the disproportionate jump from 50–75%.
+2. **M2 (flood.max) shows almost no airtime effect in normal operation**, because the real giant component has a small diameter. M2 should be understood as a **worst-case/loop brake**, not an airtime saver — its value lies in robustness that is not demanded here (short paths).
+3. **Two separate layers, not a single end-to-end model.** Layer A measures the one-time flood, Layer B the repeated unicast operation. A fully integrated traffic model (mix of discovery floods and steady unicast traffic at real rates) would weight the two gains — the actual network savings lie between the two numbers depending on the traffic mix.
+4. **Backup learning idealized** (passive learning modeled with `learn_loss=0.30`, backup = 2nd-best ETX path in the full graph). Real passive learning is patchier; the M4 gains are therefore an **upper** estimate.
+5. **Link reliability from `avg_snr`**, not measured from live packet loss; logistic curve around the reception threshold is a model. Topology is server-resolved (real edges), but geo/terrain is not included.
+6. **Suppression with perfect 2-hop knowledge (NBR)** on Layer A — robustness against incomplete 2-hop knowledge was demonstrated separately in `suppression_sim.py` (EXP 4, 60/80/100%) and is not repeated here.
+
+---
+
+## Conclusion
+
+The complete node-local MHR layer is **safe at every adoption level** (delivery rate never below baseline) and delivers **airtime savings that grow monotonically with adoption** — up to **−12.4%** in the one-time flood (Layer A) and additionally **−17…−22%** net airtime in disturbed continuous operation (Layer B, M4). The airtime gain is carried almost entirely by **M3 (guarded suppression)**; M1 improves hops, M2 is the safety brake, M4 is the independent robustness lever under disturbance. The four mechanisms **amplify each other slightly** (interaction −0.7 pp), they do not dampen each other. The rollout **pays off from ~25%** and saturates between **75–100%**.

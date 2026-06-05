@@ -200,3 +200,209 @@ sonst senden (Default = sicher):
 - `docs/MHR/study/suppression_results.json` — alle Roh-/Aggregat-Ergebnisse.
 - `docs/MHR/study/fig_supp_safety_sweep.png`, `fig_supp_param_sweep.png`,
   `fig_supp_ablation.png`, `fig_supp_imperfect_knowledge.png`.
+
+---
+## 🇬🇧 English Translation
+
+# Validation: Redundancy-Guarded Flood Suppression (Stage B)
+
+*Simulative verification of the 5-guard design (`Suppression_Design.md`) on the REAL
+mesh topology, BEFORE firmware coding. Script: `suppression_sim.py`
+(Seed 42, 6 seeds, 120 pairs, reproducible). Data: `suppression_results.json`.*
+
+---
+
+## Setup (brief)
+
+- Topology as in v4: real edges from `neighbor_graph.json`, **ambiguous edges discarded**
+  (173), link reliability logistic from real `avg_snr`. Core: 1034 nodes / 1783 edges,
+  avg degree **3.45** (sparse). Simulation on the giant component: **632 nodes / 1577 edges**.
+- Flood model as in v4: timing-driven, first-packet-wins dedup, airtime = number of
+  actually transmitting nodes per delivery, hop-weighted delay for MHR nodes.
+- **Suppression** = local rule of an MHR node R: stays silent before its rebroadcast ONLY
+  when ALL active guards are satisfied (otherwise transmit = exactly like upstream).
+  Cover-senders = neighbours of R that sent copy P in the model before/simultaneously with R;
+  G3 uses the (possibly incomplete) graph adjacency as learned 2-hop knowledge.
+- **Rollout `top_traffic`** (hub nodes adopt first) = most conservative case:
+  exactly the high-degree, load-bearing nodes are allowed to go silent first.
+- **Baseline** (stock flood, no suppression): delivery ratio **0.9292**, airtime **616.85**.
+  Noise band (2·SEM, min): delivery ratio ±0.0165, airtime ±3.08.
+
+Safety invariant per config: **delivery ratio ≥ Baseline − Tol AND airtime ≤ Baseline + Tol.**
+
+---
+
+## EXP 1 — Safety Sweep over Adoption (Default params d4/k2/snr−6/p0.8)
+
+Guarded (G1–G5) vs. naive (G2 only) vs. Baseline:
+
+| α | Guarded deliv (Δ) | Guarded air% | safe | Naive deliv (Δ) | Naive air% | safe |
+|---|---|---|---|---|---|---|
+| 1 node | 0.9514 (+0.022) | −0.1 | OK | 0.9431 (+0.014) | −1.1 | OK |
+| 0.05 | 0.9611 (+0.032) | −0.1 | OK | 0.7944 (−0.135) | −21.0 | **X** |
+| 0.10 | 0.9472 (+0.018) | −0.9 | OK | 0.7208 (−0.208) | −30.8 | **X** |
+| 0.25 | 0.9361 (+0.007) | −3.0 | OK | 0.6056 (−0.324) | −45.8 | **X** |
+| 0.50 | 0.9431 (+0.014) | −8.5 | OK | 0.6181 (−0.311) | −52.4 | **X** |
+| 1.00 | 0.9611 (+0.032) | −8.3 | OK | 0.6125 (−0.317) | −53.4 | **X** |
+
+**Finding:** The guarded variant holds the invariant at **all** α — delivery ratio remains
+consistently **above** baseline (+0.7 … +3.2 percentage points), airtime decreases with
+increasing adoption (down to −8.5 % at default prob 0.8). **Naive** suppression breaks — as
+in the v4 finding — already at **α = 0.05** (delivery ratio −13 … −32 percentage points). This
+reproduces the M3/M4 failure exactly and demonstrates the value of the protection layers.
+→ Plot `fig_supp_safety_sweep.png`.
+
+---
+
+## EXP 2 — Parameter Sweep (safe sweet spot)
+
+All 18 tested configs (`k_cover∈{2,3}`, `min_degree∈{3,4,5}`, `prob∈{0.6,0.8,1.0}`,
+snr_floor −6) hold the invariant across **all** α (`all_safe = True`). The airtime gain
+is expectedly ~0 at **low** adoption (correct — the stock network floods fully anyway,
+nothing to save there) and increases at **high** adoption. What matters is the gain
+where the mechanism is supposed to work:
+
+| Config | air gain α≥0.5 | air gain α=1.0 | worst delivery-Δ |
+|---|---|---|---|
+| **k2 d3 p1.0** (sweet spot) | **+14.6 %** | **+15.4 %** | −0.0056 (within noise band) |
+| **k2 d3 p0.8** | +11.8 % | +12.4 % | **+0.0069** (always ≥ baseline) |
+| k2 d4 p1.0 | +10.6 % | +10.5 % | +0.0111 |
+| k3 d3 p1.0 | +10.1 % | +10.1 % | +0.0111 |
+| k2 d3 p0.6 | +9.0 % | +9.5 % | +0.0097 |
+
+Trends: **smaller `min_degree`** and **higher `prob`** save more airtime (more nodes
+qualify / go silent more often), **larger `k_cover`** is more conservative (less gain,
+more margin). → Plot `fig_supp_param_sweep.png`.
+
+**Safe sweet spot (recommendation): `k_cover=2, min_degree=3, snr_floor=−6, prob=0.8`.**
+This config saves **+11.8 % airtime at α≥0.5 (+12.4 % at α=1.0)** and holds the delivery
+ratio at **every** α strictly ≥ baseline (worst Δ = +0.0069, no noise band needed). The
+`prob=1.0` variant saves more (+15.4 % at α=1.0), but its worst delivery-Δ is marginally
+negative (−0.0056, within ±0.0165 noise band) — permissible as a max-airtime variant, but
+`p=0.8` is the more robust production choice (G5 deliberately lets a fraction always transmit).
+
+---
+
+## EXP 3 — Ablation: Is G3 load-bearing?
+
+Default params, guards activated incrementally:
+
+| Variant | all_safe | worst delivery-Δ | avg airtime gain |
+|---|---|---|---|
+| **G2 only** | **NO** | **−0.324** (breaks like naive) | +34.1 % |
+| **G2+G3** | **YES** | +0.0167 | +7.2 % |
+| G2+G3+G1 | YES | +0.0083 | +4.7 % |
+| all (G1–G5) | YES | +0.0069 | +3.5 % |
+
+**Finding: G3 (Neighbour-Coverage) is clearly the load-bearing layer.** Without G3 (G2 only),
+the delivery ratio breaks by up to −32 percentage points — exactly the v4 "single-leaf-path"
+failure. Adding **G3** alone flips the system from "breaks" to "holds" (worst Δ from −0.324
+to **+0.017**). G1/G4/G5 thereafter only add additional, cheap safety margin (at some cost
+to airtime gain). → Plot `fig_supp_ablation.png`.
+
+---
+
+## EXP 4 — Imperfect 2-Hop Knowledge (Realism)
+
+Sweet-spot params, G3 uses only a fraction of the real neighbour info (incomplete passive
+learning of fresh firmware):
+
+| 2-hop knowledge | all_safe | worst delivery-Δ | avg airtime gain |
+|---|---|---|---|
+| 60 % | YES | −0.0083 (within noise band) | +6.6 % |
+| 80 % | YES | −0.0014 (within noise band) | +6.1 % |
+| 100 % | YES | −0.0056 (within noise band) | +5.7 % |
+
+**Finding: The invariant holds even with only 60 % known neighbourhood.** Incomplete
+2-hop knowledge makes G3 *stricter* (unknown neighbours are treated as not covered → R
+transmits when in doubt), not more lenient — the gap acts conservatively, not dangerously.
+G1 additionally kicks in as a degree fallback. The worst delivery-ratio deviations are
+consistently within the noise band (±0.0165). → Plot `fig_supp_imperfect_knowledge.png`.
+
+---
+
+## EXP 5 — Stress (Churn + Link Failure) at α=1.0
+
+Guarded (sweet spot) vs. Baseline **under the same disturbance**:
+
+| Scenario | Baseline deliv | Guarded deliv (Δ) | Guarded air% | safe |
+|---|---|---|---|---|
+| Churn (by advert_count) | 0.8896 | 0.8880 (−0.0015) | −13.6 | OK |
+| Link failure 10 % | 0.8639 | 0.8625 (−0.0014) | −13.8 | OK |
+| Link failure 20 % | 0.7750 | 0.7583 (−0.0167) | −12.4 | **marginal X** |
+| Churn + link failure 20 % | 0.6610 | 0.6564 (−0.0046) | −11,7 | OK |
+
+**Finding:** Under churn, 10 % link failure, and the combined hard-disturbance scenario,
+the invariant holds (delivery ratio ≈ baseline, airtime −12 … −14 %). At **20 % link
+failure it narrowly misses the noise band**: −0.0167 vs. tolerance ±0.0165 — a delivery
+ratio deviation of **−1.7 percentage points**, i.e. at the edge of statistical resolution,
+not a structural collapse (airtime remains −12.4 %). Cause: under massive link failure,
+real cover paths disappear that G3 still considers intact in its *learned* (statically
+assumed) adjacency → occasionally a node goes silent whose cover-sender is no longer
+getting through in reality. → Plot is part of the stress data in `suppression_results.json`.
+
+---
+
+## Go / No-Go
+
+### DECISION: **GO — code it, with caveats.**
+
+**Rationale (honest):**
+- The hard safety invariant (delivery ratio ≥ baseline AND airtime ≤ baseline) is satisfied
+  across the **entire** adoption sweep (1 node → 100 %) **for every** tested parameter set
+  — unlike the naive variant, which breaks at 5 %.
+- There is a parameter set that saves **meaningful** airtime **where it counts**
+  (high adoption): **`k_cover=2, min_degree=3, snr_floor=−6, prob=0.8`** → **+11.8 % at α≥0.5,
+  +12.4 % at α=1.0**, delivery ratio at every α strictly ≥ baseline. Max variant `prob=1.0`:
+  +15.4 % at α=1.0.
+- G3 is demonstrably load-bearing (ablation), the knowledge foundation is robust against gaps (60 %).
+
+**Caveat (no sugarcoating):** Under extreme link failure (20 %), the invariant **narrowly**
+misses the noise band (−1.7 percentage points delivery ratio). This is statistically borderline,
+not a crash, but it shows: G3 relies on a *learned, static* 2-hop table. In firmware this
+table **must be freshness-stamped** (Design §3): for stale/unstable cover-senders, G3 MUST
+NOT engage → fallback to G1. With freshness-gating this remaining gap is closed.
+
+### Logic to be coded (in `routeRecvPacket` / outbound queue, local, passive)
+
+Before the hop-weighted rebroadcast of an MHR node R; **go silent ONLY if ALL are satisfied**,
+otherwise transmit (default = safe):
+1. **G1** `R.degree ≥ 3` (`supp_min_degree`, default 3) — otherwise transmit.
+2. **G2** within the backoff window ≥ **2** distinct other nodes have sent the same copy P
+   (`supp_k_cover`, default 2) — otherwise transmit.
+3. **G4** only cover-senders with **EWMA-SNR ≥ −6 dB** count (`supp_snr_floor`); of those ≥ k_cover.
+4. **G3** every *known* neighbour of R is a neighbour of ≥1 (qualified) cover-sender, from the
+   passive 2-hop table — **only if the table is fresh enough**; otherwise treat G3 as not
+   satisfied (→ transmit). Unknown neighbours = not covered = transmit.
+5. **G5** with probability **0.8** (`supp_prob`) actually go silent, otherwise transmit.
+
+`supp_enable` default **0** (upstream behaviour), enabled only after bench validation.
+
+---
+
+## Fixed Bugs / Pitfalls During Validation
+- **Misleading go-metric:** The first run evaluated the **mean** airtime gain across
+  *all* α (5.7 %) — this penalises the correct behaviour of "save nothing at low adoption"
+  and would have falsely yielded NO-GO. Corrected to the **high-adoption gain (α≥0.5)** as
+  the utility metric, with the hard safety gate over all α unchanged. This shifts the value
+  from a misleading 5.7 % to a meaningful 14.6 % (or 11.8 % for robust p=0.8).
+- Matplotlib `tight_layout` warning in the param-sweep plot (rotated x-labels) → `subplots_adjust`.
+- Robustness against empty sets (isolated nodes, disconnects, `mhr_set ∩ giant`) handled
+  throughout; runs complete without errors (exit 0).
+
+## Limitations (honest)
+- G3 uses the **static** graph adjacency as 2-hop knowledge in the model; real firmware learns
+  in a time-varying and incomplete manner. EXP 4 covers gaps (60 %), EXP 5 shows the remaining
+  gap from *stale* knowledge under heavy link failure → **freshness-gating in firmware is mandatory.**
+- Cover-tracking is idealised in the model (every received neighbour-send counts immediately);
+  in hardware it depends on the actual backoff window and collisions → bench test required.
+- Airtime is modelled as "number of transmitting nodes per delivery", not as physical
+  ToA/duty-cycle — the *relative* gains are reliable, absolute ms are not.
+- Single-source flood per pair; simultaneous multi-traffic / channel collisions not
+  modelled (would tend to *favour* suppression, as fewer senders mean fewer collisions).
+
+## Files
+- `docs/MHR/study/suppression_sim.py` — simulation (reproducible, seed 42, 6 seeds).
+- `docs/MHR/study/suppression_results.json` — all raw/aggregate results.
+- `docs/MHR/study/fig_supp_safety_sweep.png`, `fig_supp_param_sweep.png`,
+  `fig_supp_ablation.png`, `fig_supp_imperfect_knowledge.png`.

@@ -189,3 +189,197 @@ von metrik-geleitetem Routing (MHR Unicast entlang eines Pfads statt netzweitem 
    wenige evtl. legitime Außenposten.
 9. **Hop-Cap im Sim-Graph:** pro Knoten werden nur die 20 stärksten Links behalten
    (Rechenbarkeit + Realismus). Sehr schwache Fern-Links bleiben unberücksichtigt.
+
+---
+## 🇬🇧 English Translation
+
+# MeshCore Simulation v3 — Calibrated on REAL Live Data
+
+**Data source:** CoreScope (`corescope.meshrheinland.de`), live snapshot from 2026-05-30.
+**Dataset:** 1962 nodes (1819 with geo), 38 observers (19 with geo), **109,980 real rx packets**
+(raw `packets.jsonl` ≈ 197 MB, *not* in the repo — only compact derivatives under `data/`).
+**Reproducible:** Seed 42. Collector: `mhr_collect_corescope.py`. Simulation: `mhr_sim_real_v3.py`.
+
+This study strictly distinguishes between **MEASURED** (derived from real production packets)
+and **SIMULATED** (Monte-Carlo routing model on the real topology). Deliberately honest,
+without embellishment: where the real dataset refutes an old assumption, that is stated here.
+
+---
+
+## Building Block A — What Was MEASURED from the Live Data
+
+### A1 — Node→Hash Mapping & Disambiguation
+MeshCore hash = the first `hash_size` bytes of the `public_key` (hex prefix). Index built over all
+1/2/3-byte prefixes. Confirmed uniqueness:
+
+| Prefix | distinct | colliding | avg nodes/prefix |
+|---|---|---|---|
+| 1-byte | 254 | 254 (all) | 7.72 |
+| 2-byte | 1934 | 27 | 1.01 |
+| 3-byte | 1961 | 1 | 1.00 |
+
+1-byte hashes (real ~75% of all path hashes) collide massively. Disambiguation via
+geography: on collision, the candidate closest to the already-resolved neighboring hop within
+LoRa range (≤ 45 km) is chosen; forward **and** backward. Unresolvable entries are marked as *ambig*
+and **not guessed**.
+
+Breakdown over all 1.41 million path-hash occurrences:
+`unique 18.2%`, `geo-disambiguated 0.1%`, `ambig 77.6%`, `unknown 4.1%`.
+The high ambig rate is an **honest limitation**: 1-byte hashes are often not unambiguously
+assignable without a reliable neighbor reference. For *quantitative* analyses (SNR fit,
+hop distances) we therefore exclusively use **unambiguously** resolvable hops — this avoids rate bias.
+
+### A2 — Observed Relay Topology (Backbone)
+Consecutive, resolved path hops = real directed edges "A forwards to B".
+Aggregated (repeater↔repeater only):
+
+- **Nodes in backbone graph:** 745
+- **Directed edges:** 6246
+- **Degree (undirected):** min 1 / median 6 / max 118
+- **Largest connected component:** 724 of 745 (97%)
+
+Result: a well-connected, cohesive backbone with few hub nodes (max degree 118).
+Compact edge list: `data/topology_edges.json`. Plot: `fig_v3_real_topology.png`.
+
+### A3 — Calibrating the SNR/Distance Link Model (CORE FINDING of the Measurement)
+For each rx packet: observer (position known) heard the **last** hop of the path chain
+(position via hash map). From **14,399 unambiguously** resolvable (last-hop → observer) pairs,
+a log-distance model `SNR ≈ SNR0 − 10·n·log10(d)` was fitted:
+
+| Model | SNR0 (dB) | Path-loss exponent n | Note |
+|---|---|---|---|
+| **MEASURED (OLS)** | **2.78** | **0.41** | corr(log d, SNR) = **−0.42** |
+| MEASURED (bin medians) | −0.75 | 0.24 | robust against saturation |
+| OLD ASSUMPTION (`mhr_sim_real.py`) | 17.0 | 2.55 | unsubstantiated |
+
+**Finding — important and inconvenient:** In the real dataset, distance alone explains SNR
+**only weakly** (|corr| ≈ 0.42, n ≈ 0.4 instead of the assumed 2.55). Antenna height,
+location (many repeaters on hills/high-rise buildings), directionality, and terrain dominate
+over the straight-line distance. Nodes 40–70 km away are sometimes heard with better SNR than
+neighbors at < 2 km. The clean path-loss assumption of the old script is therefore **not tenable**
+for this real network — the purported "accuracy gain" consists precisely in exposing this discrepancy.
+Plot: `fig_v3_snr_fit.png`. Parameters: `data/snr_calibration.json`.
+
+> **Consequence for the simulation model (Building Block B):** A PLE of 0.4 would produce a
+> physically nonsensical range graph (quasi-unlimited range). For the simulation, the real
+> intercept/scatter finding is therefore combined with a PLE **clamped** to a physically plausible
+> lower bound of 2.0, and calibrated so that the **empirically measured** median hop distance
+> (see below) appears as a reliable link. This is a deliberate, documented model choice — not a
+> measured value.
+
+**Empirical hop distance (also MEASURED):** From 172,052 unambiguously resolved
+neighbor-hop pairs, the median real hop distance is **10.1 km** (P90 28.8 km). This is a
+directly measured, robust indicator of the typical radio link distance of a hop in the network.
+
+### A4 — Real Detour Statistics (CORE RESULT)
+For each packet with path: real hop count `len(path)` vs. geographic **lower bound**
+`ceil(straight-line(first↔last resolved hop) / hop range)`. As hop range, the
+**empirical P75** (19.3 km) of real neighbor-hop distances → the bound remains a true
+*lower* bound (generous hop range ⇒ minimum required hops rather underestimated).
+
+Over **29,433** evaluable real packets:
+
+- Real hops: Median **10**, P90 **18**, Max **32**
+- **Detour factor (real / geographic lower bound): Median 2.11× · Mean 2.62× · P90 4.33× · P99 10×**
+- **78.8%** of packets travel > 1.5× · **50.2%** travel > 2× the geographically necessary hop count
+
+**This proves the "first-wins detour" problem with REAL production data:** the actually
+cached/flooded path is in the median ~2.1× as long as geographically necessary, in 10% of
+cases ≥ 4.3×, and every second packet travels ≥ 2× the necessary hop count.
+Plot: `fig_v3_real_detours.png`. Data: `data/real_detour_stats.json`.
+
+---
+
+## Building Block B — Routing Simulation on the LARGE Real Topology
+
+### Active Repeater Subgraph
+Selection criterion: `role == repeater` **and** geo present **and**
+(`relay_active` **or** `relay_count_24h > 0` **or** observed in the dataset as a resolved path hop).
+Rationale: these are the nodes that were demonstrably involved in relaying or actively
+configured for it during the observation period.
+
+- **Active subgraph:** 881 nodes (after geo plausibility filter, see Limitations)
+- **Link/range graph** (calibrated A3 sim model, edge when estimated SNR > −12 dB,
+  distance ≤ 45 km; per node only the 20 strongest links; edge weight = ETX from SNR):
+  881 nodes, **9,861 edges**, largest component **831**.
+
+### Baseline (MeshCore) vs. MHR
+- **Baseline:** first-packet-wins flood, Monte-Carlo over random hop timing (each
+  repeater transmits exactly once, hasSeen dedup); the first path to arrive at the destination wins.
+- **MHR:** SNR-/quality-guided path = ETX-shortest path (best cumulative SNR /
+  fewest effective hops; prefer-shorter implicit, since ETX grows with hops).
+- Over random source-destination pairs in the large component (Seed 42): mean hops,
+  detour ratio, airtime (sum of transmitting repeaters), reliability (product of link reliabilities).
+
+Result over **196** evaluable source-destination pairs (drawn from 200), link graph
+881 nodes / 9,861 edges (per node top-20 links) / largest component **831**
+(see `sim_results_v3.json`, plot `fig_v3_sim_compare.png`):
+
+| Metric | MeshCore (Baseline) | MHR | Delta |
+|---|---|---|---|
+| avg hops | **8.30** | **7.12** | −14% |
+| Detour ratio (Baseline/MHR) | — | — | **Median 1.17× · Mean 1.20×** |
+| Pairs with detour | — | — | **98%** |
+| avg transmission events (airtime) | **786** (network-wide flood) | **7.1** (unicast) | **−99.1%** |
+| avg path reliability | **0.47** | **0.55** | **+18%** |
+| worst baseline path | 16 hops | — | — |
+
+Core statement of the simulation: metric-guided MHR delivers on the **real 831-node topology**
+shorter, more reliable paths at drastically lower airtime — MeshCore flood activates on average
+~786 repeaters per discovery, MHR only the ~7 hops of the chosen path.
+
+**Honest assessment:** The *simulated* detour factor is considerably milder than the
+**measured** one (A4), because the sim link model is an idealized disc model without
+terrain — geographically shortest paths are short in it and the flood deviates little. The
+**real** detour (Building Block A4, Median 2.0×) is therefore the more compelling argument for the
+detour problem; the simulation primarily demonstrates the **airtime** and **reliability** advantage
+of metric-guided routing (MHR unicast along a path instead of network-wide flood).
+
+---
+
+## Generated Artifacts
+
+| File | Content |
+|---|---|
+| `mhr_sim_real_v3.py` | Complete measurement + simulation pipeline (Seed 42, commented) |
+| `mhr_collect_corescope.py` | Reproducible collector (urllib + UA + unverified SSL, offset pagination) |
+| `data/nodes.json`, `data/observers.json` | Compact copies of master data |
+| `data/topology_edges.json` | Aggregated observed edge list (A2) |
+| `data/snr_calibration.json` | SNR fit parameters + sample size (A3) |
+| `data/real_detour_stats.json` | Real detour statistics (A4) |
+| `sim_results_v3.json` | All metrics (measurement + simulation) |
+| `fig_v3_real_topology.png` | Measured backbone topology |
+| `fig_v3_snr_fit.png` | SNR/distance: measured vs. old assumption |
+| `fig_v3_real_detours.png` | Measured detour factor distribution |
+| `fig_v3_sim_compare.png` | Baseline vs. MHR (hops, airtime, reliability) |
+
+---
+
+## Limitations (Scientifically Honest)
+
+1. **Hash ambiguity:** 1-byte path hashes (the majority) collide heavily (avg 7.7 nodes/hash);
+   77.6% of hash occurrences remained unresolvable. All quantitative analyses use
+   only unambiguous hops — this reduces bias, but also the sample size, and can underrepresent
+   rare paths running only through 1-byte nodes.
+2. **Observer bias:** Only 19 of 38 observers have geo; the SNR fit relies on their
+   locations (centered on the Rhineland region). The SNR sample is therefore not spatially uniform.
+3. **Distance explains SNR only weakly in practice** (|corr| ≈ 0.42): without terrain data/antenna
+   heights/radiation patterns, a pure log-distance model for this network is coarse. The **sim link
+   model is therefore idealized** (clamped PLE = 2.0) — it is a model assumption, not a measured
+   value, and tends to yield **more conservative** (milder) detour values than reality (A4).
+4. **"Last hop" ≠ necessarily the sender at the observer:** for long/partially ambiguous paths,
+   the actual heard sender may deviate from the resolved last hop — additional noise in the
+   SNR fit (partly responsible for the weak correlation).
+5. **Detour lower bound is geographic, not topological:** it assumes a constant
+   hop range (P75 = 19.3 km). Actual minimum hop counts could be locally higher
+   (radio coverage gaps) — meaning the real detour factor is more likely **under**- than overestimated.
+6. **Simulation without duty cycle/collisions:** the flood model counts transmission events, but
+   does not model CSMA collisions, 10%-duty-cycle throttling, or buffer overflows. The real
+   airtime pressure (shared half-duplex channel) is therefore rather underestimated — in favor of MHR.
+7. **Snapshot:** a single live snapshot; time-of-day/churn effects not averaged out.
+8. **Geo plausibility filter:** some nodes/observers carry placeholder coordinates
+   (0,0) or values outside central Europe; these are discarded (bounding box
+   35–60°N, −12–25°E). This cleans up the topology plot and distances, but also discards
+   a few potentially legitimate outlying nodes.
+9. **Hop cap in sim graph:** per node only the 20 strongest links are retained
+   (computational feasibility + realism). Very weak long-range links are disregarded.

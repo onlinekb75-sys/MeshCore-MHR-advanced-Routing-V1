@@ -1,0 +1,305 @@
+From 36a49c227ee6b2b1bccf5532413b2dd902ba96ba Mon Sep 17 00:00:00 2001
+From: MHR fix <dev@example.com>
+Date: Fri, 5 Jun 2026 07:14:08 +0000
+Subject: [PATCH 1/2] MHR fix: heal prefer-shorter path pin (fail-counter + age
+ fallback)
+
+Plain prefer-shorter could pin a dead-but-shorter path forever: nothing
+auto-resets out_path_len on direct-send failure (resetPathTo() is only
+called by explicit user/app action), so a longer working replacement path
+was rejected and the node kept flooding. This was a regression vs upstream
+(which always adopts the latest path and thus self-heals).
+
+Adopt a longer path when the cached one is FAILING (>= N consecutive direct
+ACK timeouts, RAM-only per-contact counter) or STALE (> 30 min via existing
+lastmod). RAM-only, NOT persisted -> no ContactInfo/format change. Reverts
+to pure prefer-shorter if thresholds raised; keeps short-path bias for fresh
+healthy paths.
+---
+ src/helpers/BaseChatMesh.cpp | 62 ++++++++++++++++++++++++++++++------
+ src/helpers/BaseChatMesh.h   | 26 +++++++++++++++
+ 2 files changed, 79 insertions(+), 9 deletions(-)
+
+diff --git a/src/helpers/BaseChatMesh.cpp b/src/helpers/BaseChatMesh.cpp
+index c809c55..3ca1684 100644
+--- a/src/helpers/BaseChatMesh.cpp
++++ b/src/helpers/BaseChatMesh.cpp
+@@ -301,18 +301,50 @@ bool BaseChatMesh::onPeerPathRecv(mesh::Packet* packet, int sender_idx, const ui
+   return onContactPathRecv(from, packet->path, packet->path_len, path, path_len, extra_type, extra, extra_len);
+ }
+ 
++// MHR: ---- prefer-shorter path-pin healing helpers (RAM-only) -------------------------------------
++//   A small fixed table keyed by a 4-byte pub-key prefix tracks consecutive direct-send failures per
++//   contact. A slot with fails==0 is free. No dynamic allocation, not persisted.
++BaseChatMesh::MhrPathFail* BaseChatMesh::_mhrPfSlot(const uint8_t* key, bool create) {
++  int freeIdx = -1;
++  for (int i = 0; i < MHR_PATHFAIL_SLOTS; i++) {
++    if (_mhr_pf[i].fails > 0) {
++      if (memcmp(_mhr_pf[i].key, key, 4) == 0) return &_mhr_pf[i];
++    } else if (freeIdx < 0) {
++      freeIdx = i;
++    }
++  }
++  if (!create) return NULL;
++  int idx = (freeIdx >= 0) ? freeIdx : 0;   // reuse a free slot; if none, clobber slot 0 (rare)
++  memcpy(_mhr_pf[idx].key, key, 4);
++  _mhr_pf[idx].fails = 0;
++  return &_mhr_pf[idx];
++}
++uint8_t BaseChatMesh::_mhrPfGet(const uint8_t* key)  { MhrPathFail* s = _mhrPfSlot(key, false); return s ? s->fails : 0; }
++void    BaseChatMesh::_mhrPfBump(const uint8_t* key) { MhrPathFail* s = _mhrPfSlot(key, true);  if (s && s->fails < 255) s->fails++; }
++void    BaseChatMesh::_mhrPfClear(const uint8_t* key){ MhrPathFail* s = _mhrPfSlot(key, false); if (s) s->fails = 0; }
++
+ bool BaseChatMesh::onContactPathRecv(ContactInfo& from, uint8_t* in_path, uint8_t in_path_len, uint8_t* out_path, uint8_t out_path_len, uint8_t extra_type, uint8_t* extra, uint8_t extra_len) {
+-  // MHR: prefer-shorter path adoption. We only replace the cached 'out_path' if the newly offered
+-  //      path is NOT longer (>= as short) than the one we already have, or if we have none yet.
+-  //      Hop count is the low 6 bits of path_len. This prevents a later-arriving longer detour from
+-  //      overwriting a good short path. A genuinely broken path triggers resetPathTo() elsewhere,
+-  //      which sets out_path_len = OUT_PATH_UNKNOWN, so we never get permanently stuck on a stale path.
+-  //      Behaviour is never worse than upstream: with a single offered path it is identical.
+-  bool mhr_adopt = (from.out_path_len == OUT_PATH_UNKNOWN)
+-                   || ((out_path_len & 0x3F) <= (from.out_path_len & 0x3F));
++  // MHR: prefer-shorter path adoption, WITH self-healing. We keep the cached 'out_path' when the newly
++  //      offered path is longer — but ONLY while the cached path is still healthy. A longer path is
++  //      adopted when (a) we have no path yet, (b) the new path is as short or shorter, (c) the cached
++  //      path is FAILING (>= MHR_PATHFAIL_THRESHOLD consecutive direct-send timeouts, tracked in RAM), or
++  //      (d) the cached path is STALE (older than MHR_PATH_STALE_SECS). Cases (c)/(d) restore upstream's
++  //      self-healing: plain prefer-shorter could pin a dead-but-shorter path forever because nothing
++  //      auto-resets out_path_len on failure (resetPathTo() is only ever called by an explicit user/app
++  //      action). Hop count is the low 6 bits of path_len.
++  uint8_t new_hops = out_path_len & 0x3F;
++  uint8_t cur_hops = from.out_path_len & 0x3F;
++  uint32_t now = getRTCClock()->getCurrentTime();
++  bool have       = (from.out_path_len != OUT_PATH_UNKNOWN);
++  bool shorter_eq = have && (new_hops <= cur_hops);
++  bool stale      = have && (from.lastmod != 0) && (now > from.lastmod)
++                         && ((now - from.lastmod) > MHR_PATH_STALE_SECS);
++  bool failing    = have && (_mhrPfGet(from.id.pub_key) >= MHR_PATHFAIL_THRESHOLD);
++  bool mhr_adopt  = (!have) || shorter_eq || stale || failing;
+   if (mhr_adopt) {
+     from.out_path_len = mesh::Packet::copyPath(from.out_path, out_path, out_path_len);  // store a copy of path, for sendDirect()
+-    from.lastmod = getRTCClock()->getCurrentTime();
++    from.lastmod = now;
++    _mhrPfClear(from.id.pub_key);   // MHR: path refreshed -> clear failure state
+   }
+ 
+   onContactPathUpdated(from);
+@@ -321,6 +353,8 @@ bool BaseChatMesh::onContactPathRecv(ContactInfo& from, uint8_t* in_path, uint8_
+     // also got an encoded ACK!
+     if (processAck(extra) != NULL) {
+       txt_send_timeout = 0;   // matched one we're waiting for, cancel timeout timer
++      _mhr_await_valid = false;            // MHR: piggybacked ACK confirms delivery
++      _mhrPfClear(from.id.pub_key);        // MHR
+     }
+   } else if (extra_type == PAYLOAD_TYPE_RESPONSE && extra_len > 0) {
+     onContactResponse(from, extra, extra_len);
+@@ -332,6 +366,8 @@ void BaseChatMesh::onAckRecv(mesh::Packet* packet, uint32_t ack_crc) {
+   ContactInfo* from;
+   if ((from = processAck((uint8_t *)&ack_crc)) != NULL) {
+     txt_send_timeout = 0;   // matched one we're waiting for, cancel timeout timer
++    _mhr_await_valid = false;            // MHR: delivery confirmed -> stop blaming a path on timeout
++    _mhrPfClear(from->id.pub_key);       // MHR: direct path works -> reset its failure counter
+     packet->markDoNotRetransmit();   // ACK was for this node, so don't retransmit
+ 
+     if (packet->isRouteFlood() && from->out_path_len != OUT_PATH_UNKNOWN) {
+@@ -433,10 +469,12 @@ int  BaseChatMesh::sendMessage(const ContactInfo& recipient, uint32_t timestamp,
+   if (recipient.out_path_len == OUT_PATH_UNKNOWN) {
+     sendFloodScoped(recipient, pkt);
+     txt_send_timeout = futureMillis(est_timeout = calcFloodTimeoutMillisFor(t));
++    _mhr_await_valid = false;   // MHR: flood send has no cached direct path to blame on timeout
+     rc = MSG_SEND_SENT_FLOOD;
+   } else {
+     sendDirect(pkt, recipient.out_path, recipient.out_path_len);
+     txt_send_timeout = futureMillis(est_timeout = calcDirectTimeoutMillisFor(t, recipient.out_path_len));
++    memcpy(_mhr_await_key, recipient.id.pub_key, 4); _mhr_await_valid = true;   // MHR: blame this path if it times out
+     rc = MSG_SEND_SENT_DIRECT;
+   }
+   return rc;
+@@ -459,10 +497,12 @@ int  BaseChatMesh::sendCommandData(const ContactInfo& recipient, uint32_t timest
+   if (recipient.out_path_len == OUT_PATH_UNKNOWN) {
+     sendFloodScoped(recipient, pkt);
+     txt_send_timeout = futureMillis(est_timeout = calcFloodTimeoutMillisFor(t));
++    _mhr_await_valid = false;   // MHR
+     rc = MSG_SEND_SENT_FLOOD;
+   } else {
+     sendDirect(pkt, recipient.out_path, recipient.out_path_len);
+     txt_send_timeout = futureMillis(est_timeout = calcDirectTimeoutMillisFor(t, recipient.out_path_len));
++    memcpy(_mhr_await_key, recipient.id.pub_key, 4); _mhr_await_valid = true;   // MHR
+     rc = MSG_SEND_SENT_DIRECT;
+   }
+   return rc;
+@@ -941,6 +981,10 @@ void BaseChatMesh::loop() {
+ 
+   if (txt_send_timeout && millisHasNowPassed(txt_send_timeout)) {
+     // failed to get an ACK
++    if (_mhr_await_valid) {   // MHR: a direct send timed out -> count it against that contact's cached path
++      _mhrPfBump(_mhr_await_key);
++      _mhr_await_valid = false;
++    }
+     onSendTimeout();
+     txt_send_timeout = 0;
+   }
+diff --git a/src/helpers/BaseChatMesh.h b/src/helpers/BaseChatMesh.h
+index b39e736..3ee1cce 100644
+--- a/src/helpers/BaseChatMesh.h
++++ b/src/helpers/BaseChatMesh.h
+@@ -71,6 +71,30 @@ class BaseChatMesh : public mesh::Mesh {
+   uint8_t temp_buf[MAX_TRANS_UNIT];
+   ConnectionInfo connections[MAX_CONNECTIONS];
+ 
++  // MHR: prefer-shorter path-pin healing (RAM-only, NOT persisted -> no ContactInfo/format change).
++  //   A cached path that is demonstrably FAILING (>= MHR_PATHFAIL_THRESHOLD consecutive direct-send
++  //   timeouts) or STALE (older than MHR_PATH_STALE_SECS) may be replaced by a longer working path.
++  //   This restores upstream-like self-healing (upstream always adopts the latest path) while keeping
++  //   the short-path bias for fresh, healthy paths. Reverts to pure prefer-shorter if the thresholds
++  //   are raised; never pins a dead path indefinitely the way plain prefer-shorter did.
++  #ifndef MHR_PATHFAIL_SLOTS
++    #define MHR_PATHFAIL_SLOTS 8
++  #endif
++  #ifndef MHR_PATHFAIL_THRESHOLD
++    #define MHR_PATHFAIL_THRESHOLD 2      // adopt a longer path after this many consecutive direct fails
++  #endif
++  #ifndef MHR_PATH_STALE_SECS
++    #define MHR_PATH_STALE_SECS 1800      // a cached path older than this (30 min) may be overwritten
++  #endif
++  struct MhrPathFail { uint8_t key[4]; uint8_t fails; };  // fails==0 => slot free
++  MhrPathFail _mhr_pf[MHR_PATHFAIL_SLOTS];
++  uint8_t _mhr_await_key[4];   // pub-key prefix of the contact tied to the current direct txt_send_timeout
++  bool    _mhr_await_valid;    // true while a direct send is awaiting its ACK
++  MhrPathFail* _mhrPfSlot(const uint8_t* key, bool create);
++  uint8_t _mhrPfGet(const uint8_t* key);
++  void    _mhrPfBump(const uint8_t* key);
++  void    _mhrPfClear(const uint8_t* key);
++
+   mesh::Packet* composeMsgPacket(const ContactInfo& recipient, uint32_t timestamp, uint8_t attempt, const char *text, uint32_t& expected_ack);
+   void sendAckTo(const ContactInfo& dest, uint32_t ack_hash);
+ 
+@@ -86,6 +110,8 @@ protected:
+     txt_send_timeout = 0;
+     _pendingLoopback = NULL;
+     memset(connections, 0, sizeof(connections));
++    memset(_mhr_pf, 0, sizeof(_mhr_pf));   // MHR: path-fail table starts empty
++    _mhr_await_valid = false;              // MHR
+   }
+ 
+   void bootstrapRTCfromContacts();
+-- 
+2.43.0
+
+
+From 93611d5e146c3a67a3a86fa4a481554e4a600d9b Mon Sep 17 00:00:00 2001
+From: MHR fix <dev@example.com>
+Date: Fri, 5 Jun 2026 07:14:08 +0000
+Subject: [PATCH 2/2] MHR fix: adaptive flood-hop ceiling (was fixed
+ flood_max=15 < P90=18)
+
+Fixed flood_max=15 dropped ~10% of legitimate paths (measured diameter
+P90=18) at any MHR node that was the sole forwarder on a long path -> a
+reachability regression, not 'never worse than upstream'.
+
+Track a slowly-decaying rolling max of observed flood hop-counts; the
+effective limit floats between MHR_FLOOD_MAX_FLOOR (=18, cold-start safe)
+and the user ceiling _prefs.flood_max (raised 15 -> 32, now the hard
+ceiling). Far detours still bounded, legitimate long paths no longer cut.
+'set flood.max <n>' now sets the ceiling.
+---
+ examples/simple_repeater/MyMesh.cpp | 46 +++++++++++++++++++++++++----
+ examples/simple_repeater/MyMesh.h   |  9 ++++++
+ 2 files changed, 50 insertions(+), 5 deletions(-)
+
+diff --git a/examples/simple_repeater/MyMesh.cpp b/examples/simple_repeater/MyMesh.cpp
+index ffb1efd..5c77998 100644
+--- a/examples/simple_repeater/MyMesh.cpp
++++ b/examples/simple_repeater/MyMesh.cpp
+@@ -654,9 +654,40 @@ void MyMesh::sendFloodReply(mesh::Packet* packet, unsigned long delay_millis, ui
+   }
+ }
+ 
++// MHR: adaptive flood-hop ceiling tunables. Floor must be >= the measured network P90 (=18) so a cold-
++//   started node never cuts a legitimate long path before it has observed the diameter.
++#ifndef MHR_FLOOD_MAX_FLOOR
++  #define MHR_FLOOD_MAX_FLOOR 18
++#endif
++#ifndef MHR_FLOOD_MAX_MARGIN
++  #define MHR_FLOOD_MAX_MARGIN 4
++#endif
++#ifndef MHR_DIAM_DECAY_MS
++  #define MHR_DIAM_DECAY_MS 600000UL   // relax the rolling max by 1 hop every 10 min (follows topology shrink)
++#endif
++
++void MyMesh::mhrObserveDiam(const mesh::Packet* packet) {
++  if (!packet->isRouteFlood()) return;
++  uint8_t h = packet->getPathHashCount();
++  if (h > _mhr_obs_diam && h <= 63) _mhr_obs_diam = h;   // track the longest flood path seen through us
++}
++
++uint8_t MyMesh::mhrEffectiveFloodMax() {
++  // lazy decay so the cap follows the network down after it shrinks (no separate timer needed)
++  if (millisHasNowPassed(_mhr_diam_decay_at)) {
++    if (_mhr_obs_diam > 0) _mhr_obs_diam--;
++    _mhr_diam_decay_at = futureMillis(MHR_DIAM_DECAY_MS);
++  }
++  uint16_t cap = (uint16_t)_mhr_obs_diam + MHR_FLOOD_MAX_MARGIN;
++  if (cap < MHR_FLOOD_MAX_FLOOR) cap = MHR_FLOOD_MAX_FLOOR;
++  if (cap > _prefs.flood_max) cap = _prefs.flood_max;   // _prefs.flood_max is now the HARD user ceiling
++  return (uint8_t)cap;
++}
++
+ bool MyMesh::allowPacketForward(const mesh::Packet *packet) {
+   if (_prefs.disable_fwd) return false;
+-  if (packet->isRouteFlood() && packet->getPathHashCount() >= _prefs.flood_max) return false;
++  // MHR: adaptive flood-hop limit instead of the fixed _prefs.flood_max (see mhrEffectiveFloodMax()).
++  if (packet->isRouteFlood() && packet->getPathHashCount() >= mhrEffectiveFloodMax()) return false;
+   if (packet->isRouteFlood() && recv_pkt_region == NULL) {
+     MESH_DEBUG_PRINTLN("allowPacketForward: unknown transport code, or wildcard not allowed for FLOOD packet");
+     return false;
+@@ -819,6 +850,7 @@ uint32_t MyMesh::getDirectRetransmitDelay(const mesh::Packet *packet) {
+ }
+ 
+ bool MyMesh::filterRecvFloodPacket(mesh::Packet* pkt) {
++  mhrObserveDiam(pkt);   // MHR: feed the adaptive flood-hop ceiling from every flood packet we hear
+   // just try to determine region for packet (apply later in allowPacketForward())
+   if (pkt->getRouteType() == ROUTE_TYPE_TRANSPORT_FLOOD) {
+     recv_pkt_region = region_map.findMatch(pkt, REGION_DENY_FLOOD);
+@@ -1273,10 +1305,14 @@ MyMesh::MyMesh(mesh::MainBoard &board, mesh::Radio &radio, mesh::MillisecondCloc
+   _prefs.tx_power_dbm = LORA_TX_POWER;
+   _prefs.advert_interval = 1;        // default to 2 minutes for NEW installs
+   _prefs.flood_advert_interval = 12; // 12 hours
+-  // MHR: data-backed default (real diameter P90=18; study: 15 safe at all adoption levels, 12 too
+-  //      aggressive). Purely LOCAL forward limit (allowPacketForward) — stock nodes (64) still carry
+-  //      longer paths, so a single MHR node is never worse. Network-dependent: set flood.max <n>.
+-  _prefs.flood_max = 15;
++  // MHR: _prefs.flood_max is now the HARD user CEILING for the adaptive flood-hop limit (see
++  //      mhrEffectiveFloodMax()). The effective working cap floats between MHR_FLOOD_MAX_FLOOR (>= the
++  //      measured P90=18) and this ceiling, tracking the observed diameter — so legitimate long paths
++  //      are no longer cut the way the old fixed 15 did, while far detours are still bounded. Purely
++  //      LOCAL (allowPacketForward); stock nodes (64) are unaffected. Override the ceiling: set flood.max <n>.
++  _prefs.flood_max = 32;
++  _mhr_obs_diam = 0;          // MHR: no diameter observed yet -> effective cap starts at the safe floor
++  _mhr_diam_decay_at = 0;     // MHR: decay timer arms on first use
+   _prefs.interference_threshold = 0; // disabled
+ 
+   // bridge defaults
+diff --git a/examples/simple_repeater/MyMesh.h b/examples/simple_repeater/MyMesh.h
+index 13dfcf1..2bd2026 100644
+--- a/examples/simple_repeater/MyMesh.h
++++ b/examples/simple_repeater/MyMesh.h
+@@ -198,6 +198,15 @@ protected:
+ 
+   bool allowPacketForward(const mesh::Packet* packet) override;
+   const char* getLogDateTime() override;
++
++  // MHR: adaptive flood-hop ceiling. Replaces the fixed flood_max cut (which at 15 dropped ~10% of
++  //   legitimate paths vs the measured P90=18). Tracks a slowly-decaying rolling maximum of observed
++  //   flood hop-counts; the effective limit floats between MHR_FLOOD_MAX_FLOOR (cold-start safe, >= P90)
++  //   and the user ceiling _prefs.flood_max. mhrObserveDiam() feeds it from every received flood packet.
++  uint8_t       _mhr_obs_diam;          // rolling max observed flood hop-count
++  unsigned long _mhr_diam_decay_at;     // next decay deadline
++  uint8_t mhrEffectiveFloodMax();
++  void    mhrObserveDiam(const mesh::Packet* packet);
+   void logRxRaw(float snr, float rssi, const uint8_t raw[], int len) override;
+ 
+   void logRx(mesh::Packet* pkt, int len, float score) override;
+-- 
+2.43.0
+

@@ -50,3 +50,61 @@ ist ja stabil — als opt-in Schicht reaktiviert und neu bewertet werden. Heute:
 Verteilte Regler beeinflussen sich gegenseitig (im Modell erfasst, real evtl. anders); lokaler
 Airtime-Proxy ≠ globale Delivery (durch Guards aber abgesichert); Sim-Idealisierungen (kein
 Duty-Cycle/Kollisionen). Die Kernaussage „Mehrwert < statischer Satz" ist über alle Szenarien robust.
+
+---
+## 🇬🇧 English Translation
+
+# Adaptive Suppression Controller — Design & Validation (Result: NO-GO)
+
+*Question (user): Can the firmware adapt itself to the environment every 1–2 h to optimally tune
+suppression? Does this make sense?*
+**Answer after simulation: technically feasible and stable — but NOT worthwhile. The static
+safe parameter set already captures the gain.**
+
+Validation: `adaptive_sim.py` / `adaptive_results.json` (real neighbor-graph, Seed 42, ≥5 seeds,
+40 adaptation ticks per scenario). Builds on the validated guarded suppression
+([Suppression_Design.md](Suppression_Design.md), [SUPPRESSION_VALIDATION.md](SUPPRESSION_VALIDATION.md)).
+
+## The Investigated Design
+Fast safety remains per-packet at guards G1–G5. A SLOW outer control loop (tick ≈
+1–2 h) adjusts only the suppression **aggressiveness** (`supp_prob`) per node **within the
+validated safe window** — based on locally measurable quantities (neighbor density, overheard
+cover redundancy, airtime pressure, churn). Asymmetric (fast revert to conservative on
+churn/declining redundancy, slow advance), damped, bounded. Since the guards protect the delivery
+rate for every parameter value, the adaptation can only trade airtime against margin.
+
+## Results (static-safe vs. adaptive, airtime gain)
+| Scenario | static | adaptive | Δ (pp) | strictly-safe ticks (stat/adapt) |
+|---|---|---|---|---|
+| Day/night load | 12.3 % | 14.8 % | **+2.5** | 20 / 20 |
+| Node churn | 12.6 % | 14.5 % | **+1.9** | 17 / 14 |
+| Density shift | 10.5 % | 9.6 % | **−0.9** | 22 / 19 |
+| Link failure | 11.8 % | 11.4 % | **−0.3** | 17 / 20 |
+| **Mean** | | | **+0.76** | |
+
+- **Convergence/oscillation:** the controller **does not oscillate** (`any_oscillation = false`; settle
+  variance of supp_prob 3e-7 … 7e-3; it settles around p ≈ 0.58–0.77 depending on density). The
+  concept is therefore stable — that was not the problem.
+- **Value added:** on average only **+0.76 pp** airtime over the static safe set (max
+  +2.48 pp), even slightly worse in two scenarios. Below the benefit threshold (2.0 pp).
+- **Safety:** `all_scenarios_safe = false` — the adaptive controller is minimally less strictly safe
+  than the static set in individual ticks (which is continuously safe).
+
+## Decision: NO-GO (`go = false`)
+The adaptive controller provides only a negligible airtime advantage over the already very good
+static safe set, at the cost of **additional complexity and a minimal safety risk**.
+In line with the project priority **quality & stability over last-mile optimisation**, it will **not
+be coded**.
+
+**Recommended instead:** use the **static** safe set (`k_cover=2, min_degree=3..4,
+snr_floor=-6, prob=0.8`). It is simpler, continuously safe, and captures virtually the same gain.
+
+**Shelved, not discarded:** If future data from *very* heterogeneous networks (e.g. extreme
+day/night swings, where adaptive showed +2.5 pp) demonstrate a larger spread, the controller — it is
+stable, after all — can be reactivated as an opt-in layer and re-evaluated. For now: no.
+
+## Limitations
+Distributed controllers influence each other (captured in the model, possibly different in the real
+world); local airtime proxy ≠ global delivery (but protected by the guards); simulation
+idealisations (no duty-cycle/collisions). The core finding "value added < static set" is robust
+across all scenarios.

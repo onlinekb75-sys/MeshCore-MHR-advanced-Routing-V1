@@ -67,3 +67,76 @@ Routing-*Verhalten*, Adoptions-Effekte, Konvergenz/Schleifenfreiheit (Sim-Gate) 
 + `docs/MHR/study` belegt. Der Bench-Test prüft die **funk-/HW-abhängigen** Punkte, die keine Sim
 liefern kann: reales Timing/Cover im Backoff-Fenster, 2-Hop-Lern-Konvergenz on-air, Capture/Kollision,
 Watchdog/RAM unter Last, und dass Stock-Knoten DV wirklich ignorieren.
+
+---
+## 🇬🇧 English Translation
+
+# Bench Test Plan — MHR-MeshCore (Heltec V4)
+
+*What has been validated in software must be confirmed on real radio hardware. This plan is
+tailored to Heltec V4 (ESP32-S3). Order = ascending risk; each stage has clear
+acceptance criteria. **Bench/spare devices only, not production repeaters.** Back up config/identity
+beforehand.*
+
+## 0. Prerequisites
+- **Hardware:** at least **5 Heltec V4** (3–4 suffice for flood detours/Best-of-N; for backbone/regions
+  ≥ 5, ideally with 2 "regions"). USB for CLI/serial log on each node.
+- **Firmware:** `dist/`-`.bin` (default config: Stage A + Best-of-N ON, Stage B + Phase 2 OFF).
+- **Measurement tools:** CLI commands `trace <target>`, `get stats`, `neighbors`, packet log (`set log on`),
+  and — for Phase 2 — a DV table dump (debug). Spread topology spatially (attenuators/distance)
+  so that multi-hop paths + detours arise in reality.
+- **Baseline reference:** one node running **upstream** firmware (for the "never worse" comparison).
+
+## 1. Stage A — Hop-weighted Timing + flood.max 15  *(default ON)*
+**Test:** 4–5 nodes in a chain/mesh, repeated `trace` between the endpoints before/after activation
+(`set txhopweight 0` ↔ `0.6`, `set flood.max 64` ↔ `15`).
+**Acceptance:** with MHR the traced paths are on average **equal or shorter**; never longer.
+flood.max 15 does not cut off any *necessary* delivery (network diameter < 15). Delivery rate ≥ upstream node.
+
+## 2. Best-of-N at Destination  *(default ON, repeater)*
+**Test:** Force discovery over **two** paths of different length (e.g. one direct 2-hop +
+one 4-hop detour). Monitor destination node serial log.
+**Acceptance (points listed in review/code):**
+1. **Single-copy = first-wins:** only one path → reported path identical (only ~window later).
+2. **Multi-copy:** shortest (2-hop) path is reported, not the 4-hop detour.
+3. **SNR tiebreak:** two equally long paths, different last-hop SNR → better SNR wins.
+4. **Dedup invariant (critical):** payload delivered exactly **once**, regardless of how many copies.
+5. **Exactly one path-return** despite N copies.
+6. `set bofn.enable 0` → immediately first-wins without reboot; `set bofn.window 800` takes effect live.
+
+## 3. Stage B — Guarded Suppression  *(default OFF → enable for test)*
+**Preparation:** dense cluster (≥ 4–5 repeaters within mutual range). Let the 2-hop table learn
+"fresh" first (several advert periods). Then `set supp.enable 1` (settings: k_cover 2,
+min_degree 3, snr_floor -6, prob 80).
+**Acceptance:**
+- **Airtime decreases** in the cluster (fewer rebroadcasts, via packet log/`get stats`), **delivery rate remains
+  ≥** the OFF state (no leaf node cut off — test a weakly connected leaf!).
+- **Freshness gating:** a freshly booted node does NOT suppress before it has learned.
+- `set supp.enable 0` → immediately reverts to Stage A behavior. If in doubt/coverage loss: leave off.
+
+## 4. Phase 2 — Backbone  *(default OFF; ONLY activate after Code-Fix B1 + renewed convergence gate!)*
+> ⚠️ **Lock:** `bb.enable 1` only after the loop-BLOCKER B1 (per-destination seqno) is fixed and the
+> convergence gate is GO again against the corrected logic. Before that it would generate loops.
+**Test (≥ 5 nodes, 2 regions):** `set bb.enable 1` on the repeaters, `bb.period` 600.
+**Acceptance:**
+- **Convergence:** DV tables stabilize (debug dump), no persistent oscillation.
+- **Loop-freedom:** no circulating packets (packet log/`trace` shows loop-free paths), including
+  during/after nodes being toggled on/off (churn).
+- **Control airtime** stays small (DV zero-hop only, period ≥ 300 s) — `get stats` against budget.
+- **Mixed-FW:** one upstream node in the network → ignores DV (no reflood), network remains functional.
+- **Never worse:** delivery rate ≥ OFF state (data-plane short-circuit is not yet active →
+  data continues to flow via flood-and-cache; the test primarily checks control-plane stability).
+
+## 5. General Safety / Abort Criteria
+- If at any stage the **delivery rate** drops below the OFF state → disable the feature (`set …enable 0`),
+  note the cause. "Never worse" is the hard line.
+- Monitor watchdog resets / RAM anomalies (`get stats`).
+- Test each stage individually before combining multiple.
+- Log results (paths, airtime, delivery rate, per ON/OFF) → feeds back into the next
+  simulation calibration.
+
+## What Software Validation Has Already Covered (Context)
+Routing *behavior*, adoption effects, convergence/loop-freedom (sim gate) are documented in `docs/MHR/sim`
++ `docs/MHR/study`. The bench test checks the **radio/HW-dependent** points that no simulation
+can provide: real timing/coverage in the backoff window, 2-hop learning convergence on-air, capture/collision,
+watchdog/RAM under load, and that stock nodes truly ignore DV.

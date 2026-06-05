@@ -54,3 +54,62 @@ für echten Wert — ohne die nachweislich nutzlose Auto-Tuning-Schleife.
 Modell-Idealisierungen (kein Duty-Cycle/Kollisionen — die würden Suppression eher aufwerten, aber
 nicht die *relative* Aussage adaptiv-vs-statisch ändern); neighbor-graph erfasst nur genutzte Links;
 Momentaufnahme; Klassengrenzen nach Grad-Quantilen (q40/q80).
+
+---
+## 🇬🇧 English Translation
+
+# Slow per-Node Calibration & On-Node Feasibility (Result: NO-GO)
+
+*Question: Does a slow (12–48 h) self-calibration per node adapted to local density/role provide
+more benefit than the global static safe set — especially at the extremes (dense hubs / sparse bridges)?
+And is a stripped-down version runnable on the node?*
+
+**Answer: NO (second, independent NO-GO).** Locally calibrated does not beat the static set;
+it is even marginally worse in terms of airtime. The reason is structural: the **per-packet guards
+G1–G5 already adapt in real time** to the local situation (actually heard redundancy per packet)
+— better than any pre-averaged value over 12–48 h ever could.
+
+Validation: `local_calib_sim.py` / `local_calib_results.json` (real neighbor-graph: 632 nodes /
+1577 edges, classes: 129 hubs / 207 medium / 296 bridge-leaves; seed 42, ≥5 seeds).
+
+## Result
+| Metric | Value |
+|---|---|
+| Airtime locally-calibrated vs. static (high adoption) | **−0.50 pp** (worse) |
+| Extra gain at **hubs** | **−0.04 pp** (no advantage) |
+| Worst bridge delivery-rate delta (local) | −0.017 (safe) |
+| Stripped-down on-node characteristic: retained gain | **0 %** (no gain present) |
+| Decision | **`go_local_full = false`** |
+
+## Honest Nuance (one actionable side finding)
+The finer **per-class** analysis shows: the *static* set dips slightly at **bridges** at α=0.5
+(worst class-Δ −0.052), local calibration does not (−0.017). Local is therefore somewhat *safer* at
+bridges, but marginally *worse* in airtime — neither dominates. **Consequence:** instead of a
+controller, a small **static default readjustment** is sufficient (e.g. `supp_min_degree` more
+conservative at bridges), if Stage B is ever activated. No adaptive machinery needed.
+
+## On-Node Feasibility (Additional Question)
+The stripped-down calibration characteristic would be **trivially** node-compatible: ~9 bytes lookup,
+4 bytes state per node, ≤ 5 integer comparisons, no float/heap/sort, 1× per 12–48 h. Feasibility is
+therefore **not** an obstacle — but it is **moot**, because there is no gain to be had. (A *rich*
+RX statistics/telemetry on the node is independently useful — see recommendation below.)
+
+## Overall Picture: Two Independent NO-GOs for Auto-Adaptation
+1. Fast (1–2 h) supp_prob controller → +0.76 pp (too little). `Adaptive_Controller_Design.md`.
+2. Slow (12–48 h) per-node calibration → −0.5 pp (worse). This document.
+
+Robust conclusion: **The per-packet guards already capture local adaptation; a slow outer control loop
+for suppression parameters is not worthwhile.** Static safe set + guards remains the recommendation.
+
+## Recommendation Despite NO-GO
+A **passive on-node RX statistics/telemetry** (no controller!) is very much useful and straightforward
+on the ESP32-S3: local path-length histogram (= local diameter), neighbor SNR distribution,
+redundancy/cover histogram, traffic by type, duty-cycle utilization, churn. Benefit: diagnostics,
+well-founded *manual* parameter selection, feeding the existing guards (2-hop freshness, cover stats),
+anomaly/self-protection (e.g. advert backoff when duty-cycle is saturated). This uses the CPU reserve
+for real value — without the demonstrably useless auto-tuning loop.
+
+## Limitations
+Model idealizations (no duty-cycle/collisions — these would tend to upgrade suppression, but would
+not change the *relative* statement adaptive-vs-static); neighbor-graph only captures used links;
+snapshot; class boundaries by degree quantiles (q40/q80).
