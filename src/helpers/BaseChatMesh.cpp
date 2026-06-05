@@ -301,18 +301,50 @@ bool BaseChatMesh::onPeerPathRecv(mesh::Packet* packet, int sender_idx, const ui
   return onContactPathRecv(from, packet->path, packet->path_len, path, path_len, extra_type, extra, extra_len);
 }
 
+// MHR: ---- prefer-shorter path-pin healing helpers (RAM-only) -------------------------------------
+//   A small fixed table keyed by a 4-byte pub-key prefix tracks consecutive direct-send failures per
+//   contact. A slot with fails==0 is free. No dynamic allocation, not persisted.
+BaseChatMesh::MhrPathFail* BaseChatMesh::_mhrPfSlot(const uint8_t* key, bool create) {
+  int freeIdx = -1;
+  for (int i = 0; i < MHR_PATHFAIL_SLOTS; i++) {
+    if (_mhr_pf[i].fails > 0) {
+      if (memcmp(_mhr_pf[i].key, key, 4) == 0) return &_mhr_pf[i];
+    } else if (freeIdx < 0) {
+      freeIdx = i;
+    }
+  }
+  if (!create) return NULL;
+  int idx = (freeIdx >= 0) ? freeIdx : 0;   // reuse a free slot; if none, clobber slot 0 (rare)
+  memcpy(_mhr_pf[idx].key, key, 4);
+  _mhr_pf[idx].fails = 0;
+  return &_mhr_pf[idx];
+}
+uint8_t BaseChatMesh::_mhrPfGet(const uint8_t* key)  { MhrPathFail* s = _mhrPfSlot(key, false); return s ? s->fails : 0; }
+void    BaseChatMesh::_mhrPfBump(const uint8_t* key) { MhrPathFail* s = _mhrPfSlot(key, true);  if (s && s->fails < 255) s->fails++; }
+void    BaseChatMesh::_mhrPfClear(const uint8_t* key){ MhrPathFail* s = _mhrPfSlot(key, false); if (s) s->fails = 0; }
+
 bool BaseChatMesh::onContactPathRecv(ContactInfo& from, uint8_t* in_path, uint8_t in_path_len, uint8_t* out_path, uint8_t out_path_len, uint8_t extra_type, uint8_t* extra, uint8_t extra_len) {
-  // MHR: prefer-shorter path adoption. We only replace the cached 'out_path' if the newly offered
-  //      path is NOT longer (>= as short) than the one we already have, or if we have none yet.
-  //      Hop count is the low 6 bits of path_len. This prevents a later-arriving longer detour from
-  //      overwriting a good short path. A genuinely broken path triggers resetPathTo() elsewhere,
-  //      which sets out_path_len = OUT_PATH_UNKNOWN, so we never get permanently stuck on a stale path.
-  //      Behaviour is never worse than upstream: with a single offered path it is identical.
-  bool mhr_adopt = (from.out_path_len == OUT_PATH_UNKNOWN)
-                   || ((out_path_len & 0x3F) <= (from.out_path_len & 0x3F));
+  // MHR: prefer-shorter path adoption, WITH self-healing. We keep the cached 'out_path' when the newly
+  //      offered path is longer — but ONLY while the cached path is still healthy. A longer path is
+  //      adopted when (a) we have no path yet, (b) the new path is as short or shorter, (c) the cached
+  //      path is FAILING (>= MHR_PATHFAIL_THRESHOLD consecutive direct-send timeouts, tracked in RAM), or
+  //      (d) the cached path is STALE (older than MHR_PATH_STALE_SECS). Cases (c)/(d) restore upstream's
+  //      self-healing: plain prefer-shorter could pin a dead-but-shorter path forever because nothing
+  //      auto-resets out_path_len on failure (resetPathTo() is only ever called by an explicit user/app
+  //      action). Hop count is the low 6 bits of path_len.
+  uint8_t new_hops = out_path_len & 0x3F;
+  uint8_t cur_hops = from.out_path_len & 0x3F;
+  uint32_t now = getRTCClock()->getCurrentTime();
+  bool have       = (from.out_path_len != OUT_PATH_UNKNOWN);
+  bool shorter_eq = have && (new_hops <= cur_hops);
+  bool stale      = have && (from.lastmod != 0) && (now > from.lastmod)
+                         && ((now - from.lastmod) > MHR_PATH_STALE_SECS);
+  bool failing    = have && (_mhrPfGet(from.id.pub_key) >= MHR_PATHFAIL_THRESHOLD);
+  bool mhr_adopt  = (!have) || shorter_eq || stale || failing;
   if (mhr_adopt) {
     from.out_path_len = mesh::Packet::copyPath(from.out_path, out_path, out_path_len);  // store a copy of path, for sendDirect()
-    from.lastmod = getRTCClock()->getCurrentTime();
+    from.lastmod = now;
+    _mhrPfClear(from.id.pub_key);   // MHR: path refreshed -> clear failure state
   }
 
   onContactPathUpdated(from);
@@ -321,6 +353,8 @@ bool BaseChatMesh::onContactPathRecv(ContactInfo& from, uint8_t* in_path, uint8_
     // also got an encoded ACK!
     if (processAck(extra) != NULL) {
       txt_send_timeout = 0;   // matched one we're waiting for, cancel timeout timer
+      _mhr_await_valid = false;            // MHR: piggybacked ACK confirms delivery
+      _mhrPfClear(from.id.pub_key);        // MHR
     }
   } else if (extra_type == PAYLOAD_TYPE_RESPONSE && extra_len > 0) {
     onContactResponse(from, extra, extra_len);
@@ -332,6 +366,8 @@ void BaseChatMesh::onAckRecv(mesh::Packet* packet, uint32_t ack_crc) {
   ContactInfo* from;
   if ((from = processAck((uint8_t *)&ack_crc)) != NULL) {
     txt_send_timeout = 0;   // matched one we're waiting for, cancel timeout timer
+    _mhr_await_valid = false;            // MHR: delivery confirmed -> stop blaming a path on timeout
+    _mhrPfClear(from->id.pub_key);       // MHR: direct path works -> reset its failure counter
     packet->markDoNotRetransmit();   // ACK was for this node, so don't retransmit
 
     if (packet->isRouteFlood() && from->out_path_len != OUT_PATH_UNKNOWN) {
@@ -433,10 +469,12 @@ int  BaseChatMesh::sendMessage(const ContactInfo& recipient, uint32_t timestamp,
   if (recipient.out_path_len == OUT_PATH_UNKNOWN) {
     sendFloodScoped(recipient, pkt);
     txt_send_timeout = futureMillis(est_timeout = calcFloodTimeoutMillisFor(t));
+    _mhr_await_valid = false;   // MHR: flood send has no cached direct path to blame on timeout
     rc = MSG_SEND_SENT_FLOOD;
   } else {
     sendDirect(pkt, recipient.out_path, recipient.out_path_len);
     txt_send_timeout = futureMillis(est_timeout = calcDirectTimeoutMillisFor(t, recipient.out_path_len));
+    memcpy(_mhr_await_key, recipient.id.pub_key, 4); _mhr_await_valid = true;   // MHR: blame this path if it times out
     rc = MSG_SEND_SENT_DIRECT;
   }
   return rc;
@@ -459,10 +497,12 @@ int  BaseChatMesh::sendCommandData(const ContactInfo& recipient, uint32_t timest
   if (recipient.out_path_len == OUT_PATH_UNKNOWN) {
     sendFloodScoped(recipient, pkt);
     txt_send_timeout = futureMillis(est_timeout = calcFloodTimeoutMillisFor(t));
+    _mhr_await_valid = false;   // MHR
     rc = MSG_SEND_SENT_FLOOD;
   } else {
     sendDirect(pkt, recipient.out_path, recipient.out_path_len);
     txt_send_timeout = futureMillis(est_timeout = calcDirectTimeoutMillisFor(t, recipient.out_path_len));
+    memcpy(_mhr_await_key, recipient.id.pub_key, 4); _mhr_await_valid = true;   // MHR
     rc = MSG_SEND_SENT_DIRECT;
   }
   return rc;
@@ -941,6 +981,10 @@ void BaseChatMesh::loop() {
 
   if (txt_send_timeout && millisHasNowPassed(txt_send_timeout)) {
     // failed to get an ACK
+    if (_mhr_await_valid) {   // MHR: a direct send timed out -> count it against that contact's cached path
+      _mhrPfBump(_mhr_await_key);
+      _mhr_await_valid = false;
+    }
     onSendTimeout();
     txt_send_timeout = 0;
   }

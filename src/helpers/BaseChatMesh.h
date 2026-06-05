@@ -71,6 +71,30 @@ class BaseChatMesh : public mesh::Mesh {
   uint8_t temp_buf[MAX_TRANS_UNIT];
   ConnectionInfo connections[MAX_CONNECTIONS];
 
+  // MHR: prefer-shorter path-pin healing (RAM-only, NOT persisted -> no ContactInfo/format change).
+  //   A cached path that is demonstrably FAILING (>= MHR_PATHFAIL_THRESHOLD consecutive direct-send
+  //   timeouts) or STALE (older than MHR_PATH_STALE_SECS) may be replaced by a longer working path.
+  //   This restores upstream-like self-healing (upstream always adopts the latest path) while keeping
+  //   the short-path bias for fresh, healthy paths. Reverts to pure prefer-shorter if the thresholds
+  //   are raised; never pins a dead path indefinitely the way plain prefer-shorter did.
+  #ifndef MHR_PATHFAIL_SLOTS
+    #define MHR_PATHFAIL_SLOTS 8
+  #endif
+  #ifndef MHR_PATHFAIL_THRESHOLD
+    #define MHR_PATHFAIL_THRESHOLD 2      // adopt a longer path after this many consecutive direct fails
+  #endif
+  #ifndef MHR_PATH_STALE_SECS
+    #define MHR_PATH_STALE_SECS 1800      // a cached path older than this (30 min) may be overwritten
+  #endif
+  struct MhrPathFail { uint8_t key[4]; uint8_t fails; };  // fails==0 => slot free
+  MhrPathFail _mhr_pf[MHR_PATHFAIL_SLOTS];
+  uint8_t _mhr_await_key[4];   // pub-key prefix of the contact tied to the current direct txt_send_timeout
+  bool    _mhr_await_valid;    // true while a direct send is awaiting its ACK
+  MhrPathFail* _mhrPfSlot(const uint8_t* key, bool create);
+  uint8_t _mhrPfGet(const uint8_t* key);
+  void    _mhrPfBump(const uint8_t* key);
+  void    _mhrPfClear(const uint8_t* key);
+
   mesh::Packet* composeMsgPacket(const ContactInfo& recipient, uint32_t timestamp, uint8_t attempt, const char *text, uint32_t& expected_ack);
   void sendAckTo(const ContactInfo& dest, uint32_t ack_hash);
 
@@ -86,6 +110,8 @@ protected:
     txt_send_timeout = 0;
     _pendingLoopback = NULL;
     memset(connections, 0, sizeof(connections));
+    memset(_mhr_pf, 0, sizeof(_mhr_pf));   // MHR: path-fail table starts empty
+    _mhr_await_valid = false;              // MHR
   }
 
   void bootstrapRTCfromContacts();
