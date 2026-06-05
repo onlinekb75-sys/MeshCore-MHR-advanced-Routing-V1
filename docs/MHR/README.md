@@ -1,74 +1,78 @@
-# MHR — Doku-Übersicht & Einstieg
+# MHR — Documentation Overview & Entry Point
 
-**MHR = MeshCore Hybrid Routing.** Diese Seite erklärt, *was* der Fork kann, *wie* er funktioniert und
-*wo* die Details stehen. (Schnelleinstieg fürs README im Repo-Root; vollständige Patch-Liste in
+**MHR = MeshCore Hybrid Routing.** This page explains *what* the fork does, *how* it works and
+*where* the details are. (Quick entry point for the repo root README; full patch list in
 [`CHANGES_MHR.md`](CHANGES_MHR.md).)
 
 ---
 
-## 1. Worum geht es?
-MeshCore (LoRa-Mesh) macht **kein** metrik-basiertes Routing: die erste Nachricht wird geflutet, der
-**zuerst** eintreffende Pfad gecacht und fest weiterverwendet — oft ein **Umweg**. Auf echten Daten
-gemessen: **Median-Umweg 2,1×**. Umwege = verschwendete **Airtime**, der eigentliche Engpass.
+## 1. What is this about?
 
-MHR legt eine **unsichtbare, rein node-lokale Optimierungs-Schicht** darüber: sie richtet die Flutung
-an der **Hop-Zahl/Linkqualität** aus, wählt den **kürzesten** Pfad, unterdrückt **redundante**
-Aussendungen — **ohne** Paketformat-Eingriff, **mischbetriebs-kompatibel** mit Stock-Knoten und
-**„nie schlechter" als Upstream**. Architektur-Detail: [`study/Invisible_Optimizing_Layer.md`](study/Invisible_Optimizing_Layer.md).
+MeshCore (LoRa mesh) uses **no** metric-based routing: the first message is flooded, the
+**first-arriving** path is cached and reused indefinitely — often a **detour**. Measured on real
+data: **median detour 2.1×**. Detours = wasted **airtime**, the actual bottleneck.
 
-## 2. Was kann es? (Stufen — was jede bringt)
+MHR adds an **invisible, purely node-local optimization layer** on top: it aligns flooding with
+**hop count / link quality**, selects the **shortest** path, and suppresses **redundant**
+transmissions — **without** touching the packet format, **mixed-firmware-compatible** with stock
+nodes, and **"never worse" than upstream**. Architecture detail:
+[`study/Invisible_Optimizing_Layer.md`](study/Invisible_Optimizing_Layer.md).
 
-| Stufe | Mechanismus | Status | Nutzen |
+## 2. What can it do? (Stages — what each one delivers)
+
+| Stage | Mechanism | Status | Benefit |
 |---|---|---|---|
-| **Phase 0** | RX-SNR-Flutung + prefer-shorter Pfad-Adoption | ✅ aktiv | qualitätsgeleitete Ausbreitung |
-| **Stufe A** | Hop-gewichtetes TX-Delay + `flood.max` 15 + EWMA-SNR | ✅ aktiv | kürzere Pfade führen den Flood |
-| **Best-of-N** | Ziel meldet kürzesten Pfad (Hops→SNR) statt „first wins" | ✅ aktiv | Detour-Killer, dedup-sicher |
-| **Stufe B** | guarded Suppression (5 Guards + passives 2-Hop-Lernen) | 🔒 default-AUS | −12…15 % Airtime, Lieferquote ≥ Baseline |
-| **Phase 2** | proaktiver DV-Backbone (Babel-Feasibility, Regionen) | 🔒 default-AUS | optimale Unicast-Pfade statt Flood |
+| **Phase 0** | RX-SNR flooding + prefer-shorter path adoption | ✅ active | quality-guided propagation |
+| **Stage A** | Hop-weighted TX delay + adaptive `flood.max` + EWMA SNR | ✅ active | shorter paths lead the flood |
+| **Best-of-N** | Destination reports shortest path (hops → SNR) instead of "first wins" | ✅ active | detour killer, dedup-safe |
+| **Stage B** | Guarded suppression (5 guards + passive 2-hop learning) | 🔒 default-off | −12…15 % airtime, delivery ≥ baseline |
+| **Phase 2** | Proactive DV backbone (Babel-feasibility, regions) | 🔒 default-off | optimal unicast paths instead of flooding |
 
-🔒 = im Code, aber **default-aus** bis Bench-Test ([`BENCH_TEST_PLAN.md`](BENCH_TEST_PLAN.md)).
-**Datenbelegt verworfen** (bringen über die Guards hinaus nichts): adaptiver Selbst-Regler, per-Node-
-Kalibrierung, TX-Leistungsregelung — siehe Studien unten.
+🔒 = in the code, but **default-off** until bench testing ([`BENCH_TEST_PLAN.md`](BENCH_TEST_PLAN.md)).  
+**Evaluated & rejected** (no benefit beyond the guards): adaptive self-tuning controller, per-node
+calibration, TX power control — see studies below.
 
-## 3. Ist das belegt? (Validierungs-Story)
-Alles auf **echten CoreScope-Live-Daten** (109.980 Pakete, 1962 Knoten) simuliert — nicht nur Theorie:
-- **Gemessen:** realer Median-Umweg 2,1× → belegt das Problem. ([`sim/MeshCore_Simulation_v3_Realdaten.md`](sim/MeshCore_Simulation_v3_Realdaten.md))
-- **Komposit-Adoptions-Sweep** (1 %→100 % Knoten mit MHR): bis −12 % Airtime, monoton & sicher ab 1 Knoten. ([`study/Composite_Adoption_Study.md`](study/Composite_Adoption_Study.md))
-- **Phase-2-Konvergenz-Gate: GO** (0 Schleifen, re-konvergiert unter Churn). ([`study/Phase2_Convergence_Validation.md`](study/Phase2_Convergence_Validation.md))
-- Datensatz + Reproduktion: [`sim/README.md`](sim/README.md), Herkunft: [`sim/data/PROVENANCE.md`](sim/data/PROVENANCE.md).
+## 3. Is this validated? (Validation story)
 
-## 4. Wo anfangen?
-- **Bauen/Flashen:** Repo-Root-README (PlatformIO / Web-Flasher) → `dist/`.
-- **Auf Hardware testen:** [`BENCH_TEST_PLAN.md`](BENCH_TEST_PLAN.md) (gestuft, Akzeptanzkriterien; Stufe B/Phase 2 erst hier aktivieren).
-- **Was genau geändert wurde:** [`CHANGES_MHR.md`](CHANGES_MHR.md) (Patch 1–9, mit CLI-Befehlen + Persistenz-Offsets).
+Everything simulated on **real CoreScope live data** (109,980 packets, 1,962 nodes) — not just theory:
+- **Measured:** real median detour 2.1× → confirms the problem. ([`sim/MeshCore_Simulation_v3_Realdaten.md`](sim/MeshCore_Simulation_v3_Realdaten.md))
+- **Composite adoption sweep** (1 %→100 % nodes with MHR): up to −12 % airtime, monotone & safe from 1 node. ([`study/Composite_Adoption_Study.md`](study/Composite_Adoption_Study.md))
+- **Phase 2 convergence gate: GO** (0 loops, reconverges under churn). ([`study/Phase2_Convergence_Validation.md`](study/Phase2_Convergence_Validation.md))
+- Dataset + reproduction: [`sim/README.md`](sim/README.md), provenance: [`sim/data/PROVENANCE.md`](sim/data/PROVENANCE.md).
+
+## 4. Where to start?
+
+- **Build / flash:** repo root README (PlatformIO / Web Flasher) → `dist/`.
+- **Test on hardware:** [`BENCH_TEST_PLAN.md`](BENCH_TEST_PLAN.md) (staged, with acceptance criteria; Stage B / Phase 2 only enabled here).
+- **What exactly was changed:** [`CHANGES_MHR.md`](CHANGES_MHR.md) (patches 1–9, with CLI commands + persistence offsets).
 
 ---
 
-## 5. Doku-Index (alle Dokumente)
+## 5. Documentation index (all documents)
 
-**Analyse & Design**
-- [`MeshCore_Routing_Analyse_und_Optimierung.md`](MeshCore_Routing_Analyse_und_Optimierung.md) — Ursachenanalyse der Umwege (Stufen A–D)
-- [`MeshCore_Hybrid_Routing_Entwurf.md`](MeshCore_Hybrid_Routing_Entwurf.md) — MHR v1 (DSR + ETX + Best-of-N + Backbone)
-- [`MeshCore_Hybrid_Routing_v2_Robustheit.md`](MeshCore_Hybrid_Routing_v2_Robustheit.md) — v2-Härtung aus Realdaten (H1–H7)
-- [`study/Invisible_Optimizing_Layer.md`](study/Invisible_Optimizing_Layer.md) — **Architektur** der node-lokalen Schicht
-- [`CHANGES_MHR.md`](CHANGES_MHR.md) — vollständige Patch-Liste 1–9
-- [`BENCH_TEST_PLAN.md`](BENCH_TEST_PLAN.md) — Hardware-Bench-Test (Heltec V4)
+**Analysis & design**
+- [`MeshCore_Routing_Analyse_und_Optimierung.md`](MeshCore_Routing_Analyse_und_Optimierung.md) — root-cause analysis of detours (stages A–D)
+- [`MeshCore_Hybrid_Routing_Entwurf.md`](MeshCore_Hybrid_Routing_Entwurf.md) — MHR v1 (DSR + ETX + Best-of-N + backbone)
+- [`MeshCore_Hybrid_Routing_v2_Robustheit.md`](MeshCore_Hybrid_Routing_v2_Robustheit.md) — v2 hardening from real data (H1–H7)
+- [`study/Invisible_Optimizing_Layer.md`](study/Invisible_Optimizing_Layer.md) — **architecture** of the node-local layer
+- [`CHANGES_MHR.md`](CHANGES_MHR.md) — full patch list 1–9
+- [`BENCH_TEST_PLAN.md`](BENCH_TEST_PLAN.md) — hardware bench test (Heltec V4)
 
-**Studien & Validierungen** (`study/`)
-- [`study/MeshCore_Routing_Study.md`](study/MeshCore_Routing_Study.md) — Mechanismus-Studie (Adoptions-Sweep, Tiering) · Begleit: [`study/STUDY_DESIGN.md`](study/STUDY_DESIGN.md), [`study/STUDY_RESULTS.md`](study/STUDY_RESULTS.md)
-- [`study/Composite_Adoption_Study.md`](study/Composite_Adoption_Study.md) — die ganze Schicht bei 1/10/25/50/75/100 % Adoption
-- [`study/Suppression_Design.md`](study/Suppression_Design.md) + [`study/SUPPRESSION_VALIDATION.md`](study/SUPPRESSION_VALIDATION.md) — Stufe B (5 Guards) Design + GO
-- [`study/Phase2_Backbone_Design.md`](study/Phase2_Backbone_Design.md) + [`study/Backbone_Phase2_Study.md`](study/Backbone_Phase2_Study.md) + [`study/Phase2_Convergence_Validation.md`](study/Phase2_Convergence_Validation.md) — Phase 2 Design, Airtime-Ökonomie, Konvergenz-Gate
-- [`study/Path_Reinforcement_Study.md`](study/Path_Reinforcement_Study.md) — Pfad-Erfolgs-Reinforcement (GO)
-- [`study/Adaptive_Controller_Design.md`](study/Adaptive_Controller_Design.md) + [`study/Local_Calibration_Study.md`](study/Local_Calibration_Study.md) — adaptive Selbst-Anpassung (**NO-GO**, datenbelegt)
+**Studies & validations** (`study/`)
+- [`study/MeshCore_Routing_Study.md`](study/MeshCore_Routing_Study.md) — mechanism study (adoption sweep, tiering) · companion: [`study/STUDY_DESIGN.md`](study/STUDY_DESIGN.md), [`study/STUDY_RESULTS.md`](study/STUDY_RESULTS.md)
+- [`study/Composite_Adoption_Study.md`](study/Composite_Adoption_Study.md) — full layer at 1/10/25/50/75/100 % adoption
+- [`study/Suppression_Design.md`](study/Suppression_Design.md) + [`study/SUPPRESSION_VALIDATION.md`](study/SUPPRESSION_VALIDATION.md) — Stage B (5 guards) design + GO
+- [`study/Phase2_Backbone_Design.md`](study/Phase2_Backbone_Design.md) + [`study/Backbone_Phase2_Study.md`](study/Backbone_Phase2_Study.md) + [`study/Phase2_Convergence_Validation.md`](study/Phase2_Convergence_Validation.md) — Phase 2 design, airtime economics, convergence gate
+- [`study/Path_Reinforcement_Study.md`](study/Path_Reinforcement_Study.md) — path success reinforcement (GO)
+- [`study/Adaptive_Controller_Design.md`](study/Adaptive_Controller_Design.md) + [`study/Local_Calibration_Study.md`](study/Local_Calibration_Study.md) — adaptive self-tuning (**NO-GO**, data-backed)
 
-**Simulation & Daten** (`sim/`)
-- [`sim/README.md`](sim/README.md) — wie man die Sims fährt + reiche CoreScope-Endpoints
-- [`sim/MeshCore_Simulation_v3_Realdaten.md`](sim/MeshCore_Simulation_v3_Realdaten.md) — v3 auf 109.980 echten Paketen (Kernmessung)
-- [`sim/data/PROVENANCE.md`](sim/data/PROVENANCE.md) — Datensatz-Herkunft, Schema, Attribution
-- ältere Sims: [`MeshCore_Simulation_25Knoten.md`](MeshCore_Simulation_25Knoten.md), [`MeshCore_Simulation_ECHTE_Daten.md`](MeshCore_Simulation_ECHTE_Daten.md) *(illustrativ — v3/v4 sind die belastbare Referenz)*
-- Skripte: `sim/mhr_sim*.py`, `sim/mhr_collect_corescope.py`, `study/*_sim.py`
+**Simulation & data** (`sim/`)
+- [`sim/README.md`](sim/README.md) — how to run the sims + CoreScope endpoints
+- [`sim/MeshCore_Simulation_v3_Realdaten.md`](sim/MeshCore_Simulation_v3_Realdaten.md) — v3 on 109,980 real packets (core measurement)
+- [`sim/data/PROVENANCE.md`](sim/data/PROVENANCE.md) — dataset provenance, schema, attribution
+- older sims: [`MeshCore_Simulation_25Knoten.md`](MeshCore_Simulation_25Knoten.md), [`MeshCore_Simulation_ECHTE_Daten.md`](MeshCore_Simulation_ECHTE_Daten.md) *(illustrative — v3/v4 are the authoritative reference)*
+- scripts: `sim/mhr_sim*.py`, `sim/mhr_collect_corescope.py`, `study/*_sim.py`
 
-> Leitprinzip durchgängig: **Qualität & Stabilität vor letzter Optimierung.** Jeder Eingriff ist lokal,
-> reversibel, mischbetriebs-sicher und „nie schlechter als Upstream"; riskante Stufen sind default-aus
-> und bench-gegated.
+> Guiding principle throughout: **quality and stability over last-mile optimization.** Every patch is
+> local, reversible, mixed-firmware-safe and "never worse than upstream"; risky stages are default-off
+> and bench-gated.
