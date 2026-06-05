@@ -198,6 +198,15 @@ protected:
 
   bool allowPacketForward(const mesh::Packet* packet) override;
   const char* getLogDateTime() override;
+
+  // MHR: adaptive flood-hop ceiling. Replaces the fixed flood_max cut (which at 15 dropped ~10% of
+  //   legitimate paths vs the measured P90=18). Tracks a slowly-decaying rolling maximum of observed
+  //   flood hop-counts; the effective limit floats between MHR_FLOOD_MAX_FLOOR (cold-start safe, >= P90)
+  //   and the user ceiling _prefs.flood_max. mhrObserveDiam() feeds it from every received flood packet.
+  uint8_t       _mhr_obs_diam;          // rolling max observed flood hop-count
+  unsigned long _mhr_diam_decay_at;     // next decay deadline
+  uint8_t mhrEffectiveFloodMax();
+  void    mhrObserveDiam(const mesh::Packet* packet);
   void logRxRaw(float snr, float rssi, const uint8_t raw[], int len) override;
 
   void logRx(mesh::Packet* pkt, int len, float score) override;

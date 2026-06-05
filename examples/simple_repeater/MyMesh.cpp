@@ -654,9 +654,40 @@ void MyMesh::sendFloodReply(mesh::Packet* packet, unsigned long delay_millis, ui
   }
 }
 
+// MHR: adaptive flood-hop ceiling tunables. Floor must be >= the measured network P90 (=18) so a cold-
+//   started node never cuts a legitimate long path before it has observed the diameter.
+#ifndef MHR_FLOOD_MAX_FLOOR
+  #define MHR_FLOOD_MAX_FLOOR 18
+#endif
+#ifndef MHR_FLOOD_MAX_MARGIN
+  #define MHR_FLOOD_MAX_MARGIN 4
+#endif
+#ifndef MHR_DIAM_DECAY_MS
+  #define MHR_DIAM_DECAY_MS 600000UL   // relax the rolling max by 1 hop every 10 min (follows topology shrink)
+#endif
+
+void MyMesh::mhrObserveDiam(const mesh::Packet* packet) {
+  if (!packet->isRouteFlood()) return;
+  uint8_t h = packet->getPathHashCount();
+  if (h > _mhr_obs_diam && h <= 63) _mhr_obs_diam = h;   // track the longest flood path seen through us
+}
+
+uint8_t MyMesh::mhrEffectiveFloodMax() {
+  // lazy decay so the cap follows the network down after it shrinks (no separate timer needed)
+  if (millisHasNowPassed(_mhr_diam_decay_at)) {
+    if (_mhr_obs_diam > 0) _mhr_obs_diam--;
+    _mhr_diam_decay_at = futureMillis(MHR_DIAM_DECAY_MS);
+  }
+  uint16_t cap = (uint16_t)_mhr_obs_diam + MHR_FLOOD_MAX_MARGIN;
+  if (cap < MHR_FLOOD_MAX_FLOOR) cap = MHR_FLOOD_MAX_FLOOR;
+  if (cap > _prefs.flood_max) cap = _prefs.flood_max;   // _prefs.flood_max is now the HARD user ceiling
+  return (uint8_t)cap;
+}
+
 bool MyMesh::allowPacketForward(const mesh::Packet *packet) {
   if (_prefs.disable_fwd) return false;
-  if (packet->isRouteFlood() && packet->getPathHashCount() >= _prefs.flood_max) return false;
+  // MHR: adaptive flood-hop limit instead of the fixed _prefs.flood_max (see mhrEffectiveFloodMax()).
+  if (packet->isRouteFlood() && packet->getPathHashCount() >= mhrEffectiveFloodMax()) return false;
   if (packet->isRouteFlood() && recv_pkt_region == NULL) {
     MESH_DEBUG_PRINTLN("allowPacketForward: unknown transport code, or wildcard not allowed for FLOOD packet");
     return false;
@@ -819,6 +850,7 @@ uint32_t MyMesh::getDirectRetransmitDelay(const mesh::Packet *packet) {
 }
 
 bool MyMesh::filterRecvFloodPacket(mesh::Packet* pkt) {
+  mhrObserveDiam(pkt);   // MHR: feed the adaptive flood-hop ceiling from every flood packet we hear
   // just try to determine region for packet (apply later in allowPacketForward())
   if (pkt->getRouteType() == ROUTE_TYPE_TRANSPORT_FLOOD) {
     recv_pkt_region = region_map.findMatch(pkt, REGION_DENY_FLOOD);
@@ -1273,10 +1305,14 @@ MyMesh::MyMesh(mesh::MainBoard &board, mesh::Radio &radio, mesh::MillisecondCloc
   _prefs.tx_power_dbm = LORA_TX_POWER;
   _prefs.advert_interval = 1;        // default to 2 minutes for NEW installs
   _prefs.flood_advert_interval = 12; // 12 hours
-  // MHR: data-backed default (real diameter P90=18; study: 15 safe at all adoption levels, 12 too
-  //      aggressive). Purely LOCAL forward limit (allowPacketForward) — stock nodes (64) still carry
-  //      longer paths, so a single MHR node is never worse. Network-dependent: set flood.max <n>.
-  _prefs.flood_max = 15;
+  // MHR: _prefs.flood_max is now the HARD user CEILING for the adaptive flood-hop limit (see
+  //      mhrEffectiveFloodMax()). The effective working cap floats between MHR_FLOOD_MAX_FLOOR (>= the
+  //      measured P90=18) and this ceiling, tracking the observed diameter — so legitimate long paths
+  //      are no longer cut the way the old fixed 15 did, while far detours are still bounded. Purely
+  //      LOCAL (allowPacketForward); stock nodes (64) are unaffected. Override the ceiling: set flood.max <n>.
+  _prefs.flood_max = 32;
+  _mhr_obs_diam = 0;          // MHR: no diameter observed yet -> effective cap starts at the safe floor
+  _mhr_diam_decay_at = 0;     // MHR: decay timer arms on first use
   _prefs.interference_threshold = 0; // disabled
 
   // bridge defaults
