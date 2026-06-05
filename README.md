@@ -1,141 +1,122 @@
-# MeshCore-MHR-advanced Routing V1
+# MeshCore-MHR — Advanced Routing V1
 
-Ein **Fork von [meshcore-dev/MeshCore](https://github.com/meshcore-dev/MeshCore)** (MIT) V1.15 mit dem Ziel, die Pfadfindung robuster zu machen und die durch zufällige Flood-Umwege verursachte Airtime-Last zu senken.
+A **fork of [meshcore-dev/MeshCore](https://github.com/meshcore-dev/MeshCore)** (MIT) V1.15 that makes path-finding more robust and cuts the airtime wasted on random flood detours.
 
-**MHR** steht für **M**eshCore **H**ybrid **R**outing.
+**MHR** stands for **M**eshCore **H**ybrid **R**outing.
 
-📖 **Doku-Übersicht & Einstieg:** [`docs/MHR/`](docs/MHR/README.md) — was MHR kann, wie es funktioniert, alle Studien/Validierungen + Bench-Test.
+📖 **Docs overview & entry point:** [`docs/MHR/`](docs/MHR/README.md) — what MHR does, how it works, all studies/validations + bench-test plan.
 
-> ⚠️ **Experimentell & auf Hardware ungetestet.** Aktiv (default-an): Phase 0, Stufe A und Best-of-N — alle „nie schlechter als Upstream". **Stufe B** (Suppression) und **Phase 2** (DV-Backbone) sind im Code, aber **default-AUS** und erst nach Bench-Test zu aktivieren (`docs/MHR/BENCH_TEST_PLAN.md`). Flashe **zuerst auf ein Ersatz-/Bench-Gerät**, nicht auf produktive Repeater. Voller Status: Abschnitt „Stand der Optimierungs-Schicht".
-
----
-
-## 🇩🇪 Kernvorteile
-
-### Was ist MHR-MeshCore?
-Ein Fork von **[meshcore-dev/MeshCore](https://github.com/meshcore-dev/MeshCore)** (MIT), der die **Pfadfindung** im LoRa-Mesh robuster macht und die durch zufällige Flood-Umwege verursachte **Airtime-Last** senkt. MeshCore ist ein hybrides Mesh-Routing-Protokoll für LoRa-Funkgeräte (ESP32/nRF52, C++/PlatformIO).
-
-### Das Problem
-MeshCore nutzt **kein** metrik-basiertes Routing. Die erste Nachricht an einen Kontakt wird geflutet, der dabei entstehende Pfad wird gecacht, und **alle weiteren Pakete laufen fest über genau diesen einen Pfad**. Entscheidend: Es gewinnt **nicht der kürzeste oder beste Pfad, sondern derjenige, dessen Flood-Kopie zufällig zuerst beim Ziel ankommt** („first packet wins"). Die signalqualitäts-gewichtete Ausbreitung ist per Default abgeschaltet. Folge: In der Analyse echter Netzdaten landeten **~60 % der Pfadaufbauten auf einem Umweg** — das frisst Airtime, den eigentlichen Engpass im geteilten Halbduplex-Funkkanal.
-
-### Die Lösung
-MHR richtet die Flood-Ausbreitung an der **Linkqualität (SNR)** aus — an beiden Stufen:
-- **RX-Seite:** Knoten mit starkem Empfang leiten zuerst weiter und unterdrücken redundante Umweg-Kopien (per Default aktiviert).
-- **TX-Seite:** Eine Kopie mit starkem SNR (meist ein kurzer, direkter Link) zieht ihre zufällige Sendeverzögerung aus einem zu null hin geschrumpften Fenster → sie sendet früher und „gewinnt" den Pfad.
-- **Pfad-Adoption:** Ein später eintreffender **längerer** Umweg überschreibt einen guten kurzen Pfad nicht mehr.
-- **EWMA-Link-Sensing:** geglättete Nachbar-SNR als stabile Linkqualitäts-Schätzung — Fundament für eine spätere ETX-Metrik.
-
-### Warum es sicher ist
-Alle Eingriffe sind **lokal, additiv und reversibel** (zur Laufzeit per CLI ab-/zuschaltbar, ohne Reflash). **Kein Paketformat-Eingriff, keine Änderung der Duplikat-Erkennung** → MHR läuft im **gemischten Netz neben unveränderten Upstream-Knoten** und ist **nie schlechter als das Original** (bei abgeschalteten Parametern bit-identisch zu Upstream).
-
-### Belege
-Simulation auf **echter 25-Knoten-Topologie**: **−82 % Airtime**, Umwege deutlich reduziert. Unter Störung bleibt der Gewinn stabil — Pfad-Flattern **78 % → 17 %**, Re-Discovery bei Linkausfall **≤ 1,6 % statt bis 49,5 %**, bei Netz-Partition **−98 % Airtime** statt Endlos-Flood. Build verifiziert; GitHub Actions baut die flashbare **Heltec-V4-Firmware (.bin)** automatisch. Details & Belege in `docs/MHR/`.
+> ⚠️ **Experimental — untested on hardware.** Active (default-on): Phase 0, Stage A and Best-of-N — all "never worse than upstream". **Stage B** (suppression) and **Phase 2** (DV backbone) are in the code but **default-off** and should only be enabled after bench testing (`docs/MHR/BENCH_TEST_PLAN.md`). Flash to a **spare/bench device first**, not to production repeaters. Full status: see "Optimization layer status" below.
 
 ---
 
-## 🇬🇧 Core advantages
+## What is MHR-MeshCore?
 
-### What is MHR-MeshCore?
-**MHR** stands for **M**eshCore **H**ybrid **R**outing. A fork of **[meshcore-dev/MeshCore](https://github.com/meshcore-dev/MeshCore)** (MIT) that makes **path-finding** in the LoRa mesh more robust and cuts the **airtime** wasted on random flood detours. MeshCore is a hybrid mesh-routing protocol for LoRa radios (ESP32/nRF52, C++/PlatformIO).
+A fork of **[meshcore-dev/MeshCore](https://github.com/meshcore-dev/MeshCore)** (MIT) that makes **path-finding** in the LoRa mesh more robust and cuts the **airtime** wasted on random flood detours. MeshCore is a hybrid mesh-routing protocol for LoRa radios (ESP32/nRF52, C++/PlatformIO).
 
-### The problem
+## The problem
+
 MeshCore uses **no** metric-based routing. The first message to a contact is flooded, the resulting path is cached, and **every following packet is pinned to that one path**. Crucially, the winner is **not the shortest or best path, but whichever flood copy happens to reach the destination first** ("first packet wins"), while signal-quality-weighted propagation is off by default. From analysis of real network data: **~60 % of path setups end up on a detour** — burning airtime, the real bottleneck on a shared half-duplex radio channel.
 
-### The solution
+## The solution
+
 MHR aligns flood propagation with **link quality (SNR)** at both stages:
 - **RX side:** nodes with strong reception rebroadcast first, suppressing redundant detour copies (on by default).
 - **TX side:** a copy with strong SNR (usually a short, direct link) draws its random backoff from a window shrunk toward zero → it rebroadcasts earlier and "wins" the path.
 - **Path adoption:** a later-arriving **longer** detour no longer overwrites a good short path.
 - **EWMA link sensing:** smoothed neighbour SNR as a stable link-quality estimate — the foundation for a future ETX metric.
 
-### Why it's safe
+## Why it's safe
+
 All changes are **local, additive and reversible** (toggle at runtime via CLI, no reflash). **No packet-format change, no change to duplicate detection** → MHR runs in a **mixed network alongside unmodified upstream nodes** and is **never worse than the original** (with the parameters disabled it behaves bit-identically to upstream).
 
-### Evidence
+## Evidence
+
 Simulation on a **real 25-node topology**: **−82 % airtime**, detours markedly reduced. The gains hold under stress — path-flapping **78 % → 17 %**, link-failure re-discovery **≤ 1.6 % vs. up to 49.5 %**, network-partition airtime **−98 %** instead of endless flooding. Build verified; GitHub Actions builds the flashable **Heltec V4 firmware (.bin)** automatically. Details & evidence in `docs/MHR/`.
 
 ---
 
-## Was wurde geändert
+## What was changed
 
-Minimale, rückwärts­kompatible, reversible Eingriffe — alle als `// MHR:` im Code markiert, kein Paketformat-Eingriff, keine Dedup-Änderung (mixed-firmware-safe). Build verifiziert (`pio run -e heltec_v4_repeater` → SUCCESS). Details in `docs/MHR/CHANGES_MHR.md`.
+Minimal, backward-compatible, reversible patches — all marked `// MHR:` in the code, no packet-format change, no dedup change (mixed-firmware-safe). Build verified (`pio run -e heltec_v4_repeater` → SUCCESS). Full details in `docs/MHR/CHANGES_MHR.md`.
 
 **Phase 0**
-1. **SNR-gewichtete Flutung als Default an** (`examples/simple_repeater/MyMesh.cpp`): `rx_delay_base` von `0.0` auf `10.0`. Starke (kurze) Links senden zuerst und unterdrücken Umweg-Kopien. **Reversibel:** `set rxdelay 0`.
-2. **Pfad nur bei Verbesserung übernehmen** (`src/helpers/BaseChatMesh.cpp`): ein später eintreffender **längerer** Pfad überschreibt einen guten kurzen nicht mehr. Nie schlechter als Upstream.
+1. **SNR-weighted flooding on by default** (`examples/simple_repeater/MyMesh.cpp`): `rx_delay_base` from `0.0` to `10.0`. Strong (short) links rebroadcast first and suppress detour copies. **Reversible:** `set rxdelay 0`.
+2. **Path adoption only on improvement** (`src/helpers/BaseChatMesh.cpp`): a later-arriving **longer** path no longer overwrites a good short one. Never worse than upstream. **Self-healing:** a detected failure counter + 30 min staleness threshold allow a longer working path to replace a pinned dead one (RAM-only, no persistence change).
 
-**Phase 1** (neu)
-3. **SNR-gewichtetes TX-Retransmit-Delay** (`getRetransmitDelay`): ergänzt Patch 1 um die Sendeseite — starke Empfänger senden Flood-Kopien früher (aus zufallserhaltendem, geschrumpftem Fenster), schwache später. Neuer reversibler Parameter `tx_snr_weight` (Default 0.5, `set txsnrweight 0` = Upstream).
-4. **EWMA-geglättete Nachbar-SNR** (`putNeighbour`): stabile Linkqualitäts-Schätzung (L0 Link-Sensing) statt verrauschtem Momentanwert — Fundament für ETX.
+**Phase 1**
+3. **SNR-weighted TX retransmit delay** (`getRetransmitDelay`): extends patch 1 to the send side — strong receivers rebroadcast flood copies earlier (from a randomness-preserving shrunk window), weak ones later. New reversible parameter `tx_snr_weight` (default 0.5, `set txsnrweight 0` = upstream).
+4. **EWMA-smoothed neighbour SNR** (`putNeighbour`): stable link-quality estimate (L0 link-sensing) instead of a noisy instantaneous value — foundation for ETX.
 
-**Stufe A+ / B / Phase 2** (alle adversarial reviewt)
-5. **Best-of-N am Ziel** (`src/Mesh.cpp`): kürzester Pfad (Hops, dann SNR) statt „first wins" — dedup-sicher (Payload genau 1×). `bofn.enable` (Repeater default an).
-6. **`flood.max` 64 → 15** (datenbelegt): kappt Fern-Umwege; rein lokales Forward-Limit.
-7. **Stufe B — guarded Suppression** (`supp.enable`, **default-AUS**): redundanz-gesicherte Rebroadcast-Unterdrückung (5 Guards + passives 2-Hop-Lernen).
-8. **Phase 2 — DV-Backbone** (`bb.enable`, **default-AUS**): proaktiver Control-Plane (Babel-Feasibility, Konvergenz-Gate GO); ignorierbarer zero-hop Payload-Typ.
+**Stage A+ / B / Phase 2** (all adversarially reviewed)
+5. **Best-of-N at the destination** (`src/Mesh.cpp`): shortest path (hops, then SNR) instead of "first wins" — dedup-safe (payload delivered exactly once). `bofn.enable` (repeater default-on).
+6. **`flood.max` 64 → adaptive** (data-backed): fixed 15 was below the measured network P90 of 18 hops; replaced by an adaptive ceiling that floats between observed diameter + margin and the user ceiling (default 32). Pure local forward limit.
+7. **Stage B — guarded suppression** (`supp.enable`, **default-off**): redundancy-secured rebroadcast suppression (5 guards + passive 2-hop learning).
+8. **Phase 2 — DV backbone** (`bb.enable`, **default-off**): proactive control plane (Babel-feasibility, convergence-gate GO); ignorable zero-hop payload type.
 
-> Vollständiger Status (aktiv vs. default-aus) + Validierung → Abschnitt **„Stand der Optimierungs-Schicht"** unten. Komplette Patch-Liste 1–9: `docs/MHR/CHANGES_MHR.md`.
+> Full status (active vs. default-off) + validation → section **"Optimization layer status"** below. Complete patch list 1–9: `docs/MHR/CHANGES_MHR.md`.
 
-## Firmware bauen
+---
 
-### Variante A — automatisch via GitHub Actions (empfohlen)
-Nach dem Push in dein privates Repo baut `.github/workflows/build.yml` die Firmware selbst. Unter **Actions → Build MHR firmware → Artifacts** liegt anschließend `heltec_v4_repeater-firmware.bin` (+ `-factory.bin`) zum Download. Weitere Ziele im Workflow einfach einkommentieren.
+## Building the firmware
 
-### Variante B — lokal mit PlatformIO
+### Option A — automatic via GitHub Actions (recommended)
+After pushing to your repo, `.github/workflows/build.yml` builds the firmware automatically. Under **Actions → Build MHR firmware → Artifacts** you'll find `heltec_v4_repeater-firmware.bin` (+ `-factory.bin`). Additional targets can be uncommented in the workflow file.
+
+### Option B — locally with PlatformIO
 ```bash
 pip install platformio
 pio run -e heltec_v4_repeater
-# Ergebnis: .pio/build/heltec_v4_repeater/firmware.bin
+# Output: .pio/build/heltec_v4_repeater/firmware.bin
 ```
 
-## Flashen (Heltec V4, ESP32-S3 → .bin)
+---
 
-- Bequem über den **MeshCore Web-Flasher** (`https://flasher.meshcore.co.uk`, „Custom firmware") mit der `firmware.bin`, **oder**
-- per esptool:
-  ```bash
-  python -m esptool --chip esp32s3 write_flash 0x10000 heltec_v4_repeater-firmware.bin
-  # alternativ das Factory-Image @0x0:
-  python -m esptool --chip esp32s3 write_flash 0x0 heltec_v4_repeater-factory.bin
-  ```
+## Flashing (Heltec V4, ESP32-S3 → .bin)
 
-**Hinweis:** `.uf2` gibt es nur für nRF52-Boards (z. B. RAK4631); Heltec V4 ist ESP32 → `.bin`.
-
-### Wieder zurück / deaktivieren
-- Patch 1 ohne Reflash abschalten: am Repeater `set rxdelay 0`.
-- Komplett zurück: Upstream-Firmware neu flashen.
-
-## Eigenes privates GitHub-Repo
-
+**Factory image** (single-step, recommended for fresh installs):
 ```bash
-cd MHR-MeshCore
-# (Git ist bereits initialisiert und committet)
-git remote add origin git@github.com:<DEIN-USER>/MHR-MeshCore.git
-git branch -M main
-git push -u origin main
+esptool --chip esp32s3 write_flash 0x0 heltec_v4_repeater-factory.bin
 ```
-Lege das Repo auf GitHub vorher als **Private** an. (Ich kann das nicht für dich tun — Account/Push erfordern deine Anmeldedaten.)
 
-## Stand der Optimierungs-Schicht
+**Firmware only** (OTA / update):
+```bash
+esptool --chip esp32s3 write_flash 0x10000 heltec_v4_repeater-firmware.bin
+```
 
-Alle Eingriffe sind rein lokal, mischbetriebs-sicher (kein Eingriff an bestehenden Paket-Typen/Dedup) und „nie schlechter als Upstream". Priorisierung datenbelegt: SNR ist ein schwacher Hebel, **Hop-Zahl** ist verlässlicher (Realdaten-Befund, siehe unten).
+Or use the **MeshCore Web Flasher** (`https://flasher.meshcore.co.uk`, "Custom firmware") with the `firmware.bin`.
 
-**✅ Im Code & aktiv (default-an, Repeater)**
-- **Phase 0:** RX-SNR-gewichtete Flutung (`rxdelay`) + prefer-shorter Pfad-Adoption.
-- **Stufe A:** hop-gewichtetes Rebroadcast-Delay (`tx_hop_weight`, primär) + SNR-Gewichtung (`tx_snr_weight`, sekundär) + EWMA-Nachbar-SNR + **`flood.max` 64→15** (datenbelegt, realer Durchmesser P90≈12–18).
-- **Best-of-N am Ziel:** kürzester Pfad (Hops, dann SNR) statt „first wins" — dedup-sicher, Payload genau 1×.
+**Note:** `.uf2` is only for nRF52 boards (e.g. RAK4631); Heltec V4 is ESP32 → use `.bin`.
 
-**🔒 Im Code, default-AUS (erst nach Bench-Test aktivieren — `docs/MHR/BENCH_TEST_PLAN.md`)**
-- **Stufe B — guarded Suppression** (`supp.enable`): unterdrückt redundante Rebroadcasts nur bei lokal bestätigter Redundanz (5 Guards + passives 2-Hop-Lernen). Validiert: Lieferquote ≥ Baseline über den ganzen Adoptions-Sweep, −12…15 % Airtime bei hoher Adoption.
-- **Phase 2 — proaktiver DV-Backbone** (`bb.enable`): Control-Plane mit Babel-Feasibility (Schleifenfreiheit), Seqno, Feasible-Successor, Hold-down/Poisoning, Regions-Hierarchie; ignorierbarer zero-hop Payload-Typ. Konvergenz-Gate **GO** (0 Loops, re-konvergiert unter Churn). Data-Plane-Short-Circuit bewusst noch nicht verdrahtet → Aktivieren ändert nur die Control-Plane.
+### Reverting / disabling
+- Disable patch 1 without reflashing: `set rxdelay 0` on the repeater.
+- Full revert: reflash the upstream firmware.
 
-**🧪 Validierung (Simulation auf echten CoreScope-Daten)** — `docs/MHR/sim/` + `docs/MHR/study/`
-- 109.980 reale Pakete: realer Umweg-Median **2,1×** (belegt das „first-wins"-Problem). v4 auf echtem `neighbor-graph`.
-- Komposit-Adoptions-Sweep der ganzen Schicht: bis **−12 % Airtime** + bessere Lieferquote, monoton & sicher ab 1 Knoten.
+---
 
-**❌ Geprüft & verworfen (datenbelegt)** — adaptiver Selbst-Regler (2× NO-GO), per-Node-Kalibrierung, TPC: bringen über die Guards hinaus nichts.
+## Optimization layer status
 
-**↗️ Offen** — Phase-2-Daten-Plane-Short-Circuit (Endpunkt-Integration, eigene getestete Stufe); Hardware-Bench-Tests aller Stufen.
+All patches are purely local, mixed-network-safe (no changes to existing packet types/dedup) and "never worse than upstream". Prioritization is data-backed: SNR is a weak lever; **hop count** is more reliable (real-data finding, see below).
 
-## Lizenz & Attribution
+**✅ In the code & active (default-on, repeater)**
+- **Phase 0:** RX-SNR-weighted flooding (`rxdelay`) + prefer-shorter path adoption with self-healing.
+- **Stage A:** hop-weighted rebroadcast delay (`tx_hop_weight`, primary) + SNR weighting (`tx_snr_weight`, secondary) + EWMA neighbour SNR + **adaptive `flood.max`** (floor ≥ P90 = 18, ceiling default 32).
+- **Best-of-N at destination:** shortest path (hops, then SNR) instead of "first wins" — dedup-safe, payload exactly once.
 
-MIT (wie Upstream, siehe `license.txt`). Dieser Fork basiert auf **meshcore-dev/MeshCore**; das ursprüngliche README liegt als `README.upstream.md` bei. Alle Marken-/Projektrechte an MeshCore verbleiben beim Upstream-Projekt.
+**🔒 In the code, default-off (enable only after bench testing — `docs/MHR/BENCH_TEST_PLAN.md`)**
+- **Stage B — guarded suppression** (`supp.enable`): suppresses redundant rebroadcasts only when local redundancy is confirmed (5 guards + passive 2-hop learning). Validated: delivery rate ≥ baseline across the full adoption sweep, −12…15 % airtime at high adoption.
+- **Phase 2 — proactive DV backbone** (`bb.enable`): control plane with Babel-feasibility (loop-freedom), seqno, feasible successor, hold-down/poisoning, region hierarchy; ignorable zero-hop payload type. Convergence gate **GO** (0 loops, reconverges under churn). Data-plane short-circuit deliberately not wired yet → enabling only changes the control plane.
+
+**🧪 Validation (simulation on real CoreScope data)** — `docs/MHR/sim/` + `docs/MHR/study/`
+- 109,980 real packets: measured median detour **2.1×** (confirms the "first-wins" problem). v4 on a real neighbour graph.
+- Composite adoption sweep of the full layer: up to **−12 % airtime** + better delivery rate, monotone & safe from 1 node.
+
+**❌ Evaluated & rejected (data-backed)** — adaptive self-tuning controller (2× NO-GO), per-node calibration, TPC: no benefit beyond the guards.
+
+**↗️ Open** — Phase 2 data-plane short-circuit (endpoint integration, own tested stage); hardware bench tests for all stages.
+
+---
+
+## License & attribution
+
+MIT (same as upstream, see `license.txt`). This fork is based on **meshcore-dev/MeshCore**; the original README is included as `README.upstream.md`. All trademarks and project rights for MeshCore remain with the upstream project.
