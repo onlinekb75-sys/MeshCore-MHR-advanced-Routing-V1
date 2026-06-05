@@ -740,6 +740,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#deutsche-ubersetzung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇩🇪 Deutsche Übersetzung
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -875,7 +886,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+    MeshCore Routing Analyse und Optimierung
   
 
     
@@ -931,7 +942,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    MeshCore Simulation ECHTE Daten
   
 
     
@@ -1137,7 +1148,7 @@
   <span class="md-ellipsis">
     
   
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
+    PROVENANCE
   
 
     
@@ -1452,7 +1463,7 @@
   <span class="md-ellipsis">
     
   
-    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+    Phase2 Convergence Validation
   
 
     
@@ -1564,7 +1575,7 @@
   <span class="md-ellipsis">
     
   
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+    Suppression Design
   
 
     
@@ -1668,6 +1679,17 @@
     <span class="md-ellipsis">
       
         5. Documentation index (all documents)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deutsche-ubersetzung" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇩🇪 Deutsche Übersetzung
       
     </span>
   </a>
@@ -1797,6 +1819,109 @@ calibration, TX power control — see studies below.</p>
 <p>Guiding principle throughout: <strong>quality and stability over last-mile optimization.</strong> Every patch is
 local, reversible, mixed-firmware-safe and "never worse than upstream"; risky stages are default-off
 and bench-gated.</p>
+</blockquote>
+<hr />
+<h2 id="deutsche-ubersetzung">🇩🇪 Deutsche Übersetzung</h2>
+<h1 id="mhr-dokumentationsubersicht-einstiegspunkt">MHR — Dokumentationsübersicht &amp; Einstiegspunkt</h1>
+<p><strong>MHR = MeshCore Hybrid Routing.</strong> Diese Seite erklärt, <em>was</em> der Fork tut, <em>wie</em> er funktioniert
+und <em>wo</em> die Details zu finden sind. (Schnelleinstieg vom Repo-Root-README; vollständige Patch-Liste
+in <a href="CHANGES_MHR/"><code>CHANGES_MHR.md</code></a>.)</p>
+<hr />
+<h2 id="1-worum-geht-es">1. Worum geht es?</h2>
+<p>MeshCore (LoRa-Mesh) nutzt <strong>kein</strong> metrik-basiertes Routing: Die erste Nachricht wird geflutet, der
+<strong>zuerst eintreffende</strong> Pfad wird gecacht und danach unbegrenzt wiederverwendet — oft ein
+<strong>Umweg</strong>. Gemessen an echten Daten: <strong>medianer Umweg 2,1×</strong>. Umwege = verschwendete <strong>Airtime</strong>,
+der eigentliche Engpass.</p>
+<p>MHR fügt eine <strong>unsichtbare, rein knotenlokal arbeitende Optimierungsschicht</strong> darüber ein: Sie
+richtet die Flutung an <strong>Hop-Zahl / Linkqualität</strong> aus, wählt den <strong>kürzesten</strong> Pfad und
+unterdrückt <strong>redundante</strong> Übertragungen — <strong>ohne</strong> das Paketformat anzutasten,
+<strong>mixed-firmware-kompatibel</strong> mit Standard-Knoten, und <strong>„nie schlechter als Upstream"</strong>.
+Architekturdetails: <a href="study/Invisible_Optimizing_Layer/"><code>study/Invisible_Optimizing_Layer.md</code></a>.</p>
+<h2 id="2-was-kann-es-stufen-was-jede-liefert">2. Was kann es? (Stufen — was jede liefert)</h2>
+<table>
+<thead>
+<tr>
+<th>Stufe</th>
+<th>Mechanismus</th>
+<th>Status</th>
+<th>Vorteil</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Phase 0</strong></td>
+<td>RX-SNR-Flutung + Prefer-Shorter-Pfadübernahme</td>
+<td>✅ aktiv</td>
+<td>qualitätsgesteuerte Ausbreitung</td>
+</tr>
+<tr>
+<td><strong>Stufe A</strong></td>
+<td>Hop-gewichtetes TX-Delay + adaptives <code>flood.max</code> + EWMA-SNR</td>
+<td>✅ aktiv</td>
+<td>kürzere Pfade führen die Flutung an</td>
+</tr>
+<tr>
+<td><strong>Best-of-N</strong></td>
+<td>Ziel meldet kürzesten Pfad (Hops → SNR) statt „First wins"</td>
+<td>✅ aktiv</td>
+<td>Umwegkiller, dedup-sicher</td>
+</tr>
+<tr>
+<td><strong>Stufe B</strong></td>
+<td>Gesicherte Unterdrückung (5 Guards + passives 2-Hop-Lernen)</td>
+<td>🔒 default-aus</td>
+<td>−12…15 % Airtime, Lieferquote ≥ Baseline</td>
+</tr>
+<tr>
+<td><strong>Phase 2</strong></td>
+<td>Proaktiver DV-Backbone (Babel-Feasibility, Regionen)</td>
+<td>🔒 default-aus</td>
+<td>optimale Unicast-Pfade statt Flutung</td>
+</tr>
+</tbody>
+</table>
+<p>🔒 = im Code vorhanden, aber <strong>default-aus</strong> bis zum Bench-Test
+(<a href="BENCH_TEST_PLAN/"><code>BENCH_TEST_PLAN.md</code></a>).<br />
+<strong>Bewertet &amp; verworfen</strong> (kein Vorteil über die Guards hinaus): adaptiver Selbstregler,
+knotenweise Kalibrierung, TX-Leistungsregelung — siehe Studien unten.</p>
+<h2 id="3-ist-das-validiert-validierungsgeschichte">3. Ist das validiert? (Validierungsgeschichte)</h2>
+<p>Alles auf <strong>echten CoreScope-Livedaten</strong> simuliert (109.980 Pakete, 1.962 Knoten) — nicht nur Theorie:
+- <strong>Gemessen:</strong> echter medianer Umweg 2,1× → bestätigt das Problem. (<a href="sim/MeshCore_Simulation_v3_Realdaten/"><code>sim/MeshCore_Simulation_v3_Realdaten.md</code></a>)
+- <strong>Zusammengesetzter Adoptions-Sweep</strong> (1 %→100 % Knoten mit MHR): bis zu −12 % Airtime, monoton &amp; sicher ab 1 Knoten. (<a href="study/Composite_Adoption_Study/"><code>study/Composite_Adoption_Study.md</code></a>)
+- <strong>Phase-2-Konvergenz-Gate: GO</strong> (0 Schleifen, konvergiert unter Churn neu). (<a href="study/Phase2_Convergence_Validation/"><code>study/Phase2_Convergence_Validation.md</code></a>)
+- Datensatz + Reproduktion: <a href="sim/"><code>sim/README.md</code></a>, Herkunft: <a href="sim/data/PROVENANCE/"><code>sim/data/PROVENANCE.md</code></a>.</p>
+<h2 id="4-wo-anfangen">4. Wo anfangen?</h2>
+<ul>
+<li><strong>Bauen / flashen:</strong> Repo-Root-README (PlatformIO / Web Flasher) → <code>dist/</code>.</li>
+<li><strong>Test auf Hardware:</strong> <a href="BENCH_TEST_PLAN/"><code>BENCH_TEST_PLAN.md</code></a> (gestuft, mit Abnahmekriterien; Stufe B / Phase 2 nur hier aktiviert).</li>
+<li><strong>Was genau geändert wurde:</strong> <a href="CHANGES_MHR/"><code>CHANGES_MHR.md</code></a> (Patches 1–9, mit CLI-Befehlen + Persistenz-Offsets).</li>
+</ul>
+<hr />
+<h2 id="5-dokumentationsindex-alle-dokumente">5. Dokumentationsindex (alle Dokumente)</h2>
+<p><strong>Analyse &amp; Design</strong>
+- <a href="MeshCore_Routing_Analyse_und_Optimierung/"><code>MeshCore_Routing_Analyse_und_Optimierung.md</code></a> — Ursachenanalyse der Umwege (Stufen A–D)
+- <a href="MeshCore_Hybrid_Routing_Entwurf/"><code>MeshCore_Hybrid_Routing_Entwurf.md</code></a> — MHR v1 (DSR + ETX + Best-of-N + Backbone)
+- <a href="MeshCore_Hybrid_Routing_v2_Robustheit/"><code>MeshCore_Hybrid_Routing_v2_Robustheit.md</code></a> — v2-Härtung aus Realdaten (H1–H7)
+- <a href="study/Invisible_Optimizing_Layer/"><code>study/Invisible_Optimizing_Layer.md</code></a> — <strong>Architektur</strong> der knotenlokal arbeitenden Schicht
+- <a href="CHANGES_MHR/"><code>CHANGES_MHR.md</code></a> — vollständige Patch-Liste 1–9
+- <a href="BENCH_TEST_PLAN/"><code>BENCH_TEST_PLAN.md</code></a> — Hardware-Bench-Test (Heltec V4)</p>
+<p><strong>Studien &amp; Validierungen</strong> (<code>study/</code>)
+- <a href="study/MeshCore_Routing_Study/"><code>study/MeshCore_Routing_Study.md</code></a> — Mechanismus-Studie (Adoptions-Sweep, Tiering) · Begleitdokumente: <a href="study/STUDY_DESIGN/"><code>study/STUDY_DESIGN.md</code></a>, <a href="study/STUDY_RESULTS/"><code>study/STUDY_RESULTS.md</code></a>
+- <a href="study/Composite_Adoption_Study/"><code>study/Composite_Adoption_Study.md</code></a> — vollständige Schicht bei 1/10/25/50/75/100 % Adoption
+- <a href="study/Suppression_Design/"><code>study/Suppression_Design.md</code></a> + <a href="study/SUPPRESSION_VALIDATION/"><code>study/SUPPRESSION_VALIDATION.md</code></a> — Stufe-B-Design (5 Guards) + GO
+- <a href="study/Phase2_Backbone_Design/"><code>study/Phase2_Backbone_Design.md</code></a> + <a href="study/Backbone_Phase2_Study/"><code>study/Backbone_Phase2_Study.md</code></a> + <a href="study/Phase2_Convergence_Validation/"><code>study/Phase2_Convergence_Validation.md</code></a> — Phase-2-Design, Airtime-Ökonomie, Konvergenz-Gate
+- <a href="study/Path_Reinforcement_Study/"><code>study/Path_Reinforcement_Study.md</code></a> — Pfaderfolgs-Verstärkung (GO)
+- <a href="study/Adaptive_Controller_Design/"><code>study/Adaptive_Controller_Design.md</code></a> + <a href="study/Local_Calibration_Study/"><code>study/Local_Calibration_Study.md</code></a> — adaptiver Selbstregler (<strong>NO-GO</strong>, datenbelegt)</p>
+<p><strong>Simulation &amp; Daten</strong> (<code>sim/</code>)
+- <a href="sim/"><code>sim/README.md</code></a> — Anleitung zum Ausführen der Simulationen + CoreScope-Endpunkte
+- <a href="sim/MeshCore_Simulation_v3_Realdaten/"><code>sim/MeshCore_Simulation_v3_Realdaten.md</code></a> — v3 auf 109.980 echten Paketen (Kernmessung)
+- <a href="sim/data/PROVENANCE/"><code>sim/data/PROVENANCE.md</code></a> — Datensatzherkunft, Schema, Quellenangaben
+- ältere Simulationen: <a href="MeshCore_Simulation_25Knoten/"><code>MeshCore_Simulation_25Knoten.md</code></a>, <a href="MeshCore_Simulation_ECHTE_Daten/"><code>MeshCore_Simulation_ECHTE_Daten.md</code></a> <em>(illustrativ — v3/v4 sind die maßgebliche Referenz)</em>
+- Skripte: <code>sim/mhr_sim*.py</code>, <code>sim/mhr_collect_corescope.py</code>, <code>study/*_sim.py</code></p>
+<blockquote>
+<p>Leitendes Prinzip durchgehend: <strong>Qualität und Stabilität vor Last-Mile-Optimierung.</strong> Jeder Patch
+ist lokal, reversibel, mixed-firmware-sicher und „nie schlechter als Upstream"; riskante Stufen
+sind default-aus und bench-gegated.</p>
 </blockquote>
 
 

@@ -975,6 +975,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1054,7 +1065,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+    MeshCore Routing Analyse und Optimierung
   
 
     
@@ -1110,7 +1121,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    MeshCore Simulation ECHTE Daten
   
 
     
@@ -1316,7 +1327,7 @@
   <span class="md-ellipsis">
     
   
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
+    PROVENANCE
   
 
     
@@ -1631,7 +1642,7 @@
   <span class="md-ellipsis">
     
   
-    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+    Phase2 Convergence Validation
   
 
     
@@ -1743,7 +1754,7 @@
   <span class="md-ellipsis">
     
   
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+    Suppression Design
   
 
     
@@ -2032,6 +2043,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2213,6 +2235,165 @@ Satz ist die Empfehlung.</p>
 <li>Ergebnisse in <code>sim/sim_results_v2.json</code>, Plots <code>fig_v2_*.png</code>. Reproduzierbar (Seed 42).</li>
 <li><code>docs/MHR/sim/mhr_sim_real_v3.py</code> — <strong>auf echten CoreScope-Live-Daten</strong> (109.980 Pakete, 1962 Knoten) kalibriert. GEMESSEN: realer Umweg-Median <strong>2,1×</strong> (78,8 % der Pakete &gt; 1,5×) — belegt das „first-wins"-Problem mit Produktionsdaten; das alte Log-Distance-SNR-Modell trägt für dieses Netz nicht (real PLE ≈ 0,4). Datensatz reproduzierbar via <code>mhr_collect_corescope.py</code>.</li>
 <li><code>docs/MHR/study/MeshCore_Routing_Study.md</code> — <strong>Mechanismus-Studie mit Adoptions-Sweep</strong> (1 Knoten → alle) auf der realen 776-Knoten-Topologie, Safety-Invariante „nie schlechter als Baseline". Ergebnis: hop-basierte Pfadwahl (Best-of-N nach Hops, Hop-Delay) + <code>flood.max</code> 15 sind ab 1 Knoten safe; Airtime-Suppression (Cancel/Counter/MPR) braucht adaptive Redundanz-Bedingung. Verschiebt die Priorität von SNR weg hin zur Hop-Zahl.</li>
+</ul>
+<hr />
+<h2 id="english-translation">🇬🇧 English Translation</h2>
+<h1 id="mhr-changes-vs-upstream-phase-0-phase-1">MHR – Changes vs. Upstream (Phase 0 + Phase 1)</h1>
+<p>Conservative, reversible, backward-compatible. All changed locations in the code are marked with <code>// MHR:</code>.
+Build verified: <code>pio run -e heltec_v4_repeater</code> → SUCCESS (RAM 3.4 %, Flash 18.1 %).</p>
+<h2 id="phase-0_1">Phase 0</h2>
+<h3 id="patch-1-snr-weighted-flooding-enabled-by-default">Patch 1 — SNR-weighted flooding enabled by default</h3>
+<ul>
+<li>File: <code>examples/simple_repeater/MyMesh.cpp</code></li>
+<li>Before: <code>_prefs.rx_delay_base = 0.0f;</code> (SNR weighting off)</li>
+<li>After: <code>_prefs.rx_delay_base = 10.0f;</code></li>
+<li>Effect: Nodes with strong reception transmit flood copies first and suppress redundant detour copies (dedup via hasSeen). Flooding follows link quality instead of pure chance.</li>
+<li>Reversible at runtime without reflash: <code>set rxdelay 0</code>. Value adjustable 0–20 (<code>set rxdelay &lt;n&gt;</code>).</li>
+<li>Active in the repeater build.</li>
+</ul>
+<h3 id="patch-2-adopt-path-only-on-improvement">Patch 2 — Adopt path only on improvement</h3>
+<ul>
+<li>File: <code>src/helpers/BaseChatMesh.cpp</code>, <code>onContactPathRecv()</code></li>
+<li>Before: every received <code>out_path</code> unconditionally overwrites the cached one.</li>
+<li>After: adoption only when the new hop count <code>(out_path_len &amp; 0x3F)</code> ≤ current, or no path is known yet (<code>OUT_PATH_UNKNOWN</code>).</li>
+<li>Effect: a later-arriving longer detour path no longer displaces a good short one. With only one offered path, behavior is identical to upstream → never worse.</li>
+<li>Safety: if a path breaks, <code>resetPathTo()</code> sets <code>out_path_len = OUT_PATH_UNKNOWN</code> → the next path is accepted again, no sticking.</li>
+<li>Active in companion/chat builds (BaseChatMesh).</li>
+</ul>
+<h2 id="phase-1-new">Phase 1 (new)</h2>
+<p>Local, additive improvements — still <strong>no</strong> packet-format change, <strong>no</strong> dedup change
+→ fully mixed-firmware-compatible and "never worse than upstream". Adversarially reviewed
+(persistence, integer arithmetic, EWMA, CLI) — no bugs found.</p>
+<h3 id="patch-3-snr-weighted-tx-retransmit-delay-quality-guided-flooding-tx-side">Patch 3 — SNR-weighted TX retransmit delay (quality-guided flooding, TX side)</h3>
+<ul>
+<li>File: <code>examples/simple_repeater/MyMesh.cpp</code>, <code>getRetransmitDelay()</code></li>
+<li>New persisted parameter <code>tx_snr_weight</code> (float 0..1, default <strong>0.5</strong>), appended at the end of
+  <code>NodePrefs</code> (<code>src/helpers/CommonCLI.h</code>) and in <code>loadPrefs</code>/<code>savePrefs</code> at file offset 291
+  (forward-/backward-compatible: old config files retain the default).</li>
+<li>Effect: A flood copy with <strong>strong SNR</strong> (usually a short, direct link) draws its random
+  backoff time from a window shrunk towards 0 → transmits earlier and suppresses slower
+  detour copies downstream via <code>hasSeen()</code> dedup. The random component is preserved
+  (window never &lt; <code>t+1</code>) → no synchronous collisions among equally strong neighbors.</li>
+<li>Extends Phase-0 Patch 1 (RX side <code>rx_delay_base</code>) with the <strong>TX side</strong>: flooding now follows
+  link quality at both stages instead of only at reception.</li>
+<li>Reversible at runtime without reflash: <code>set txsnrweight 0</code> (= exactly upstream). <code>get txsnrweight</code> reads it back.</li>
+<li>Active in the repeater build.</li>
+</ul>
+<h3 id="patch-4-ewma-smoothed-neighbor-snr-l0-link-sensing">Patch 4 — EWMA-smoothed neighbor SNR (L0 link sensing)</h3>
+<ul>
+<li>File: <code>examples/simple_repeater/MyMesh.cpp</code>, <code>putNeighbour()</code></li>
+<li>Before: <code>neighbour-&gt;snr</code> was overwritten with the latest raw value on every advert.</li>
+<li>After: exponentially smoothed (EWMA, α = 1/4); a freshly allocated/evicted slot is seeded with
+  the raw value.</li>
+<li>Effect: stable link-quality estimate instead of a noisy instantaneous value — foundation for a
+  later ETX metric (Phase 1+) and better <code>neighbors</code> evaluation. No int8 overflow
+  (weighted mean of two int8 values stays within int8).</li>
+</ul>
+<h2 id="level-a-from-the-real-data-study-hop-based-path-selection">Level A (from the real-data study) — hop-based path selection</h2>
+<p>Justified by <code>docs/MHR/study/MeshCore_Routing_Study.md</code>: SNR is a weak lever, the
+<strong>hop count</strong> is more reliable. Both patches are purely local, "never worse than upstream", safe
+and monotone from a single node — ideal for slow rollout in mixed-firmware operation.</p>
+<h3 id="patch-5-hop-weighted-rebroadcast-delay-primary-lever">Patch 5 — Hop-weighted rebroadcast delay (PRIMARY lever)</h3>
+<ul>
+<li>File: <code>examples/simple_repeater/MyMesh.cpp</code>, <code>getRetransmitDelay()</code></li>
+<li>New persisted parameter <code>tx_hop_weight</code> (float 0..1, default <strong>0.6</strong>), appended at the end of
+  <code>NodePrefs</code> (<code>CommonCLI.h</code>) + persistence offset 295 (forward-/backward-compatible) + CLI
+  <code>set/get txhopweight</code>.</li>
+<li>Effect: A flood copy with <strong>fewer accumulated hops</strong> (= reliable signal for a short path)
+  draws its random backoff time from a window shrunk towards 0 → transmits earlier and suppresses
+  slower detour copies via <code>hasSeen()</code> dedup. The hop term <strong>dominates</strong> the previous SNR term
+  (combined, capped; window never &lt; <code>t+1</code> → no synchronous collisions).</li>
+<li><code>tx_hop_weight == 0</code> <strong>and</strong> <code>tx_snr_weight == 0</code> reproduce upstream exactly. Hop horizon
+  <code>MHR_HOP_HORIZON = 12</code> (≈ real network diameter). Reversible: <code>set txhopweight 0</code>.</li>
+</ul>
+<h3 id="patch-6-floodmax-default-64-15-data-backed">Patch 6 — <code>flood.max</code> default 64 → 15 (data-backed)</h3>
+<ul>
+<li>File: <code>examples/simple_repeater/MyMesh.cpp</code> (<code>flood_max</code> default)</li>
+<li>Real network diameter: median 10, P90 18 hops → 64 is massively oversized. The study
+  showed: <strong>12 is too aggressive</strong> (cuts off distant deliveries at full adoption), <strong>15 remains safe
+  across all adoption levels</strong>.</li>
+<li><code>flood.max</code> is a purely <strong>local forward limit</strong> (<code>allowPacketForward</code>): stock nodes (64)
+  carry longer paths further → a single MHR node is never worse, but locally kills
+  long-range detour copies. Network-dependent, further adjustable via CLI: <code>set flood.max &lt;n&gt;</code>.</li>
+</ul>
+<h2 id="level-b-redundancy-guarded-flood-suppression-in-code-default-off">Level B — redundancy-guarded flood suppression (in code, <strong>default-OFF</strong>)</h2>
+<p>Implemented but <strong>dormant</strong> (<code>supp_enable = 0</code>): when OFF, the node behaves <strong>exactly like
+Level A</strong> (adversarially reviewed — not a single additional effect in the send/receive path). Only
+activate after bench-testing via CLI (<code>set supp.enable 1</code>). Design + validation:
+<code>docs/MHR/study/Suppression_Design.md</code>, <code>SUPPRESSION_VALIDATION.md</code>.</p>
+<h3 id="patch-7-5-guard-suppression-passive-2-hop-learning">Patch 7 — 5-guard suppression + passive 2-hop learning</h3>
+<ul>
+<li>Files: <code>examples/simple_repeater/MyMesh.{h,cpp}</code>, <code>src/Dispatcher.{h,cpp}</code> (new virtual hook
+  <code>allowFloodRebroadcast()</code>, default <code>true</code> → other builds are bit-identical), <code>src/helpers/CommonCLI.{h,cpp}</code>.</li>
+<li>Logic: a repeater suppresses its flood rebroadcast ONLY when all guards hold —
+  <strong>G1</strong> degree ≥ <code>supp_min_degree</code>, <strong>G2</strong> ≥ <code>supp_k_cover</code> distinct cover-senders heard during backoff,
+  <strong>G3</strong> every own neighbor is covered by a cover (via passively learned, freshness-gated 2-hop table —
+  the <em>load-bearing</em> layer against "cutting the last path"), <strong>G4</strong> cover SNR ≥
+  <code>supp_snr_floor</code>, <strong>G5</strong> probability <code>supp_prob</code>. Default action = transmit (never worse).</li>
+<li>New persisted prefs @299–303: <code>supp_enable</code>(0), <code>supp_min_degree</code>(4), <code>supp_k_cover</code>(2),
+  <code>supp_snr_floor</code>(-6 dB), <code>supp_prob</code>(80 %). CLI <code>set/get supp.enable|mindeg|kcover|snrfloor|prob</code>.</li>
+<li>Fixed tables (~0.8 KB, no dynamic allocation). Validated: delivery rate ≥ baseline across the
+  ENTIRE adoption sweep, −12…15 % airtime at high adoption. Bench test pending (cover timing in
+  HW, 2-hop convergence, freshness gating).</li>
+</ul>
+<h2 id="best-of-n-at-destination-hop-snr-best-path-selection-instead-of-first-wins-in-code">Best-of-N at destination — hop-/SNR-best path selection instead of "first wins" (in code)</h2>
+<h3 id="patch-8-collection-window-at-destination-report-shortest-path-back">Patch 8 — Collection window at destination, report shortest path back</h3>
+<ul>
+<li>Files: <code>src/Mesh.{h,cpp}</code> (shared base → applies to companion/room/repeater targets),
+  <code>src/helpers/CommonCLI.{h,cpp}</code>, default activation in <code>examples/simple_repeater/MyMesh.cpp</code>.</li>
+<li>Instead of immediately reporting back the <em>first-arrived</em> flood path via <code>createPathReturn</code>, the
+  destination briefly collects multiple copies (fixed table <code>_bofn[8]</code>) and reports the <strong>shortest
+  path (hops, then SNR as tiebreaker)</strong> back. v4-backed: hop dominates, SNR is a good reliability tiebreaker.</li>
+<li><strong>Dedup-safe (adversarially reviewed, no blocker):</strong> the payload is still delivered EXACTLY ONCE on
+  first reception; <code>hasSeen()</code>/dedup unchanged; only the reciprocal path-return is delayed by ONE
+  window (default 1500 ms, once per path setup). With a single copy, identical to first-wins.</li>
+<li>Mixed-firmware-safe: no packet format change (standard <code>PAYLOAD_TYPE_PATH</code> return). Prefs
+  <code>bofn_enable</code>(default 1 in repeater), <code>bofn_window_ms</code>(1500) @304/305, CLI <code>set/get bofn.enable|window</code>.
+  Default-OFF in the base (other builds unchanged). ~0.9 KB fixed table.</li>
+</ul>
+<h2 id="adaptive-self-controller-reviewed-and-rejected-no-go">Adaptive self-controller — reviewed and REJECTED (NO-GO)</h2>
+<p>A slow (1–2 h) controller that adapts <code>supp_prob</code> to the local environment was designed and
+simulated (<code>docs/MHR/study/Adaptive_Controller_Design.md</code>). Result: does not oscillate, but delivers
+only <strong>+0.76 pp</strong> airtime over the static safe set (&lt; 2 pp threshold) and is marginally less
+strictly safe → <strong>not coded</strong> (quality/stability before last-mile optimization). The static safe
+set is the recommendation.</p>
+<h2 id="phase-2-proactive-regional-backbone-in-code-default-off-bench-gated">Phase 2 — proactive regional backbone (in code, <strong>default-OFF</strong>, bench-gated)</h2>
+<p>Convergence gate passed (<code>docs/MHR/study/Phase2_Convergence_Validation.md</code>: GO), then coded.</p>
+<h3 id="patch-9-dv-control-plane-backbone_1">Patch 9 — DV control plane (backbone)</h3>
+<ul>
+<li>Files: new <code>examples/simple_repeater/Backbone.{h,cpp}</code>; <code>src/Packet.h</code> (<code>PAYLOAD_TYPE_DV=0x0C</code>);
+  <code>src/Mesh.{h,cpp}</code> (virtual <code>onDVDataRecv</code> + zero-hop DV dispatch + <code>createDVData</code>);
+  <code>src/helpers/CommonCLI.{h,cpp}</code> (prefs); <code>examples/simple_repeater/MyMesh.{h,cpp}</code> (wiring).</li>
+<li>Distributed DV: per-destination seqno + <strong>origin-independent Babel feasibility</strong> (loop breaker),
+  feasible-successor backup, hold-down + route poisoning, trigger-on-change (rate-limited),
+  periodic zero-hop announcement. ETX from EWMA-SNR. Region from <code>region_map</code>.</li>
+<li><strong>Mixed-firmware-safe:</strong> DV is an <strong>ignorable, zero-hop</strong> payload type (0x0C) → stock nodes
+  discard it without re-flooding. No existing type/format touched.</li>
+<li><strong>default-OFF = bit-identically inert</strong> (<code>bb_enable=0</code>): no DV send/receive, no timer, no
+  route changes. Prefs <code>bb_enable</code>(0), <code>bb_period_s</code>(600), <code>bb_holddown_s</code>(1200) @307/308/310,
+  CLI <code>set/get bb.enable|bb.period|bb.holddown</code>. ~1.25 KB fixed tables.</li>
+<li>Adversarially reviewed: delivery state safe; one found loop-BLOCKER (seqno per-announcer
+  instead of per-destination) + 2 WARNs <strong>fixed</strong> (B1/W1/W2), build green on repeater/room_server/companion.</li>
+<li><strong>Deliberately deferred:</strong> the data-plane short-circuit (backbone unicast instead of flood) is NOT
+  wired — it belongs at the endpoint and would touch dedup/path semantics (high risk). Enabling
+  <code>bb_enable</code> therefore changes ONLY the control plane; data continues to run via flood-and-cache →
+  "never worse" holds. <code>lookupRoute()</code> is ready for this later integration.</li>
+<li>⚠️ <code>bb.enable 1</code> only after <strong>bench test</strong> (<code>docs/MHR/BENCH_TEST_PLAN.md</code> §4).</li>
+</ul>
+<h2 id="deliberately-not-changed-still-open">Deliberately NOT changed / still open</h2>
+<ul>
+<li>No new packet format for existing types, no metric in existing packets.</li>
+<li>Phase-2 <strong>data-plane short-circuit</strong> (endpoint integration) — its own tested stage (dedup risk).</li>
+</ul>
+<h2 id="validation-simulation">Validation (Simulation)</h2>
+<ul>
+<li><code>docs/MHR/sim/mhr_sim_v2.py</code> — stress scenarios on the real 25-node topology:</li>
+<li><strong>Churn</strong>: path flapping 78 % → 17 %, better delivery rate, shorter paths.</li>
+<li><strong>Link failure (0–30 %)</strong>: re-discovery ≤ 1.6 % instead of up to 49.5 %, airtime nearly flat.</li>
+<li><strong>Partition</strong>: −98 % airtime (baseline runs in endless flood, MHR floods once + fallback).</li>
+<li>Results in <code>sim/sim_results_v2.json</code>, plots <code>fig_v2_*.png</code>. Reproducible (seed 42).</li>
+<li><code>docs/MHR/sim/mhr_sim_real_v3.py</code> — <strong>calibrated on real CoreScope live data</strong> (109,980 packets, 1,962 nodes). MEASURED: real detour median <strong>2.1×</strong> (78.8 % of packets &gt; 1.5×) — proves the "first-wins" problem with production data; the old log-distance SNR model does not apply to this network (real PLE ≈ 0.4). Dataset reproducible via <code>mhr_collect_corescope.py</code>.</li>
+<li><code>docs/MHR/study/MeshCore_Routing_Study.md</code> — <strong>mechanism study with adoption sweep</strong> (1 node → all) on the real 776-node topology, safety invariant "never worse than baseline". Result: hop-based path selection (Best-of-N by hops, hop delay) + <code>flood.max</code> 15 are safe from 1 node; airtime suppression (cancel/counter/MPR) requires an adaptive redundancy condition. Shifts priority away from SNR towards hop count.</li>
 </ul>
 
 

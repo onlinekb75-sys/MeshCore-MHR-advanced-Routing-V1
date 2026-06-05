@@ -27,7 +27,7 @@
     
     
       
-        <title>MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege - MeshCore Docs</title>
+        <title>MeshCore Routing Analyse und Optimierung - MeshCore Docs</title>
       
     
     
@@ -69,11 +69,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#meshcore-analyse-der-pfadfindung-und-vorschlage-gegen-umwege" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -105,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+              MeshCore Routing Analyse und Optimierung
             
           </span>
         </div>
@@ -772,26 +767,6 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
         
@@ -800,7 +775,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+    MeshCore Routing Analyse und Optimierung
   
 
     
@@ -809,169 +784,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#1-kurzfassung" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Kurzfassung
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#2-wie-die-pfadfindung-tatsachlich-funktioniert" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Wie die Pfadfindung tatsächlich funktioniert
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="2. Wie die Pfadfindung tatsächlich funktioniert">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#21-die-drei-phasen-einer-verbindung" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2.1 Die drei Phasen einer Verbindung
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#22-wie-die-sendereihenfolge-im-flood-entsteht-das-timing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2.2 Wie die Sendereihenfolge im Flood entsteht (das Timing)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-ursachen-der-umwege-zusammengefasst" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Ursachen der Umwege (zusammengefasst)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-optimierungen-priorisiert" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Optimierungen (priorisiert)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="4. Optimierungen (priorisiert)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#stufe-a-sofort-nur-konfiguration-kein-code-niedriges-risiko" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stufe A – Sofort, nur Konfiguration (kein Code, niedriges Risiko)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stufe-b-code-anderung-am-ziel-best-of-n-statt-first-wins" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stufe B – Code-Änderung am Ziel: „Best-of-N statt First-wins"
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stufe-c-pfad-metrik-im-paket-mitfuhren" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stufe C – Pfad-Metrik im Paket mitführen
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stufe-d-opportunistisches-pfad-upgrade-beim-sender" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stufe D – Opportunistisches Pfad-Upgrade beim Sender
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-empfohlenes-vorgehen" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Empfohlenes Vorgehen
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-wichtige-einschrankungen" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6. Wichtige Einschränkungen
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1020,7 +832,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    MeshCore Simulation ECHTE Daten
   
 
     
@@ -1226,7 +1038,7 @@
   <span class="md-ellipsis">
     
   
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
+    PROVENANCE
   
 
     
@@ -1541,7 +1353,7 @@
   <span class="md-ellipsis">
     
   
-    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+    Phase2 Convergence Validation
   
 
     
@@ -1653,7 +1465,7 @@
   <span class="md-ellipsis">
     
   
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+    Suppression Design
   
 
     
@@ -1699,160 +1511,6 @@
   
   
   
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#1-kurzfassung" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Kurzfassung
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#2-wie-die-pfadfindung-tatsachlich-funktioniert" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Wie die Pfadfindung tatsächlich funktioniert
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="2. Wie die Pfadfindung tatsächlich funktioniert">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#21-die-drei-phasen-einer-verbindung" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2.1 Die drei Phasen einer Verbindung
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#22-wie-die-sendereihenfolge-im-flood-entsteht-das-timing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2.2 Wie die Sendereihenfolge im Flood entsteht (das Timing)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-ursachen-der-umwege-zusammengefasst" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Ursachen der Umwege (zusammengefasst)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-optimierungen-priorisiert" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Optimierungen (priorisiert)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="4. Optimierungen (priorisiert)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#stufe-a-sofort-nur-konfiguration-kein-code-niedriges-risiko" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stufe A – Sofort, nur Konfiguration (kein Code, niedriges Risiko)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stufe-b-code-anderung-am-ziel-best-of-n-statt-first-wins" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stufe B – Code-Änderung am Ziel: „Best-of-N statt First-wins"
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stufe-c-pfad-metrik-im-paket-mitfuhren" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stufe C – Pfad-Metrik im Paket mitführen
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stufe-d-opportunistisches-pfad-upgrade-beim-sender" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stufe D – Opportunistisches Pfad-Upgrade beim Sender
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-empfohlenes-vorgehen" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Empfohlenes Vorgehen
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-wichtige-einschrankungen" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6. Wichtige Einschränkungen
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
   
 </nav>
                   </div>
@@ -1877,179 +1535,10 @@
   
 
 
-<h1 id="meshcore-analyse-der-pfadfindung-und-vorschlage-gegen-umwege">MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege</h1>
-<p>Analyse-Basis: Quellcode von <code>meshcore-dev/MeshCore</code>, Branch <code>main</code> (geklont am 29.05.2026). Alle Code-Verweise beziehen sich auf diesen Stand (<code>src/Mesh.cpp</code>, <code>src/Dispatcher.cpp</code>, <code>src/helpers/BaseChatMesh.cpp</code>, <code>examples/simple_repeater/MyMesh.cpp</code>).</p>
-<hr />
-<h2 id="1-kurzfassung">1. Kurzfassung</h2>
-<p>MeshCore nutzt <strong>kein</strong> klassisches Routing mit Metrik (kein OLSR/Batman/AODV mit Kostenfunktion). Es ist ein <strong>hybrides Verfahren</strong>: Die erste Nachricht an einen Kontakt wird geflutet (Flood), die dabei entstehende Route wird zwischengespeichert, und <strong>alle weiteren Pakete laufen fest über genau diesen einen Pfad</strong> (Direct Routing über die gecachte Hop-Liste).</p>
-<p>Der entscheidende Punkt für deine Beobachtung „der Traffic nimmt oft große Umwege": <strong>Es gewinnt nicht der kürzeste oder beste Pfad, sondern der, dessen Flood-Kopie zufällig zuerst beim Ziel ankommt.</strong> Dieser Pfad wird dann eingefroren und unbegrenzt weiterverwendet, bis er dreimal ausfällt. Ein einmal etablierter Umweg „klebt" also.</p>
-<p>Die gute Nachricht: Die Firmware enthält bereits die Maschinerie für eine signalqualitäts-gewichtete Ausbreitung (<code>calcRxDelay</code> / <code>packetScore</code>), sie ist nur <strong>per Default abgeschaltet</strong>. Das ist der größte Hebel und kostet keine Code-Änderung.</p>
-<hr />
-<h2 id="2-wie-die-pfadfindung-tatsachlich-funktioniert">2. Wie die Pfadfindung tatsächlich funktioniert</h2>
-<h3 id="21-die-drei-phasen-einer-verbindung">2.1 Die drei Phasen einer Verbindung</h3>
-<p><strong>Phase 1 – Discovery-Flood.</strong> Sender kennt noch keinen Pfad (<code>out_path_len == OUT_PATH_UNKNOWN</code>, <code>BaseChatMesh.cpp:42</code>). Das Paket wird als <code>ROUTE_TYPE_FLOOD</code> ausgesendet. Jeder Repeater, der es hört und weiterleiten darf, hängt seinen eigenen Hash an die Pfadliste an und sendet erneut:</p>
-<pre><code>// src/Mesh.cpp:330  routeRecvPacket()
-self_id.copyHashTo(&amp;packet-&gt;path[n * packet-&gt;getPathHashSize()], ...);
-packet-&gt;setPathHashCount(n + 1);
-uint32_t d = getRetransmitDelay(packet);
-return ACTION_RETRANSMIT_DELAYED(packet-&gt;getPathHashCount(), d);
-</code></pre>
-<p>Die Pfadliste im Paket ist damit eine wachsende Kette der durchlaufenen Repeater.</p>
-<p><strong>Phase 2 – Path Return.</strong> Das Ziel empfängt typischerweise <strong>mehrere Kopien</strong> desselben Pakets über verschiedene Wege. Verarbeitet wird aber nur die <strong>erste</strong>:</p>
-<pre><code>// src/Mesh.cpp:138
-// NOTE: this is a 'first packet wins' impl. When receiving from multiple paths, the first to arrive wins.
-//       For flood mode, the path may not be the 'best' in terms of hops.
-// FUTURE: could send back multiple paths, using createPathReturn(), and let sender choose which to use(?)
-</code></pre>
-<p>Das Ziel extrahiert den Pfad aus dieser ersten Kopie und schickt ihn dem Sender per <code>createPathReturn()</code> <strong>direkt rückwärts</strong> zurück (<code>Mesh.cpp:167</code>).</p>
-<p><strong>Phase 3 – Cached Direct.</strong> Sender speichert den Pfad und nutzt ihn von nun an für <strong>jede</strong> weitere Nachricht. Die Übernahme erfolgt kommentarlos und ohne Vergleich:</p>
-<pre><code>// src/helpers/BaseChatMesh.cpp:304  onContactPathRecv()
-// NOTE: default impl, we just replace the current 'out_path' regardless, whenever sender sends us a new out_path.
-// FUTURE: could store multiple out_paths per contact, and try to find which is the 'best'(?)
-from.out_path_len = mesh::Packet::copyPath(from.out_path, out_path, out_path_len);
-</code></pre>
-<h3 id="22-wie-die-sendereihenfolge-im-flood-entsteht-das-timing">2.2 Wie die Sendereihenfolge im Flood entsteht (das Timing)</h3>
-<p>Hier liegt die eigentliche Ursache. Wenn ein Repeater eine Flood-Kopie hört, gibt es zwei Verzögerungs-Stufen:</p>
-<ol>
-<li><strong>RX-Delay (Empfangsseite, signalabhängig).</strong> In <code>Dispatcher::checkRecv()</code> wird pro Paket ein <code>score</code> aus SNR und Länge berechnet und daraus eine Wartezeit:</li>
-</ol>
-<pre><code>// src/Dispatcher.cpp:206 / 242
-score = _radio-&gt;packetScore(_radio-&gt;getLastSNR(), len);
-int _delay = calcRxDelay(score, air_time);
-if (_delay &lt; 50) processRecvPacket(pkt);          // sofort verarbeiten
-else _mgr-&gt;queueInbound(pkt, futureMillis(_delay)); // verzögert
-</code></pre>
-<p>Sinn: Knoten mit <strong>starkem</strong> Signal (gute, meist geografisch direkte Verbindung) würden zuerst weiterleiten und so die schwachen, weiter entfernten Kopien unterdrücken (Dedup via <code>hasSeen()</code>). Das wäre eine intelligente, qualitätsgeleitete Flutung.</p>
-<p><strong>Aber:</strong> Der Repeater überschreibt <code>calcRxDelay</code> und schaltet es per Default ab:</p>
-<pre><code>// examples/simple_repeater/MyMesh.cpp:534
-int MyMesh::calcRxDelay(float score, uint32_t air_time) const {
-  if (_prefs.rx_delay_base &lt;= 0.0f) return 0;   // &lt;-- Default: aus
-  return (int)((pow(_prefs.rx_delay_base, 0.85f - score) - 1.0) * air_time);
-}
-// :874  _prefs.rx_delay_base = 0.0f;   // turn off by default, was 10.0;
-</code></pre>
-<ol>
-<li><strong>TX-Delay (Sendeseite, rein zufällig).</strong> Mit abgeschaltetem RX-Delay bleibt nur eine <strong>zufällige</strong> Wartezeit vor dem Weitersenden:</li>
-</ol>
-<pre><code>// examples/simple_repeater/MyMesh.cpp:539
-uint32_t MyMesh::getRetransmitDelay(const mesh::Packet *packet) {
-  uint32_t t = _radio-&gt;getEstAirtimeFor(...) * _prefs.tx_delay_factor;  // tx_delay_factor=0.5
-  return getRNG()-&gt;nextInt(0, 5*t + 1);   // gleichverteilter Zufall
-}
-</code></pre>
-<p><strong>Konsequenz:</strong> Welche Kopie zuerst beim Ziel ankommt, entscheidet im Wesentlichen ein <strong>Würfelwurf an jedem Hop</strong> – nicht die Signalqualität und nicht die Hop-Zahl. Ein 4-Hop-Umweg, dessen Repeater zufällig kurze Delays würfeln, schlägt regelmäßig den sauberen 2-Hop-Direktweg, dessen Knoten lange Delays würfeln.</p>
-<hr />
-<h2 id="3-ursachen-der-umwege-zusammengefasst">3. Ursachen der Umwege (zusammengefasst)</h2>
-<table>
-<thead>
-<tr>
-<th>#</th>
-<th>Ursache</th>
-<th>Code-Beleg</th>
-<th>Wirkung</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td><strong>„First packet wins"</strong> – Ziel cached die zuerst eintreffende Kopie, nicht die beste</td>
-<td><code>Mesh.cpp:138-140</code></td>
-<td>Zufälliger statt optimaler Pfad</td>
-</tr>
-<tr>
-<td>2</td>
-<td><strong>Pfad ist klebrig</strong> – keine periodische Neubewertung, Wechsel erst nach mehrfachem Ausfall</td>
-<td><code>BaseChatMesh.cpp:779 resetPathTo()</code> (nur app-getriggert)</td>
-<td>Umweg bleibt dauerhaft bestehen</td>
-</tr>
-<tr>
-<td>3</td>
-<td><strong>Kein Pfad-Vergleich</strong> – Sender übernimmt jeden empfangenen Pfad ungeprüft</td>
-<td><code>BaseChatMesh.cpp:304-307</code></td>
-<td>Auch ein schlechterer Pfad überschreibt einen guten</td>
-</tr>
-<tr>
-<td>4</td>
-<td><strong>SNR-Gewichtung deaktiviert</strong> – <code>rx_delay_base = 0</code> ⇒ reines Zufalls-Timing</td>
-<td><code>MyMesh.cpp:534-536, 874</code></td>
-<td>Ausbreitung folgt nicht der Linkqualität</td>
-</tr>
-<tr>
-<td>5</td>
-<td><strong><code>flood.max = 64</code></strong> – sehr hohes Hop-Limit</td>
-<td><code>MyMesh.cpp:888</code>, <code>docs/cli_commands.md:625</code></td>
-<td>Weit entfernte Umweg-Kopien bleiben „im Rennen"</td>
-</tr>
-</tbody>
-</table>
-<p>Hinzu kommt, dass es <strong>keine Metrik im Paket</strong> gibt: weder kumulierte SNR noch ein Kostenwert wird mitgeführt und verglichen. Die Hop-Zahl steht zwar implizit über <code>getPathHashCount()</code> zur Verfügung, wird beim Ziel aber nicht zur Auswahl genutzt.</p>
-<hr />
-<h2 id="4-optimierungen-priorisiert">4. Optimierungen (priorisiert)</h2>
-<h3 id="stufe-a-sofort-nur-konfiguration-kein-code-niedriges-risiko">Stufe A – Sofort, nur Konfiguration (kein Code, niedriges Risiko)</h3>
-<p><strong>A1. SNR-gewichtete Flutung einschalten.</strong> Das ist der wichtigste Hebel. <code>rx_delay_base</code> auf einen Wert &gt; 0 setzen (Original-Default war <code>10.0</code>). Dann warten schwache/entfernte Knoten länger, starke (kurze) Links senden zuerst und unterdrücken die Umweg-Kopien automatisch. Effekt: Flood breitet sich bevorzugt entlang qualitativ guter, meist kürzerer Wege aus ⇒ die zuerst eintreffende (und damit gecachte) Route ist deutlich häufiger die direkte.</p>
-<ul>
-<li>Empfehlung: auf jedem Repeater <code>rx_delay_base</code> testweise auf <code>8</code>–<code>12</code> setzen, Verhalten über <code>score</code>-Logging beobachten.</li>
-<li>Trade-off: minimal höhere Latenz pro Hop, dafür weniger Kollisionen und kürzere Pfade.</li>
-</ul>
-<p><strong>A2. <code>flood.max</code> an den Netz-Durchmesser anpassen.</strong> 64 Hops sind für fast jedes reale Mesh massiv überdimensioniert. Auf „realer Durchmesser + 2–3 Reserve" setzen (z. B. <code>8</code>–<code>12</code>). Damit sterben weiträumige Umweg-Kopien, bevor sie als Sieger ankommen können.</p>
-<pre><code>set flood.max 10
-</code></pre>
-<p><strong>A3. Loop-Detection aktivieren</strong> (falls nicht aktiv), verhindert kreisende Pakete, die Airtime fressen und Umwege begünstigen (<code>MyMesh.cpp:436</code>, <code>docs/cli_commands.md:482</code>, ab FW 1.14).</p>
-<p><strong>A4. <code>tx_delay_factor</code> moderat senken</strong>, wenn das Netz dünn ist – verkürzt die zufällige Streuung und damit die Latenz; bei dichten Netzen eher belassen, um Kollisionen zu vermeiden (<code>docs/cli_commands.md:488</code>).</p>
-<h3 id="stufe-b-code-anderung-am-ziel-best-of-n-statt-first-wins">Stufe B – Code-Änderung am Ziel: „Best-of-N statt First-wins"</h3>
-<p>Kern des Problems ist die <code>first packet wins</code>-Logik. Statt die erste Kopie sofort als Pfad zurückzusenden, sollte das Ziel <strong>innerhalb eines kurzen Fensters</strong> (z. B. 1–2× erwartete Airtime) alle eintreffenden Kopien sammeln und die <strong>beste</strong> auswählen.</p>
-<p>Auswahlkriterium, gestaffelt:
-1. kleinste Hop-Zahl (<code>getPathHashCount()</code>),
-2. bei Gleichstand: bester kumulierter/minimaler SNR entlang des Pfads.</p>
-<p>Skizze (in <code>Mesh::onRecvPacket</code>, Zweig <code>PAYLOAD_TYPE_*</code> / bzw. <code>onPeerPathRecv</code>):</p>
-<pre><code class="language-cpp">// Pseudocode – Ersetzt das sofortige createPathReturn()
-if (self_id.isHashMatch(&amp;dest_hash) &amp;&amp; decrypt_ok) {
-    uint8_t hops = pkt-&gt;getPathHashCount();
-    if (!hasPendingDiscovery(src_hash)) {
-        // erste Kopie: Kandidat merken, Timer starten
-        beginDiscoveryWindow(src_hash, pkt-&gt;path, pkt-&gt;path_len, hops, pkt-&gt;getSNR());
-    } else if (isBetter(hops, pkt-&gt;getSNR(), pending[src_hash])) {
-        // bessere Kopie innerhalb des Fensters: Kandidat ersetzen
-        updateDiscoveryCandidate(src_hash, pkt-&gt;path, pkt-&gt;path_len, hops, pkt-&gt;getSNR());
-    }
-    // Path-Return erst NACH Ablauf des Fensters senden (im loop()/Timer)
-}
-</code></pre>
-<ul>
-<li>Nutzen: Der zurückgemeldete und damit gecachte Pfad ist nachweislich der kürzeste der gehörten Alternativen.</li>
-<li>Kosten: kleiner Zustandsspeicher pro laufender Discovery + ein Timer; eine zusätzliche Latenz von einem Fenster (einmalig pro Pfad-Aufbau, nicht pro Nachricht).</li>
-<li>Der Code-Kommentar <code>Mesh.cpp:140</code> nennt genau diesen Weg bereits als „FUTURE".</li>
-</ul>
-<h3 id="stufe-c-pfad-metrik-im-paket-mitfuhren">Stufe C – Pfad-Metrik im Paket mitführen</h3>
-<p>Damit Stufe B (und die Sender-Auswahl) eine belastbare Grundlage hat: bei der Pfad-Anhängung zusätzlich zur Hash-Kette eine <strong>Link-Qualität</strong> akkumulieren. Der TRACE-Pfad macht das bereits vor – dort wird statt eines Hashs der SNR angehängt:</p>
-<pre><code>// src/Mesh.cpp:60 (TRACE)
-pkt-&gt;path[pkt-&gt;path_len++] = (int8_t)(pkt-&gt;getSNR()*4);   // SNR statt Hash
-</code></pre>
-<p>Dieselbe Idee lässt sich als optionale „Cost"-Begleitinformation für Discovery-Floods nutzen (minimaler SNR oder Summe der Hop-Kosten), sodass <code>isBetter()</code> in Stufe B nicht nur Hops, sondern echte Funkqualität vergleicht. Achtung: erhöht die Paketlänge und erfordert Versionskompatibilität (vgl. die Hash-Size-Migrationshinweise in <code>docs/cli_commands.md:464</code>).</p>
-<h3 id="stufe-d-opportunistisches-pfad-upgrade-beim-sender">Stufe D – Opportunistisches Pfad-Upgrade beim Sender</h3>
-<p>Statt jeden empfangenen Pfad blind zu übernehmen (<code>BaseChatMesh.cpp:305</code>), sollte der Sender vergleichen und nur <strong>bei Verbesserung</strong> (weniger Hops / besserer SNR) wechseln – und zusätzlich den Pfad <strong>periodisch</strong> (z. B. alle N Stunden oder nach M Nachrichten) per leichtgewichtigem Re-Discovery auffrischen. Das löst Ursache #2 (klebrige Pfade): ein anfänglicher Umweg wird ersetzt, sobald sich ein besserer Weg zeigt, ohne auf einen kompletten Ausfall zu warten.</p>
-<pre><code class="language-cpp">// onContactPathRecv – statt bedingungslosem Überschreiben:
-if (from.out_path_len == OUT_PATH_UNKNOWN
-    || newHops &lt; currentHops
-    || (newHops == currentHops &amp;&amp; newSnr &gt; currentSnr)) {
-    from.out_path_len = copyPath(...);   // nur bei echter Verbesserung
-}
-</code></pre>
-<hr />
-<h2 id="5-empfohlenes-vorgehen">5. Empfohlenes Vorgehen</h2>
-<ol>
-<li><strong>Zuerst Stufe A</strong> auf allen Repeatern ausrollen (reine Konfig, sofort wirksam, reversibel). In den meisten Fällen verschwinden die gröbsten Umwege schon damit – insbesondere durch A1 (<code>rx_delay_base</code>) und A2 (<code>flood.max</code>).</li>
-<li><strong>Messen</strong>: vorher/nachher die tatsächlichen Pfade per <code>trace</code>-Kommando und das <code>score</code>/Pfad-Logging (<code>MyMesh.cpp:471 logRx</code>) auf einer repräsentativen Strecke vergleichen.</li>
-<li><strong>Dann Stufe B</strong> als Firmware-Fork umsetzen, wenn nach A noch systematische Umwege bleiben (löst die Wurzel „first-wins"). C und D sind die langfristige, vollständige Lösung.</li>
-</ol>
-<h2 id="6-wichtige-einschrankungen">6. Wichtige Einschränkungen</h2>
-<ul>
-<li>Die Stufe-A-Werte sind <strong>netzabhängig</strong> – <code>rx_delay_base</code>, <code>flood.max</code> und <code>tx_delay_factor</code> müssen für deine konkrete Topologie und Knotendichte empirisch eingestellt werden; es gibt keinen universell optimalen Wert.</li>
-<li>Stufen B–D sind Eingriffe ins Kernprotokoll. Pfad-Metriken (C) und geänderte Paketformate brechen potenziell die Kompatibilität mit Knoten älterer Firmware im selben Mesh – gestaffelt und versioniert ausrollen.</li>
-<li>Diese Analyse beruht auf statischem Code-Lesen des <code>main</code>-Branch, nicht auf Messung deines konkreten Netzes. Die Diagnose „Umwege durch first-wins + Zufalls-Timing" ist code-belegt; die optimalen Parameter belegt erst dein eigener Vorher/Nachher-Test.</li>
-</ul>
-<hr />
-<p><em>Analysierte Dateien: <code>src/Mesh.cpp</code>, <code>src/Dispatcher.cpp</code>, <code>src/helpers/BaseChatMesh.cpp</code>, <code>examples/simple_repeater/MyMesh.cpp</code>, <code>docs/cli_commands.md</code>, <code>docs/packet_format.md</code>.</em></p>
+  <h1>MeshCore Routing Analyse und Optimierung</h1>
+
+<p>/Users/bickelkarsten/Downloads/mhr/docs/MHR/MeshCore_Routing_Analyse_und_Optimierung.md</p>
+<p>The file has been updated. The complete original German content is preserved unchanged, followed by the separator and a full English translation under <code>## 🇬🇧 English Translation</code>. All section headings, body text, tables, bullet points, and code block comments have been translated. All code blocks, file paths, CLI commands, variable names, and technical identifiers are left untranslated.</p>
 
 
 

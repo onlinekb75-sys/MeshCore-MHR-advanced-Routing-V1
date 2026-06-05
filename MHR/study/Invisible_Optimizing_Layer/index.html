@@ -773,7 +773,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+    MeshCore Routing Analyse und Optimierung
   
 
     
@@ -829,7 +829,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    MeshCore Simulation ECHTE Daten
   
 
     
@@ -1035,7 +1035,7 @@
   <span class="md-ellipsis">
     
   
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
+    PROVENANCE
   
 
     
@@ -1330,6 +1330,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1465,7 +1476,7 @@
   <span class="md-ellipsis">
     
   
-    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+    Phase2 Convergence Validation
   
 
     
@@ -1577,7 +1588,7 @@
   <span class="md-ellipsis">
     
   
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+    Suppression Design
   
 
     
@@ -1692,6 +1703,17 @@
     <span class="md-ellipsis">
       
         6. Abgrenzung
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
       
     </span>
   </a>
@@ -1877,6 +1899,162 @@ kein Server. Der Engpass (Airtime) wird <strong>gesenkt, nicht belastet</strong>
 <p>Diese Schicht ist die <strong>gratis, unsichtbare, sichere</strong> Optimierung. Der proaktive <strong>Backbone (Phase 2)</strong>
 ist explizit NICHT enthalten — er ist mächtiger, aber er kostet Kontroll-Airtime und ist sichtbar im
 Sinne neuer Paket-Typen; er bleibt die separate, ambitionierte Kür.</p>
+<hr />
+<h2 id="english-translation">🇬🇧 English Translation</h2>
+<h1 id="the-invisible-node-local-mesh-optimization-layer-architecture">The Invisible, Node-Local Mesh Optimization Layer (Architecture)</h1>
+<p><em>Vision: MHR as a </em><em>transparent intermediate layer — invisible to users and applications</em><em> — between
+radio reception and the existing MeshCore routing. Nobody reconfigures anything, no packet looks
+different, the chat/messaging function stays bit-identical — the network </em><em>simply works quieter,
+shorter, more reliably</em><em>. Fully </em><em>decentralized</em><em>: every node decides on its own from what it hears
+anyway. No server, no coordination, no new infrastructure.</em></p>
+<p>Basis: validated on real CoreScope data (<code>../sim/</code>, <code>MeshCore_Simulation_v3/v4</code>, study).</p>
+<hr />
+<h2 id="1-two-layers-both-node-local">1. Two Layers, Both Node-Local</h2>
+<pre><code>            ┌──────────────────────────────────────────────┐
+   Radio-RX ─┤  (P) PASSIVE SENSING  — 0 Airtime             │  only listens to what flies anyway
+            │   • Neighbor table (EWMA-SNR)                   │
+            │   • 2-hop adjacency (freshness-gated)          │
+            │   • Redundancy/cover histogram                 │
+            │   • Local path-length hist (= local diameter)  │
+            │   • Duty-cycle utilization, churn              │
+            └───────────────┬──────────────────────────────┘
+                            │ feeds
+            ┌───────────────▼──────────────────────────────┐
+   Routing ─┤  (D) LOCAL DECISIONS  — no new packet          │  only changes timing/whether/which path
+            │   1 Hop-weighted flood timing   (Stage A ✅)   │
+            │   2 Guarded Suppression G1–G5   (Stage B ✅)   │
+            │   3 Path-success reinforcement  (new)          │
+            │   4 flood.max = local diameter  (Stage A ✅)   │
+            │   5 Duty-cycle self-protection  (defensive)    │
+            └────────────────────────────────────────────────┘
+</code></pre>
+<p>(P) costs <strong>zero</strong> airtime (pure observation). (D) generates <strong>no</strong> new packet and changes <strong>no</strong>
+format — it only influences <em>when</em> / <em>whether</em> / <em>via which cached path</em> the node transmits anyway.</p>
+<hr />
+<h2 id="2-what-makes-the-layer-invisible-transparency-guarantees">2. What Makes the Layer "Invisible" (Transparency Guarantees)</h2>
+<ul>
+<li><strong>No packet-format intrusion, no new mandatory fields, no new packet types</strong> → legacy nodes and
+  the app see exactly today's protocol.</li>
+<li><strong>No app-/user-visible behavioral change</strong> — messaging/discovery work identically;
+  the only observable effect is <em>less airtime / shorter paths / higher reliability</em>.</li>
+<li><strong>Every component "never worse than upstream"</strong> and individually disableable (CLI). Default-safe.</li>
+<li><strong>Mixed firmware:</strong> coexists with stock nodes; when in doubt, always the safe action (transmit).</li>
+</ul>
+<h2 id="3-what-makes-it-node-only-decentralization-guarantees">3. What Makes it "Node-Only" (Decentralization Guarantees)</h2>
+<ul>
+<li><strong>Every decision from locally observable data</strong> (own RX, own neighborhood) — no
+  central service, no inter-node negotiation beyond what is already in flight.</li>
+<li><strong>No backbone, no control-plane overlay</strong> (that would be Phase 2 — deliberately NOT part of this
+  layer, because it costs control traffic = airtime and is no longer "invisible/free").</li>
+<li>Converges purely by overhearing; a freshly booted node falls back cleanly to conservative
+  behavior until it has learned enough (freshness gating).</li>
+</ul>
+<hr />
+<h2 id="4-the-building-blocks-status">4. The Building Blocks (Status)</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Building Block</th>
+<th>Status</th>
+<th>Effect (on real data)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P</td>
+<td>Passive sensing (neighbors, 2-hop, redundancy, diameter, duty-cycle)</td>
+<td>Foundation (parts in Stage A/B)</td>
+<td>enables everything else, 0 airtime</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Hop-weighted flood timing</td>
+<td><strong>✅ in code (Stage A)</strong></td>
+<td>shorter paths lead the flood</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Redundancy-guarded suppression (G1–G5)</td>
+<td><strong>✅ in code, default-OFF (Stage B)</strong></td>
+<td>−12…15 % airtime at high adoption, delivery ≥ baseline</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Path-success reinforcement</strong> (EWMA success per path, strengthen proven paths, demote shaky ones <em>before</em> failure)</td>
+<td><strong>new — to be simulated here</strong></td>
+<td>less re-discovery airtime, more stable routes</td>
+</tr>
+<tr>
+<td>4</td>
+<td>flood.max = real diameter (15)</td>
+<td><strong>✅ in code (Stage A)</strong></td>
+<td>cuts off long-range detours</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Duty-cycle self-protection (defensive backoff near limit)</td>
+<td>Concept</td>
+<td>protects against own saturation</td>
+</tr>
+</tbody>
+</table>
+<p>Discarded (honestly, data-backed): fast adaptive controller, slow per-node calibration, TPC —
+they add nothing beyond the guards (see <code>Adaptive_Controller_Design.md</code>,
+<code>Local_Calibration_Study.md</code>). The layer therefore remains deliberately <strong>lean</strong>.</p>
+<hr />
+<h2 id="5-node-feasibility-the-core-question">5. Node Feasibility (the Core Question)</h2>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Layer's requirement</th>
+<th>Heltec V4 (ESP32-S3)</th>
+<th>nRF52840</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RAM (fixed tables)</td>
+<td>~1–2 KB (neighbors + 2-hop + pending + path memory)</td>
+<td>512 KB ✅ ample</td>
+<td>256 KB ✅</td>
+</tr>
+<tr>
+<td>CPU per packet</td>
+<td>few integer comparisons (guards)</td>
+<td>trivial</td>
+<td>trivial</td>
+</tr>
+<tr>
+<td>CPU "every few hours"</td>
+<td>(not needed — no controller required)</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Flash</td>
+<td>few KB of code</td>
+<td>ample</td>
+<td>ample</td>
+</tr>
+<tr>
+<td><strong>Airtime</strong> (the actual bottleneck)</td>
+<td><strong>0 additional</strong> (purely passive + only transmit less)</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>→ <strong>Initial assessment: realistically implementable node-only.</strong> No dynamic allocation, fixed tables,
+no server. The bottleneck (airtime) is <strong>reduced, not added to</strong>. Open validation: the
+<strong>composite effect</strong> (do the building blocks interact cleanly?), <strong>path reinforcement</strong> (new), and the
+<strong>hardware bench points</strong> of suppression (cover timing, 2-hop freshness).</p>
+<hr />
+<h2 id="6-delimitation">6. Delimitation</h2>
+<p>This layer is the <strong>free, invisible, safe</strong> optimization. The proactive <strong>backbone (Phase 2)</strong>
+is explicitly NOT included — it is more powerful, but it costs control airtime and is visible in
+the sense of new packet types; it remains the separate, ambitious stretch goal.</p>
 
 
 

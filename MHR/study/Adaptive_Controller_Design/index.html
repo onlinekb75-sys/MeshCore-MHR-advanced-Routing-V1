@@ -773,7 +773,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+    MeshCore Routing Analyse und Optimierung
   
 
     
@@ -829,7 +829,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    MeshCore Simulation ECHTE Daten
   
 
     
@@ -1035,7 +1035,7 @@
   <span class="md-ellipsis">
     
   
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
+    PROVENANCE
   
 
     
@@ -1218,6 +1218,17 @@
     <span class="md-ellipsis">
       
         Limitierungen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
       
     </span>
   </a>
@@ -1443,7 +1454,7 @@
   <span class="md-ellipsis">
     
   
-    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+    Phase2 Convergence Validation
   
 
     
@@ -1555,7 +1566,7 @@
   <span class="md-ellipsis">
     
   
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+    Suppression Design
   
 
     
@@ -1648,6 +1659,17 @@
     <span class="md-ellipsis">
       
         Limitierungen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
       
     </span>
   </a>
@@ -1765,6 +1787,96 @@ ist ja stabil — als opt-in Schicht reaktiviert und neu bewertet werden. Heute:
 <p>Verteilte Regler beeinflussen sich gegenseitig (im Modell erfasst, real evtl. anders); lokaler
 Airtime-Proxy ≠ globale Delivery (durch Guards aber abgesichert); Sim-Idealisierungen (kein
 Duty-Cycle/Kollisionen). Die Kernaussage „Mehrwert &lt; statischer Satz" ist über alle Szenarien robust.</p>
+<hr />
+<h2 id="english-translation">🇬🇧 English Translation</h2>
+<h1 id="adaptive-suppression-controller-design-validation-result-no-go">Adaptive Suppression Controller — Design &amp; Validation (Result: NO-GO)</h1>
+<p><em>Question (user): Can the firmware adapt itself to the environment every 1–2 h to optimally tune
+suppression? Does this make sense?</em>
+<strong>Answer after simulation: technically feasible and stable — but NOT worthwhile. The static
+safe parameter set already captures the gain.</strong></p>
+<p>Validation: <code>adaptive_sim.py</code> / <code>adaptive_results.json</code> (real neighbor-graph, Seed 42, ≥5 seeds,
+40 adaptation ticks per scenario). Builds on the validated guarded suppression
+(<a href="../Suppression_Design/">Suppression_Design.md</a>, <a href="../SUPPRESSION_VALIDATION/">SUPPRESSION_VALIDATION.md</a>).</p>
+<h2 id="the-investigated-design">The Investigated Design</h2>
+<p>Fast safety remains per-packet at guards G1–G5. A SLOW outer control loop (tick ≈
+1–2 h) adjusts only the suppression <strong>aggressiveness</strong> (<code>supp_prob</code>) per node <strong>within the
+validated safe window</strong> — based on locally measurable quantities (neighbor density, overheard
+cover redundancy, airtime pressure, churn). Asymmetric (fast revert to conservative on
+churn/declining redundancy, slow advance), damped, bounded. Since the guards protect the delivery
+rate for every parameter value, the adaptation can only trade airtime against margin.</p>
+<h2 id="results-static-safe-vs-adaptive-airtime-gain">Results (static-safe vs. adaptive, airtime gain)</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>static</th>
+<th>adaptive</th>
+<th>Δ (pp)</th>
+<th>strictly-safe ticks (stat/adapt)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Day/night load</td>
+<td>12.3 %</td>
+<td>14.8 %</td>
+<td><strong>+2.5</strong></td>
+<td>20 / 20</td>
+</tr>
+<tr>
+<td>Node churn</td>
+<td>12.6 %</td>
+<td>14.5 %</td>
+<td><strong>+1.9</strong></td>
+<td>17 / 14</td>
+</tr>
+<tr>
+<td>Density shift</td>
+<td>10.5 %</td>
+<td>9.6 %</td>
+<td><strong>−0.9</strong></td>
+<td>22 / 19</td>
+</tr>
+<tr>
+<td>Link failure</td>
+<td>11.8 %</td>
+<td>11.4 %</td>
+<td><strong>−0.3</strong></td>
+<td>17 / 20</td>
+</tr>
+<tr>
+<td><strong>Mean</strong></td>
+<td></td>
+<td></td>
+<td><strong>+0.76</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Convergence/oscillation:</strong> the controller <strong>does not oscillate</strong> (<code>any_oscillation = false</code>; settle
+  variance of supp_prob 3e-7 … 7e-3; it settles around p ≈ 0.58–0.77 depending on density). The
+  concept is therefore stable — that was not the problem.</li>
+<li><strong>Value added:</strong> on average only <strong>+0.76 pp</strong> airtime over the static safe set (max
+  +2.48 pp), even slightly worse in two scenarios. Below the benefit threshold (2.0 pp).</li>
+<li><strong>Safety:</strong> <code>all_scenarios_safe = false</code> — the adaptive controller is minimally less strictly safe
+  than the static set in individual ticks (which is continuously safe).</li>
+</ul>
+<h2 id="decision-no-go-go-false">Decision: NO-GO (<code>go = false</code>)</h2>
+<p>The adaptive controller provides only a negligible airtime advantage over the already very good
+static safe set, at the cost of <strong>additional complexity and a minimal safety risk</strong>.
+In line with the project priority <strong>quality &amp; stability over last-mile optimisation</strong>, it will <strong>not
+be coded</strong>.</p>
+<p><strong>Recommended instead:</strong> use the <strong>static</strong> safe set (<code>k_cover=2, min_degree=3..4,
+snr_floor=-6, prob=0.8</code>). It is simpler, continuously safe, and captures virtually the same gain.</p>
+<p><strong>Shelved, not discarded:</strong> If future data from <em>very</em> heterogeneous networks (e.g. extreme
+day/night swings, where adaptive showed +2.5 pp) demonstrate a larger spread, the controller — it is
+stable, after all — can be reactivated as an opt-in layer and re-evaluated. For now: no.</p>
+<h2 id="limitations">Limitations</h2>
+<p>Distributed controllers influence each other (captured in the model, possibly different in the real
+world); local airtime proxy ≠ global delivery (but protected by the guards); simulation
+idealisations (no duty-cycle/collisions). The core finding "value added &lt; static set" is robust
+across all scenarios.</p>
 
 
 

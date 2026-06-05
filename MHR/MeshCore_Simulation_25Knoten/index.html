@@ -773,7 +773,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+    MeshCore Routing Analyse und Optimierung
   
 
     
@@ -908,6 +908,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -931,7 +942,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    MeshCore Simulation ECHTE Daten
   
 
     
@@ -1137,7 +1148,7 @@
   <span class="md-ellipsis">
     
   
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
+    PROVENANCE
   
 
     
@@ -1452,7 +1463,7 @@
   <span class="md-ellipsis">
     
   
-    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+    Phase2 Convergence Validation
   
 
     
@@ -1564,7 +1575,7 @@
   <span class="md-ellipsis">
     
   
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+    Suppression Design
   
 
     
@@ -1668,6 +1679,17 @@
     <span class="md-ellipsis">
       
         Mit echten CoreScope-Daten
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
       
     </span>
   </a>
@@ -1793,6 +1815,102 @@
 <h2 id="mit-echten-corescope-daten">Mit echten CoreScope-Daten</h2>
 <p>Sobald die echten Knoten/Links vorliegen (Koordinaten, gehörte Nachbarn, SNR), ersetzt man im Skript einfach die <code>NODES</code>-Liste und die Linkmatrix durch die Messwerte – Routing-Logik und Auswertung bleiben identisch. Das ginge, wenn du den <strong>Claude-in-Chrome-Browser verbindest</strong> (dann navigiere ich CoreScope live und lese die Knoten-/Link-Tabelle aus), oder du exportierst aus CoreScope eine Knoten-/Nachbarliste (CSV/JSON) und legst sie in den Projektordner.</p>
 <p><em>Verwandte Dokumente: <code>MeshCore_Routing_Analyse_und_Optimierung.md</code>, <code>MeshCore_Hybrid_Routing_Entwurf.md</code>.</em></p>
+<hr />
+<h2 id="english-translation">🇬🇧 English Translation</h2>
+<h1 id="simulation-meshcore-vs-mhr-25-nodes-rhineland-topology">Simulation: MeshCore vs. MHR – 25 Nodes, Rhineland Topology</h1>
+<p>Comparison of current MeshCore routing (network-wide flood + "first packet wins") with the MHR design (metric-optimal path + backbone short-circuit) on a realistic 25-node topology in the corridor <strong>Cologne–Bonn–Siebengebirge–Bergisches Land–Eifel edge</strong>.</p>
+<blockquote>
+<p><strong>Data basis – honestly stated:</strong> The live data from CoreScope (<code>corescope.meshrheinland.de</code>) and the official map API could <strong>not be retrieved programmatically</strong> (single-page app with no JSON interface reachable via the fetch tool; direct access via <code>curl</code>/script is prohibited for security reasons; additionally, no Chrome browser was connected). The topology is therefore a <strong>physics-based synthetic model</strong>, but grounded in <strong>real Rhineland reality</strong>: actual high-elevation sites (Colonius/Cologne, Oelberg/Siebengebirge, Deutz high-rise, Lindenthal, Bergisch Gladbach), real geographic positions, and the documented real-world behaviour that <strong>companion clients do not relay</strong> (only repeaters form the relay mesh). With real CoreScope data, the exact same script can be run again — see the end.</p>
+</blockquote>
+<hr />
+<h2 id="model-in-brief">Model in Brief</h2>
+<ul>
+<li><strong>25 nodes:</strong> 12 repeaters (5 of which are high-elevation sites), 13 companion clients. Clients attach zero-hop to the repeaters they can hear; <strong>routing occurs only over the repeater mesh</strong>.</li>
+<li><strong>Radio model:</strong> Log-distance path loss with a line-of-sight-dependent exponent — high-elevation site to high-elevation site is quasi-free-space (long links), ground nodes urban/NLoS (short links). From this, SNR → soft delivery probability per link.</li>
+<li><strong>Metric:</strong> Link cost = ETX = 1/(p·p_return); path cost additive.</li>
+<li><strong>MeshCore:</strong> Monte Carlo flood (200 runs per pair) with per-hop random delay ~U(0, 5·Airtime), <code>rx_delay_base = 0</code> (SNR weighting off), <code>flood.max = 8</code>, "first copy wins".</li>
+<li><strong>MHR:</strong> ETX-optimal backbone path (the convergence target of backbone DV + Best-of-N) + discovery short-circuit (client floods only to the nearest repeater, then backbone unicast).</li>
+</ul>
+<hr />
+<h2 id="results-31-cross-cluster-client-pairs">Results (31 cross-cluster client pairs)</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>MeshCore (today)</th>
+<th>MHR</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Avg. backbone hops per delivery</td>
+<td><strong>1.40</strong></td>
+<td>1.10 (optimum)</td>
+<td>MeshCore paths are on average longer</td>
+</tr>
+<tr>
+<td>Worst-case path</td>
+<td><strong>4 hops</strong></td>
+<td>1 hop</td>
+<td>Severe individual detours do occur</td>
+</tr>
+<tr>
+<td>Avg. detour factor (cost/optimum)</td>
+<td><strong>1.26×</strong></td>
+<td>1.00×</td>
+<td>+26% path cost on average</td>
+</tr>
+<tr>
+<td>Detour hit rate</td>
+<td><strong>28.8%</strong> of floods</td>
+<td>–</td>
+<td>Nearly one in three path discoveries lands on a detour</td>
+</tr>
+<tr>
+<td>Pairs that ever experience detours</td>
+<td><strong>100%</strong></td>
+<td>–</td>
+<td>No pair is safe from detours</td>
+</tr>
+<tr>
+<td>Airtime per discovery (transmit events)</td>
+<td><strong>5.7</strong></td>
+<td>2.1</td>
+<td>MHR saves <strong>approx. 63%</strong> airtime</td>
+</tr>
+<tr>
+<td>Avg. end-to-end reliability (1 attempt)</td>
+<td>0.74</td>
+<td><strong>0.79</strong></td>
+<td>Shorter paths = fewer loss points</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Interpretation:</strong> The core thesis is confirmed quantitatively. "First packet wins" + random timing selects a detour in <strong>~29%</strong> of cases, on average <strong>26% more expensive</strong>, in the extreme case a 4-hop path where 1 hop would suffice. Because MHR replaces network-wide flooding with local flood + targeted backbone unicast, <strong>airtime per path discovery drops by ~63%</strong> — exactly the factor that causes peak load in a real mesh. Reliability also improves slightly, because every avoided extra hop is one fewer potential loss point (in a real network with retries this effect is amplified).</p>
+<hr />
+<h2 id="figures">Figures</h2>
+<p><strong>Topology</strong> – repeater mesh (blue), client attachment (grey dotted), high-elevation sites as red triangles:</p>
+<p><img alt="Topology" src="../sim/fig_topology.png" /></p>
+<p><strong>Path length</strong> – average hop count:</p>
+<p><img alt="Hops" src="../sim/fig_hops.png" /></p>
+<p><strong>Detour distribution</strong> – ratio of MeshCore cost / optimum across all pairs:</p>
+<p><img alt="Detour" src="../sim/fig_detour.png" /></p>
+<p><strong>Airtime per discovery</strong> – transmit events per path establishment:</p>
+<p><img alt="Airtime" src="../sim/fig_airtime.png" /></p>
+<p><strong>Concrete example</strong> – MeshCore routes Cologne-South→Cologne-North via Bergisch Gladbach to the east; MHR takes the direct high-elevation hop:</p>
+<p><img alt="Example" src="../sim/fig_example.png" /></p>
+<hr />
+<h2 id="assessment-limitations-honestly-stated">Assessment &amp; Limitations (honestly stated)</h2>
+<ul>
+<li>The <strong>absolute</strong> numbers depend on model parameters (path loss, threshold, density). What is robust is the <strong>direction and order of magnitude</strong>: clear airtime savings, systematic but not dramatic path detours, slightly better reliability.</li>
+<li>A well-placed high-elevation backbone already turns many pairs into 1–2-hop connections — the detour effect then appears less often in the <em>hop count</em>, but clearly in <strong>airtime</strong> (avoidable network-wide floods) and in <strong>individual outliers</strong> (4-hop detour instead of 1 hop).</li>
+<li>Not modelled: ACK retries (would additionally penalise detour paths), time-of-day/load dynamics, mobility, collisions on the shared channel (would <em>additionally</em> disadvantage network-wide floods → MHR advantage likely larger).</li>
+<li>The script (<code>sim/mhr_sim.py</code>) is parameterised and reproducible (seed 42).</li>
+</ul>
+<h2 id="with-real-corescope-data">With Real CoreScope Data</h2>
+<p>Once the real nodes/links are available (coordinates, heard neighbours, SNR), simply replace the <code>NODES</code> list and the link matrix in the script with the measured values — routing logic and evaluation remain identical. This would be possible if you <strong>connect Claude via the Chrome browser</strong> (then I can navigate CoreScope live and read out the node/link table), or you export a node/neighbour list (CSV/JSON) from CoreScope and place it in the project folder.</p>
+<p><em>Related documents: <code>MeshCore_Routing_Analyse_und_Optimierung.md</code>, <code>MeshCore_Hybrid_Routing_Entwurf.md</code>.</em></p>
 
 
 

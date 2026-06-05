@@ -773,7 +773,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+    MeshCore Routing Analyse und Optimierung
   
 
     
@@ -829,7 +829,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    MeshCore Simulation ECHTE Daten
   
 
     
@@ -1035,7 +1035,7 @@
   <span class="md-ellipsis">
     
   
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
+    PROVENANCE
   
 
     
@@ -1352,7 +1352,7 @@
   <span class="md-ellipsis">
     
   
-    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+    Phase2 Convergence Validation
   
 
     
@@ -1487,6 +1487,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1566,7 +1577,7 @@
   <span class="md-ellipsis">
     
   
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+    Suppression Design
   
 
     
@@ -1670,6 +1681,17 @@
     <span class="md-ellipsis">
       
         5. Was ich erwarte (Hypothesen, vor der Messung)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
       
     </span>
   </a>
@@ -1851,6 +1873,159 @@ Firmware-Machbarkeit im Mischbetrieb.</p>
   änderung. Hohe Hebelwirkung als Fundament.</li>
 </ul>
 <p>Die Messung entscheidet — nicht die Intuition.</p>
+<hr />
+<h2 id="english-translation">🇬🇧 English Translation</h2>
+<h1 id="study-routing-optimizations-for-meshcore-in-mixed-firmware-operation">Study: Routing Optimizations for MeshCore in Mixed-Firmware Operation</h1>
+<p><strong>Guiding question:</strong> Which routing optimizations reduce airtime and detours in the real MeshCore
+network in a <em>measurable</em> way, <strong>without</strong> breaking the packet format and in such a way that
+<strong>every partial adoption</strong> (a single node, some, all) coexists with unchanged original firmware
+and the network <strong>never</strong> performs worse than today? Priority: <strong>quality &amp; stability over maximum
+optimality.</strong></p>
+<p>Basis: real CoreScope dataset (109,980 packets, 1,962 nodes, real topology + real detours
+median 2.1×, see <code>../sim/MeshCore_Simulation_v3_Realdaten.md</code>).</p>
+<hr />
+<h2 id="1-what-the-real-world-data-says-about-the-levers-starting-point-of-my-thinking">1. What the Real-World Data Says About the Levers (Starting Point of My Thinking)</h2>
+<ol>
+<li><strong>The problem is large and real:</strong> Median detour 2.1×, flood paths up to 63 hops, ~786
+   repeaters transmitting per flood — that is the actual airtime waste.</li>
+<li><strong>SNR is a weak lever:</strong> Distance barely explains SNR (PLE≈0.4). "Strong SNR ⇒ shorter
+   path" does not hold reliably. ⇒ <strong>Hop count is the more reliable signal</strong> than SNR.</li>
+<li><strong>The path hash chain is gold:</strong> Every flood packet carries its complete hop chain. From this,
+   topology and hop distance can be learned <strong>passively, without a single extra packet</strong>.</li>
+<li><strong>Redundancy is enormous:</strong> In dense regions, dozens of repeaters transmit the same copy. This
+   is where the biggest airtime lever lies (broadcast suppression).</li>
+</ol>
+<p>From this follows my core principle: <strong>Use what is already in the packet (hop chain), decide
+locally, transmit less — but never in a way that causes reachability to be lost.</strong></p>
+<hr />
+<h2 id="2-mixed-firmware-safety-the-hard-constraint">2. Mixed-Firmware Safety (the Hard Constraint)</h2>
+<p>Every mechanism must take one of these forms:
+- <strong>(L) Purely local decision</strong> by a node about its <em>own</em> transmit/cache behavior —
+  legacy nodes notice nothing. No packet format changes.
+- <strong>(P) Passive observation</strong> of existing fields (path chain, SNR, adverts) — zero extra airtime.
+- <strong>(O) Optional, ignorable payload type</strong> (only if necessary) — legacy nodes discard it
+  harmlessly, fallback remains flood-and-cache.</p>
+<p><strong>Forbidden:</strong> changes to dedup/hash that cause legacy nodes to receive message duplicates; new
+mandatory fields; anything that reduces reachability at α&lt;100%.</p>
+<p><strong>Safety invariant (for every mechanism, every α):</strong> delivery rate ≥ baseline AND airtime ≤
+baseline. If violated, the mechanism is disqualified at that α.</p>
+<hr />
+<h2 id="3-candidate-mechanisms-conventional-unconventional">3. Candidate Mechanisms (conventional → unconventional)</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Mechanism</th>
+<th>Type</th>
+<th>Idea</th>
+<th>Expectation</th>
+<th>Adoption Threshold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>M0</strong></td>
+<td>Baseline (stock flood, first-wins)</td>
+<td>—</td>
+<td>Reference</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>M1</strong></td>
+<td><strong>Hop-weighted rebroadcast delay</strong></td>
+<td>L</td>
+<td>Copies with <em>fewer</em> accumulated hops transmit earlier → shorter paths lead the flood (replaces the weak SNR lever)</td>
+<td>fewer detours</td>
+<td>helps from 1 node, scales</td>
+</tr>
+<tr>
+<td><strong>M2</strong></td>
+<td><strong>Counter-based broadcast suppression (gossip)</strong></td>
+<td>L</td>
+<td>Repeater suppresses its own rebroadcast if it has already heard the copy ≥k times during backoff</td>
+<td>strong airtime reduction</td>
+<td>needs critical mass, coverage risk</td>
+</tr>
+<tr>
+<td><strong>M3</strong></td>
+<td><strong>Shorter-path-cancel (overhear suppression with hop comparison)</strong></td>
+<td>L</td>
+<td>Repeater discards its <em>pending</em> rebroadcast when it hears the same copy via an <em>equally short/shorter</em> path</td>
+<td>airtime ↓ without coverage loss</td>
+<td>helps from a few, monotone</td>
+</tr>
+<tr>
+<td><strong>M4</strong></td>
+<td><strong>MPR/CDS relay reduction (OLSR idea, passively learned)</strong></td>
+<td>L+P</td>
+<td>Only a dominating subset of repeaters floods; non-relay new nodes stay silent. 2-hop neighborhood passively learned from path chains</td>
+<td>greatest airtime reduction at high adoption</td>
+<td>needs mass + local topology</td>
+</tr>
+<tr>
+<td><strong>M5</strong></td>
+<td><strong>Best-of-N at destination (by hops)</strong></td>
+<td>L</td>
+<td>Destination briefly collects multiple copies, reports back the <em>shortest</em> path (the deliberately deferred Phase-1 core)</td>
+<td>fewer detours on cached paths</td>
+<td>helps from 1 destination node</td>
+</tr>
+<tr>
+<td><strong>M6</strong></td>
+<td><strong>Passive topology learning + feasible successor</strong></td>
+<td>P</td>
+<td>Build local link table from path chains (0 airtime); on path break use local backup instead of re-flood</td>
+<td>less re-discovery airtime, stability</td>
+<td>helps from 1 node</td>
+</tr>
+<tr>
+<td><strong>M7</strong></td>
+<td><strong>flood.max empirically reduced (12–15)</strong></td>
+<td>L</td>
+<td>Hop limit aligned to real network diameter (median 10, P90 18); kills far-detour copies</td>
+<td>airtime ↓, caps extreme detours</td>
+<td>takes effect per node</td>
+</tr>
+</tbody>
+</table>
+<p>Combination hypothesis: <strong>M3+M5+M7</strong> are all "helpful &amp; monotone from 1 node" → ideal
+incremental rollout. <strong>M2/M4</strong> are the big airtime levers, but need critical mass —
+exactly what the adoption sweep is meant to quantify.</p>
+<hr />
+<h2 id="4-experiment-design-the-adoption-sweep-core-of-the-study">4. Experiment Design (the Adoption Sweep — Core of the Study)</h2>
+<p><strong>Topology:</strong> real active repeater component from v3 (≈831 nodes) + calibrated link/range
+graph; cross-validated against the <em>observed</em> edges (<code>topology_edges.json</code>).</p>
+<p><strong>Adoption fraction α (new firmware):</strong> {0 (=baseline), 1 node, 1%, 5%, 10%, 25%, 50%, 100%}.
+Assignment both random <strong>and</strong> targeted (top-traffic repeaters first — realistic rollout),
+each averaged over multiple seeds.</p>
+<p><strong>Measured per (mechanism, α):</strong>
+- <strong>Airtime</strong> = Σ rebroadcasts per delivered message (the actual bottleneck)
+- <strong>Delivery rate</strong> (destinations reached / attempts)
+- <strong>Hops / detour ratio</strong> of the used path vs. shortest known
+- <strong>Route stability</strong> (path changes across repeated transmissions / under churn)
+- <strong>Safety flag:</strong> delivery rate ≥ baseline? Airtime ≤ baseline? (otherwise disqualified at α)</p>
+<p><strong>Mixed-firmware semantics:</strong> new nodes apply their rule; stock nodes flood normally —
+they guarantee connectivity if new nodes suppress too aggressively (this is the
+built-in safety net that the sweep must demonstrate).</p>
+<p><strong>Stress (stability):</strong> additionally churn (by advert_count) and link failure at selected α,
+to verify that the gains do not collapse into flapping/partition.</p>
+<p><strong>Success criterion:</strong> mechanisms are ranked by (i) airtime gain with delivery rate held,
+(ii) <strong>monotonicity &amp; safety</strong> across α (quality/stability priority), (iii)
+firmware feasibility in mixed-firmware operation.</p>
+<hr />
+<h2 id="5-what-i-expect-hypotheses-before-measurement">5. What I Expect (Hypotheses, Before Measurement)</h2>
+<ul>
+<li>M3, M5, M7: small but <strong>monotonically safe</strong> gain already from a single node → the "good
+  citizens" that can be rolled out without concern.</li>
+<li>M2/M4: the large airtime jumps (potentially −50…−90% flood TX), but only noticeable from
+  ~10–25% adoption; risk that at low α nothing happens and at very high α (if <em>all</em> suppress)
+  coverage suffers — stock nodes as safety net should catch this.</li>
+<li>The unconventional favourite: <strong>M6 passive topology learning</strong> — costs <em>zero</em> airtime because
+  the data is already in flight, and enables directed forwarding/backup later without protocol
+  changes. High leverage as a foundation.</li>
+</ul>
+<p>Measurement decides — not intuition.</p>
 
 
 

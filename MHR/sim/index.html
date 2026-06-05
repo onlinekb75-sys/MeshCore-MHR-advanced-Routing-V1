@@ -773,7 +773,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+    MeshCore Routing Analyse und Optimierung
   
 
     
@@ -829,7 +829,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    MeshCore Simulation ECHTE Daten
   
 
     
@@ -1041,6 +1041,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1167,7 +1178,7 @@
   <span class="md-ellipsis">
     
   
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
+    PROVENANCE
   
 
     
@@ -1482,7 +1493,7 @@
   <span class="md-ellipsis">
     
   
-    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+    Phase2 Convergence Validation
   
 
     
@@ -1594,7 +1605,7 @@
   <span class="md-ellipsis">
     
   
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+    Suppression Design
   
 
     
@@ -1726,6 +1737,17 @@
     <span class="md-ellipsis">
       
         Eigene Auswertungen bauen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
       
     </span>
   </a>
@@ -1885,6 +1907,136 @@ python3 mhr_sim_real_v3.py
 <blockquote>
 <p>Hinweis: Das v3-Linkmodell ist geometrisch idealisiert (reales Gelände/Antennenhöhe fehlen) —
 <strong>relative</strong> Mechanismus-Vergleiche sind robuster als <strong>absolute</strong> Airtime-Zahlen.</p>
+</blockquote>
+<hr />
+<h2 id="english-translation">🇬🇧 English Translation</h2>
+<h1 id="mhr-simulations-real-world-dataset">MHR Simulations &amp; Real-World Dataset</h1>
+<p>This folder contains the routing simulations of the MHR fork <strong>and the real CoreScope dataset</strong>
+used to calibrate them — so that anyone can reproduce the results or build their own analyses.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<pre><code class="language-bash">pip install numpy networkx matplotlib
+# to decompress the raw data: xz (macOS: brew install xz, Debian/Ubuntu: apt install xz-utils)
+</code></pre>
+<h2 id="dataset-data">Dataset (<code>data/</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Contents</th>
+<th>Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>data/packets.jsonl.xz</code></td>
+<td><strong>complete raw data</strong>: 109,980 real packets (1 JSON/line), each with <code>path_json</code> (hop chain), <code>snr</code>, <code>rssi</code>, <code>observer_id</code>, <code>route_type</code>, <code>payload_type</code>, <code>timestamp</code></td>
+<td>16.6 MB (decompressed 188 MB)</td>
+</tr>
+<tr>
+<td><code>data/nodes.json</code></td>
+<td>1,962 nodes: <code>public_key</code>, <code>lat</code>/<code>lon</code>, <code>role</code>, <code>advert_count</code>, <code>relay_count_*</code>, <code>usefulness_score</code>, …</td>
+<td>1.3 MB</td>
+</tr>
+<tr>
+<td><code>data/observers.json</code></td>
+<td>38 observers (receiving nodes)</td>
+<td>24 KB</td>
+</tr>
+<tr>
+<td><code>data/topology_edges.json</code></td>
+<td>observed relay edges derived from the paths (aggregated)</td>
+<td>0.7 MB</td>
+</tr>
+<tr>
+<td><code>data/neighbor_graph.json</code></td>
+<td><strong>best link model</strong>: server-resolved real neighbor topology (1,034 nodes, 1,956 edges) with full pubkeys, <code>avg_snr</code> <strong>per edge</strong> and <code>ambiguous</code> flag (only 8.8% ambiguous)</td>
+<td>0.6 MB</td>
+</tr>
+<tr>
+<td><code>data/hash_sizes.json</code></td>
+<td>hash-size distribution (1/2/3-byte) in the network</td>
+<td>0.5 MB</td>
+</tr>
+<tr>
+<td><code>data/snr_calibration.json</code>, <code>data/real_detour_stats.json</code></td>
+<td>derived metrics (SNR fit, real detour statistics)</td>
+<td>small</td>
+</tr>
+</tbody>
+</table>
+<h3 id="richer-corescope-endpoints-for-more-accurate-new-simulations">Richer CoreScope Endpoints (for more accurate / new simulations)</h3>
+<p>The CoreScope API offers more than the basic endpoints used initially — particularly useful for a real link model:
+- <strong><code>/api/analytics/neighbor-graph</code></strong> — ready-made real link topology with <code>avg_snr</code> per edge + <code>ambiguous</code> flag (source of <code>data/neighbor_graph.json</code>). Replaces the geometric v3 model with <strong>real measured edges</strong> → significantly more accurate.
+- <strong><code>/api/packets?expand=observations</code></strong> — returns ALL observer receptions per packet (each with its own <code>snr</code>/<code>rssi</code>), instead of just one measurement → much denser link-quality data.
+- <strong><code>/api/resolve-hops</code></strong> (POST) / <strong><code>/api/paths/inspect</code></strong> (POST) — server-side hash→node resolution (bypasses the 1-byte hash ambiguity).
+- <strong><code>/api/nodes/{pubkey}</code></strong>, <strong><code>/api/analytics/hash-sizes</code></strong>, time pagination (<code>?before=</code>/<code>?since=</code>).</p>
+<p><strong>Source:</strong> public CoreScope API <code>https://corescope.meshrheinland.de/api/{nodes,observers,packets}</code>
+(MeshCore Rheinland). The dataset is a <strong>snapshot</strong> (2026-05-30). Raw data intentionally included as
+<code>.xz</code> (xz compresses JSON-Lines ~11×; 188 MB → 16.6 MB, within GitHub's limit).</p>
+<h2 id="quick-start-reproducing-the-v3-real-data-simulation-from-the-repo">Quick Start — Reproducing the v3 Real-Data Simulation from the Repo</h2>
+<p>The scripts expect the raw data under <code>/tmp/cs_data/</code>. One-time preparation:</p>
+<pre><code class="language-bash">mkdir -p /tmp/cs_data
+xz -dkc data/packets.jsonl.xz &gt; /tmp/cs_data/packets.jsonl     # decompress (~188 MB)
+cp data/nodes.json data/observers.json /tmp/cs_data/
+python3 mhr_sim_real_v3.py        # → sim_results_v3.json, data/*, fig_v3_*.png
+</code></pre>
+<h2 id="fetching-completely-fresh-data-instead-of-the-repo-snapshot">Fetching Completely Fresh Data (instead of the repo snapshot)</h2>
+<pre><code class="language-bash">python3 mhr_collect_corescope.py            # downloads current data to /tmp/cs_data/ (paginated ~110k packets)
+python3 mhr_sim_real_v3.py
+</code></pre>
+<p>The collector uses urllib with a browser user agent + offset pagination (see the top of the file).</p>
+<h2 id="overview-of-the-simulations">Overview of the Simulations</h2>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>What</th>
+<th>Data basis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mhr_sim.py</code></td>
+<td>v1 — synthetic Rhineland topology, MeshCore flood vs. MHR</td>
+<td>synthetic <em>(illustrative — the assumed SNR model is refuted by real data)</em></td>
+</tr>
+<tr>
+<td><code>mhr_sim_real.py</code></td>
+<td>v1 on 25 real nodes</td>
+<td>small, assumed link model</td>
+</tr>
+<tr>
+<td><code>mhr_sim_v2.py</code></td>
+<td>stress scenarios (churn, link failure, partition)</td>
+<td>real 25-node topology</td>
+</tr>
+<tr>
+<td><code>mhr_sim_real_v3.py</code></td>
+<td><strong>v3 — calibrated on the full real dataset</strong>: measures real topology, SNR fit, real detours (median 2.1×), simulates baseline vs. MHR</td>
+<td><code>data/</code> + raw packets</td>
+</tr>
+<tr>
+<td><code>../study/study_sim.py</code></td>
+<td><strong>mechanism x adoption sweep</strong> (1 node → all), safety invariant</td>
+<td>real 776-node topology</td>
+</tr>
+</tbody>
+</table>
+<p>All reproducible with <strong>Seed 42</strong>. Results are written as <code>*_results*.json</code> + <code>fig_*.png</code> alongside the scripts.</p>
+<h2 id="building-your-own-analyses">Building Your Own Analyses</h2>
+<ul>
+<li>Stream packets (never load all into RAM): <code>for line in open('/tmp/cs_data/packets.jsonl'): p = json.loads(line)</code>.
+  Directly from <code>.xz</code> without decompressing: <code>import lzma, json; [json.loads(l) for l in lzma.open('data/packets.jsonl.xz','rt')]</code>.</li>
+<li><strong>Node→Hash mapping:</strong> the MeshCore hash of a node = the first <code>hash_size</code> bytes of the
+  <code>public_key</code> (hex prefix). 2-byte hashes are ~99% unique; 1-byte hashes collide heavily — for
+  1-byte, disambiguate by geography or count as ambiguous (do not guess).</li>
+<li><code>path_json</code> is the real hop chain of a flood packet; consecutive hashes = real edge.</li>
+<li>Methodology &amp; limitations are honestly documented in <code>MeshCore_Simulation_v3_Realdaten.md</code> and
+  <code>../study/MeshCore_Routing_Study.md</code>.</li>
+</ul>
+<blockquote>
+<p>Note: The v3 link model is geometrically idealised (real terrain / antenna height are absent) —
+<strong>relative</strong> mechanism comparisons are more robust than <strong>absolute</strong> airtime figures.</p>
 </blockquote>
 
 

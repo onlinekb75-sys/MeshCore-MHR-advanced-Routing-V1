@@ -773,7 +773,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+    MeshCore Routing Analyse und Optimierung
   
 
     
@@ -829,7 +829,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    MeshCore Simulation ECHTE Daten
   
 
     
@@ -1035,7 +1035,7 @@
   <span class="md-ellipsis">
     
   
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
+    PROVENANCE
   
 
     
@@ -1358,6 +1358,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1465,7 +1476,7 @@
   <span class="md-ellipsis">
     
   
-    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+    Phase2 Convergence Validation
   
 
     
@@ -1577,7 +1588,7 @@
   <span class="md-ellipsis">
     
   
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+    Suppression Design
   
 
     
@@ -1698,6 +1709,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1794,6 +1816,78 @@ für echten Wert — ohne die nachweislich nutzlose Auto-Tuning-Schleife.</p>
 <p>Modell-Idealisierungen (kein Duty-Cycle/Kollisionen — die würden Suppression eher aufwerten, aber
 nicht die <em>relative</em> Aussage adaptiv-vs-statisch ändern); neighbor-graph erfasst nur genutzte Links;
 Momentaufnahme; Klassengrenzen nach Grad-Quantilen (q40/q80).</p>
+<hr />
+<h2 id="english-translation">🇬🇧 English Translation</h2>
+<h1 id="slow-per-node-calibration-on-node-feasibility-result-no-go">Slow per-Node Calibration &amp; On-Node Feasibility (Result: NO-GO)</h1>
+<p><em>Question: Does a slow (12–48 h) self-calibration per node adapted to local density/role provide
+more benefit than the global static safe set — especially at the extremes (dense hubs / sparse bridges)?
+And is a stripped-down version runnable on the node?</em></p>
+<p><strong>Answer: NO (second, independent NO-GO).</strong> Locally calibrated does not beat the static set;
+it is even marginally worse in terms of airtime. The reason is structural: the <strong>per-packet guards
+G1–G5 already adapt in real time</strong> to the local situation (actually heard redundancy per packet)
+— better than any pre-averaged value over 12–48 h ever could.</p>
+<p>Validation: <code>local_calib_sim.py</code> / <code>local_calib_results.json</code> (real neighbor-graph: 632 nodes /
+1577 edges, classes: 129 hubs / 207 medium / 296 bridge-leaves; seed 42, ≥5 seeds).</p>
+<h2 id="result">Result</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Airtime locally-calibrated vs. static (high adoption)</td>
+<td><strong>−0.50 pp</strong> (worse)</td>
+</tr>
+<tr>
+<td>Extra gain at <strong>hubs</strong></td>
+<td><strong>−0.04 pp</strong> (no advantage)</td>
+</tr>
+<tr>
+<td>Worst bridge delivery-rate delta (local)</td>
+<td>−0.017 (safe)</td>
+</tr>
+<tr>
+<td>Stripped-down on-node characteristic: retained gain</td>
+<td><strong>0 %</strong> (no gain present)</td>
+</tr>
+<tr>
+<td>Decision</td>
+<td><strong><code>go_local_full = false</code></strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="honest-nuance-one-actionable-side-finding">Honest Nuance (one actionable side finding)</h2>
+<p>The finer <strong>per-class</strong> analysis shows: the <em>static</em> set dips slightly at <strong>bridges</strong> at α=0.5
+(worst class-Δ −0.052), local calibration does not (−0.017). Local is therefore somewhat <em>safer</em> at
+bridges, but marginally <em>worse</em> in airtime — neither dominates. <strong>Consequence:</strong> instead of a
+controller, a small <strong>static default readjustment</strong> is sufficient (e.g. <code>supp_min_degree</code> more
+conservative at bridges), if Stage B is ever activated. No adaptive machinery needed.</p>
+<h2 id="on-node-feasibility-additional-question">On-Node Feasibility (Additional Question)</h2>
+<p>The stripped-down calibration characteristic would be <strong>trivially</strong> node-compatible: ~9 bytes lookup,
+4 bytes state per node, ≤ 5 integer comparisons, no float/heap/sort, 1× per 12–48 h. Feasibility is
+therefore <strong>not</strong> an obstacle — but it is <strong>moot</strong>, because there is no gain to be had. (A <em>rich</em>
+RX statistics/telemetry on the node is independently useful — see recommendation below.)</p>
+<h2 id="overall-picture-two-independent-no-gos-for-auto-adaptation">Overall Picture: Two Independent NO-GOs for Auto-Adaptation</h2>
+<ol>
+<li>Fast (1–2 h) supp_prob controller → +0.76 pp (too little). <code>Adaptive_Controller_Design.md</code>.</li>
+<li>Slow (12–48 h) per-node calibration → −0.5 pp (worse). This document.</li>
+</ol>
+<p>Robust conclusion: <strong>The per-packet guards already capture local adaptation; a slow outer control loop
+for suppression parameters is not worthwhile.</strong> Static safe set + guards remains the recommendation.</p>
+<h2 id="recommendation-despite-no-go">Recommendation Despite NO-GO</h2>
+<p>A <strong>passive on-node RX statistics/telemetry</strong> (no controller!) is very much useful and straightforward
+on the ESP32-S3: local path-length histogram (= local diameter), neighbor SNR distribution,
+redundancy/cover histogram, traffic by type, duty-cycle utilization, churn. Benefit: diagnostics,
+well-founded <em>manual</em> parameter selection, feeding the existing guards (2-hop freshness, cover stats),
+anomaly/self-protection (e.g. advert backoff when duty-cycle is saturated). This uses the CPU reserve
+for real value — without the demonstrably useless auto-tuning loop.</p>
+<h2 id="limitations">Limitations</h2>
+<p>Model idealizations (no duty-cycle/collisions — these would tend to upgrade suppression, but would
+not change the <em>relative</em> statement adaptive-vs-static); neighbor-graph only captures used links;
+snapshot; class boundaries by degree quantiles (q40/q80).</p>
 
 
 

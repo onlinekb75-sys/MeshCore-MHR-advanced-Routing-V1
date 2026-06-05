@@ -935,6 +935,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -958,7 +969,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+    MeshCore Routing Analyse und Optimierung
   
 
     
@@ -1014,7 +1025,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    MeshCore Simulation ECHTE Daten
   
 
     
@@ -1220,7 +1231,7 @@
   <span class="md-ellipsis">
     
   
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
+    PROVENANCE
   
 
     
@@ -1535,7 +1546,7 @@
   <span class="md-ellipsis">
     
   
-    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+    Phase2 Convergence Validation
   
 
     
@@ -1647,7 +1658,7 @@
   <span class="md-ellipsis">
     
   
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+    Suppression Design
   
 
     
@@ -1834,6 +1845,17 @@
     <span class="md-ellipsis">
       
         5. Erwartete Wirkung &amp; Validierung
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
       
     </span>
   </a>
@@ -2030,6 +2052,173 @@ L0  Link-Sensing  : EWMA-ETX (zuverlässigkeitsdominant) + Knoten-Stabilitäts-S
 </ul>
 <hr />
 <p><em>Baut auf <code>MeshCore_Hybrid_Routing_Entwurf.md</code> (v1), <code>MeshCore_Simulation_ECHTE_Daten.md</code> und <code>MeshCore_Routing_Analyse_und_Optimierung.md</code> auf. Der 4-Phasen-Rollout aus v1 gilt weiter; H1/H2/H3 gehören in Phase 2 (Backbone), H4/H5 in Phase 1, H6/H7 durchgängig.</em></p>
+<hr />
+<h2 id="english-translation">🇬🇧 English Translation</h2>
+<h1 id="mhr-v2-hardening-for-robustness-stability-from-real-data">MHR v2 – Hardening for Robustness &amp; Stability (from Real Data)</h1>
+<p>Revision of the MHR design based on <strong>real CoreScope observations</strong> (live snapshot, Bonn–Rhein-Sieg–Siebengebirge–Lohmar–Leverkusen area). Reality deviates from the v1 assumptions in several places – v2 closes exactly those gaps.</p>
+<hr />
+<h2 id="1-what-reality-has-shown-and-what-follows-from-it">1. What Reality Has Shown – and What Follows from It</h2>
+<table>
+<thead>
+<tr>
+<th>Observation (real)</th>
+<th>Assumption in v1</th>
+<th>Implication for v2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>80 repeaters</strong> vs. only 20 companions in the active area</td>
+<td>"few stable repeaters, many clients"</td>
+<td>Backbone is <strong>large &amp; dense</strong> → naive flat DV does not scale; hierarchy needed</td>
+</tr>
+<tr>
+<td>Paths up to <strong>8 hops</strong>, ~50 km stretched</td>
+<td>short backbone paths</td>
+<td>Long chains → <strong>loop-freedom &amp; convergence</strong> become critical</td>
+</tr>
+<tr>
+<td>End-to-end reliability only <strong>0.58</strong></td>
+<td>links "mostly ok"</td>
+<td>Metric must weight <strong>reliability</strong> over hop count; redundancy needed</td>
+</tr>
+<tr>
+<td>advert_count <strong>7 … 455</strong> (extremely heterogeneous)</td>
+<td>repeaters ~equally stable</td>
+<td>Flapping nodes must <strong>not serve as transit</strong> → stability gating</td>
+</tr>
+<tr>
+<td>1 node <strong>RF-isolated</strong> (Leverkusen)</td>
+<td>backbone connected</td>
+<td><strong>Partition tolerance</strong> + clean reactive fallback mandatory</td>
+</tr>
+<tr>
+<td>Duplicates (Lohmar #17 ×2), "Pending", <strong>2-byte hashes</strong>, multi-byte status mixed</td>
+<td>clean, homogeneous network</td>
+<td><strong>Mixed-firmware coexistence</strong> + garbage/duplicate hardening as first-class requirement</td>
+</tr>
+<tr>
+<td>Deployment uses <strong>regions</strong> (de-nw, rheinland, bonn, koeln, eifel, leverkusen) for scoping</td>
+<td>regions ignored</td>
+<td>Reuse regions as <strong>ready-made cluster boundaries</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Key finding from the sim (real topology): <strong>60% of path setups</strong> took detours, <strong>−82% airtime</strong> with MHR – the gain is genuinely large, but v1 would have become <strong>unstable</strong> in this large, lossy, heterogeneous network (DV load, flapping, loops). v2 therefore prioritizes stability over last-mile optimality.</p>
+<hr />
+<h2 id="2-the-seven-hardenings">2. The Seven Hardenings</h2>
+<h3 id="h1-regional-hierarchy-instead-of-a-flat-backbone-scales-to-80-repeaters">H1 – Regional Hierarchy Instead of a Flat Backbone <em>(scales to 80+ repeaters)</em></h3>
+<p>Instead of running DV across all repeaters, the <strong>already-existing regions</strong> are used as clusters:</p>
+<ul>
+<li><strong>Intra-region:</strong> proactive DV only within one region (e.g. "bonn", "koeln") – few nodes, fast convergence, low load.</li>
+<li><strong>Inter-region:</strong> a small number of <strong>border repeaters</strong> (nodes that hear adverts from multiple regions) form a thin second-order backbone. Only they exchange <em>aggregated</em> "region reachable via me, cost X" entries.</li>
+</ul>
+<p>Effect: DV tables and control traffic scale with <em>region size</em>, not with the total network. This is classic <strong>hierarchical/area routing</strong> logic (OSPF-areas idea), applied to the real region structure. On the code side: region is already determined per packet today (<code>region_map.findMatch</code>, <code>filterRecvFloodPacket</code>) – the information is available.</p>
+<h3 id="h2-loop-free-convergence-babel-feasibility-instead-of-pure-dsdv-long-chains">H2 – Loop-Free Convergence (Babel Feasibility Instead of Pure DSDV) <em>(long chains)</em></h3>
+<p>With up to 8 hops on lossy links, transient loops are expensive. v2 adopts the <strong>feasibility condition</strong> from Babel/EIGRP: a neighbor is only accepted as a next-hop if its advertised cost is <strong>strictly less</strong> than the locally last-reached cost (feasible distance). Plus <strong>sequence numbers</strong> per destination. This guarantees loop-freedom <em>during</em> convergence – not just after – without a global topology view.</p>
+<h3 id="h3-feasible-successor-backup-partitionlink-failure-tolerance">H3 – Feasible-Successor Backup <em>(partition/link-failure tolerance)</em></h3>
+<p>Each repeater maintains <strong>two</strong> routes per destination: primary next-hop + a pre-validated loop-free <strong>backup next-hop</strong>. If the primary hop fails, the backup is switched to immediately without a new flood (EIGRP principle). This directly addresses the observed failures/isolation: a single link loss no longer triggers <strong>any</strong> expensive re-discovery.</p>
+<h3 id="h4-metric-hardening-reliability-dominant-damped-node-aware-058-reliability-flapping">H4 – Metric Hardening: Reliability-Dominant, Damped, Node-Aware <em>(0.58 reliability + flapping)</em></h3>
+<p>The ETX metric from v1 is hardened:</p>
+<ul>
+<li><strong>Reliability dominates hop count:</strong> cost = ETX (not hops); a 3-hop path with good links beats a 2-hop path with a shaky link.</li>
+<li><strong>EWMA + hysteresis:</strong> link costs are smoothed, and a new path only replaces the old one when it is <strong>noticeably</strong> better (e.g. ≥ 15%). This prevents the back-and-forth flapping that otherwise occurs on lossy links. (Counterpart to the "sticky path" from the analysis – v2 seeks the stable middle ground: switch on <em>clear</em> improvement, otherwise hold.)</li>
+<li><strong>Node stability gating:</strong> from the advert regularity (real: advert_count 7…455), an availability score is formed. Nodes below the threshold may be <strong>endpoints</strong>, but <strong>not preferred transit</strong>. Flapping repeaters thus do not poison backbone routes.</li>
+</ul>
+<h3 id="h5-reliability-floor-hop-by-hop-retry-delivery-ratio">H5 – Reliability Floor + Hop-by-Hop Retry <em>(delivery ratio)</em></h3>
+<p>Best-of-N does not just select "best metric", but discards paths below an <strong>estimated delivery probability threshold</strong> (e.g. &lt; 0.5) in favor of a slightly longer but more reliable path. On the backbone, MeshCore's hop-by-hop direct retry remains active; optionally <strong>dual-path</strong> for important messages (two disjoint routes) – deliberately on-demand only, as it costs airtime.</p>
+<h3 id="h6-mixed-firmware-coexistence-as-a-first-class-requirement-2-byte-hashes-pending-forks">H6 – Mixed-Firmware Coexistence as a First-Class Requirement <em>(2-byte hashes, "Pending", forks)</em></h3>
+<p>In reality, different firmware versions and hash sizes run side by side. v2 requires:</p>
+<ul>
+<li>DV/backbone packets as <strong>their own, ignorable payload type</strong> → legacy nodes discard them without effect.</li>
+<li>Where MHR nodes are absent or the region has no backbone route, <strong>automatic fallback to today's flood-and-cache</strong>. MHR must <strong>never</strong> degrade existing behavior, only complement it.</li>
+<li>Respect the existing <strong>hash-size migration</strong> (1/2/3-byte) and loop detection.</li>
+</ul>
+<h3 id="h7-garbage-duplicate-abuse-hardening-messy-reality">H7 – Garbage, Duplicate &amp; Abuse Hardening <em>(messy reality)</em></h3>
+<ul>
+<li><strong>Duplicates</strong> (same key/quasi-identical coordinates, cf. Lohmar #17 ×2) are deduplicated via public key, not name.</li>
+<li><strong>Rate-limiting</strong> of DV updates per neighbor (works hand in hand with the existing <code>discover_limiter</code>).</li>
+<li>Sequence numbers + plausibility checks prevent a single misconfigured/malicious node from poisoning routes or triggering a packet storm (ties into the real loop-detection rationale in the MeshCore docs).</li>
+</ul>
+<hr />
+<h2 id="3-v2-architecture-compact">3. v2 Architecture (Compact)</h2>
+<pre><code>L2  Client edge   : reactive, attach to region repeater, discovery short-circuit
+                    -&gt; fallback to flood if no backbone route
+L1b Inter-region  : border repeaters, aggregated DV &quot;region X via me, cost&quot;
+L1a Intra-region  : proactive DV, Babel-feasibility + seqno + feasible-successor
+L0  Link sensing  : EWMA-ETX (reliability-dominant) + node stability score
+</code></pre>
+<p>Guiding principle of v2: <strong>Stability over last-mile optimality.</strong> A slightly suboptimal but stable and loop-free path is preferable to a theoretically shortest path that flaps. This is exactly what MeshCore lacks today (random detours) <em>and</em> what a naive v1 would lack in this network (DV instability).</p>
+<hr />
+<h2 id="4-failure-mode-coverage-v1-v2">4. Failure Mode Coverage (v1 → v2)</h2>
+<table>
+<thead>
+<tr>
+<th>Failure mode</th>
+<th>v1</th>
+<th>v2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DV does not scale to 80+ repeaters</td>
+<td>risk</td>
+<td><strong>H1</strong> regional hierarchy</td>
+</tr>
+<tr>
+<td>Transient loops on long paths</td>
+<td>seqno/split-horizon</td>
+<td><strong>H2</strong> feasibility condition</td>
+</tr>
+<tr>
+<td>Link failure → expensive re-discovery</td>
+<td>re-flood</td>
+<td><strong>H3</strong> backup successor</td>
+</tr>
+<tr>
+<td>Route flapping on lossy links</td>
+<td>–</td>
+<td><strong>H4</strong> EWMA+hysteresis</td>
+</tr>
+<tr>
+<td>Unreliable/flapping transit nodes</td>
+<td>–</td>
+<td><strong>H4</strong> stability gating</td>
+</tr>
+<tr>
+<td>Low delivery ratio</td>
+<td>shortest path</td>
+<td><strong>H5</strong> reliability floor + retry/dual-path</td>
+</tr>
+<tr>
+<td>Mixed firmware/hashes</td>
+<td>"graceful" (vague)</td>
+<td><strong>H6</strong> hard requirement + fallback</td>
+</tr>
+<tr>
+<td>Duplicates/garbage/abuse</td>
+<td>–</td>
+<td><strong>H7</strong> dedup + rate-limit + seqno</td>
+</tr>
+<tr>
+<td>Backbone partition</td>
+<td>fallback</td>
+<td><strong>H3 + H6</strong> backup + reactive fallback</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-expected-impact-validation">5. Expected Impact &amp; Validation</h2>
+<p>v2 does not aim for better peak values than v1, but for <strong>sustained gains under real disturbances</strong>: the ~82% airtime savings and the detour reduction should remain <em>stable</em> even under node churn, link failures, and mixed firmware, rather than tipping into flapping/loops.</p>
+<p><strong>Validation plan (next step):</strong> extend the existing real-data sim (<code>sim/mhr_sim_real.py</code>) with disturbance scenarios and compare v1 vs. v2:</p>
+<ul>
+<li><strong>Churn:</strong> randomly turn nodes on/off according to their real advert_count profile → measure route change rate (flapping) and delivery ratio.</li>
+<li><strong>Link failure:</strong> drop random links/high-load nodes → re-discovery frequency (v1) vs. backup switchover (v2).</li>
+<li><strong>Partition:</strong> isolated nodes (real: Leverkusen) → clean fallback instead of endless flood?</li>
+<li><strong>Metrics:</strong> route stability (changes/hour), convergence time, airtime under disturbance, delivery ratio.</li>
+</ul>
+<hr />
+<p><em>Builds on <code>MeshCore_Hybrid_Routing_Entwurf.md</code> (v1), <code>MeshCore_Simulation_ECHTE_Daten.md</code>, and <code>MeshCore_Routing_Analyse_und_Optimierung.md</code>. The 4-phase rollout from v1 still applies; H1/H2/H3 belong in Phase 2 (backbone), H4/H5 in Phase 1, H6/H7 throughout.</em></p>
 
 
 

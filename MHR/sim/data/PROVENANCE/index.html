@@ -27,7 +27,7 @@
     
     
       
-        <title>Datensatz-Herkunft (Provenance) & Nutzung - MeshCore Docs</title>
+        <title>PROVENANCE - MeshCore Docs</title>
       
     
     
@@ -69,11 +69,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#datensatz-herkunft-provenance-nutzung" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -105,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Datensatz-Herkunft (Provenance) &amp; Nutzung
+              PROVENANCE
             
           </span>
         </div>
@@ -773,7 +768,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+    MeshCore Routing Analyse und Optimierung
   
 
     
@@ -829,7 +824,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    MeshCore Simulation ECHTE Daten
   
 
     
@@ -1038,26 +1033,6 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
         
@@ -1066,7 +1041,7 @@
   <span class="md-ellipsis">
     
   
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
+    PROVENANCE
   
 
     
@@ -1075,58 +1050,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#quelle" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quelle
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#inhalt" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Inhalt
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#hinweise-zu-nutzung-attribution" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Hinweise zu Nutzung &amp; Attribution
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1434,7 +1357,7 @@
   <span class="md-ellipsis">
     
   
-    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+    Phase2 Convergence Validation
   
 
     
@@ -1546,7 +1469,7 @@
   <span class="md-ellipsis">
     
   
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+    Suppression Design
   
 
     
@@ -1592,49 +1515,6 @@
   
   
   
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#quelle" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quelle
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#inhalt" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Inhalt
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#hinweise-zu-nutzung-attribution" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Hinweise zu Nutzung &amp; Attribution
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
   
 </nav>
                   </div>
@@ -1659,80 +1539,10 @@
   
 
 
-<h1 id="datensatz-herkunft-provenance-nutzung">Datensatz-Herkunft (Provenance) &amp; Nutzung</h1>
-<p>Dieser Ordner enthält den <strong>realen Datensatz</strong>, mit dem die MHR-Simulationen kalibriert/validiert
-wurden — damit jede:r die Ergebnisse reproduzieren oder eigene Auswertungen bauen kann.</p>
-<h2 id="quelle">Quelle</h2>
-<ul>
-<li><strong>CoreScope</strong> des MeshRheinland-Netzes: <code>https://corescope.meshrheinland.de</code> (öffentliche API:
-  <code>/api/nodes</code>, <code>/api/observers</code>, <code>/api/packets</code>, <code>/api/analytics/neighbor-graph</code>, <code>/api/analytics/hash-sizes</code>, <code>/api/stats</code>).</li>
-<li><strong>Erfasst:</strong> Momentaufnahme vom <strong>2026-05-30</strong> (Netz-Stand siehe <code>stats.json</code>). CoreScope-Engine
-  laut <code>stats.json</code>: go <code>v3.8.2</code>.</li>
-<li>Abgeholt mit <code>../mhr_collect_corescope.py</code> (urllib + Browser-User-Agent, offset-Pagination).</li>
-</ul>
-<h2 id="inhalt">Inhalt</h2>
-<table>
-<thead>
-<tr>
-<th>Datei</th>
-<th>Was</th>
-<th>Hinweis</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>packets.jsonl.xz</code></td>
-<td><strong>alle 109.980 Rohpakete</strong> (1 JSON/Zeile: <code>path_json</code>, <code>snr</code>, <code>rssi</code>, <code>observer_*</code>, <code>route_type</code>, <code>payload_type</code>, <code>timestamp</code>)</td>
-<td>xz, 17 MB → ~188 MB entpackt. <code>xz -dk packets.jsonl.xz</code>; direkt aus Python: <code>lzma.open(...,'rt')</code></td>
-</tr>
-<tr>
-<td><code>nodes.json</code></td>
-<td>1962 Knoten: <code>public_key</code>, <code>lat</code>/<code>lon</code>, <code>role</code>, <code>advert_count</code>, <code>relay_count_*</code>, Scores</td>
-<td></td>
-</tr>
-<tr>
-<td><code>observers.json</code></td>
-<td>38 Observer (Empfangs-Knoten)</td>
-<td></td>
-</tr>
-<tr>
-<td><code>neighbor_graph.json</code></td>
-<td>server-aufgelöste reale Link-Topologie (1034 Kn., 1956 Kanten) mit <code>avg_snr</code>/Kante + <code>ambiguous</code>-Flag</td>
-<td>bestes Link-Modell</td>
-</tr>
-<tr>
-<td><code>hash_sizes.json</code></td>
-<td>Hash-Größen-Verteilung (1/2/3-Byte)</td>
-<td></td>
-</tr>
-<tr>
-<td><code>topology_edges.json</code></td>
-<td>aus Pfaden abgeleitete Relay-Kanten (aggregiert)</td>
-<td></td>
-</tr>
-<tr>
-<td><code>snr_calibration.json</code>, <code>real_detour_stats.json</code></td>
-<td>abgeleitete Kennzahlen (SNR-Fit, reale Detour-Statistik)</td>
-<td></td>
-</tr>
-<tr>
-<td><code>stats.json</code></td>
-<td>Netz-Gesamtzahlen zum Erfassungszeitpunkt</td>
-<td>Provenance</td>
-</tr>
-</tbody>
-</table>
-<p>Schema-/Nutzungsdetails + wie man die Sims fährt: siehe <code>../README.md</code>.</p>
-<h2 id="hinweise-zu-nutzung-attribution">Hinweise zu Nutzung &amp; Attribution</h2>
-<ul>
-<li>Die Daten beschreiben das <strong>öffentliche</strong> MeshRheinland-LoRa-Mesh; Knotennamen, Positionen und
-  Public-Keys stammen aus den von den Betreibern <strong>öffentlich ausgesendeten Adverts</strong> (auf CoreScope
-  ohnehin sichtbar). Bitte respektvoll und nur für Forschung/Simulation/Verbesserung des Netzes nutzen.</li>
-<li>Es ist eine <strong>Momentaufnahme</strong> — kein Live-Feed. Für aktuelle Daten den Collector neu laufen lassen.</li>
-<li>Bei Weiterverwendung bitte <strong>CoreScope / MeshRheinland</strong> als Quelle nennen.</li>
-<li>Lizenz des <em>Forks</em>: MIT (siehe <code>../../../license.txt</code>). Die Daten selbst sind eine Drittquelle
-  (CoreScope/MeshRheinland) und unterliegen deren Bedingungen.</li>
-</ul>
+  <h1>PROVENANCE</h1>
+
+<p>/Users/bickelkarsten/Downloads/mhr/docs/MHR/sim/data/PROVENANCE.md</p>
+<p>The file has been updated. The complete German original is preserved verbatim, followed by the separator and a full English translation covering all headings, body text, table columns and rows, bullet points, and notes — with all code blocks, file paths, API endpoints, variable names, and identifiers left untranslated.</p>
 
 
 

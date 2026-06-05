@@ -773,7 +773,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+    MeshCore Routing Analyse und Optimierung
   
 
     
@@ -829,7 +829,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    MeshCore Simulation ECHTE Daten
   
 
     
@@ -1035,7 +1035,7 @@
   <span class="md-ellipsis">
     
   
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
+    PROVENANCE
   
 
     
@@ -1453,6 +1453,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1504,7 +1515,7 @@
   <span class="md-ellipsis">
     
   
-    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+    Phase2 Convergence Validation
   
 
     
@@ -1616,7 +1627,7 @@
   <span class="md-ellipsis">
     
   
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+    Suppression Design
   
 
     
@@ -1770,6 +1781,17 @@
     <span class="md-ellipsis">
       
         6. Dateien
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
       
     </span>
   </a>
@@ -2022,6 +2044,230 @@ CPU: 1 EWMA-Update + 1 Vergleich je Zustellung; kein Heap/Sort/Float-Pfad.</p>
 <li><code>fig_rf_airtime.png</code> — Re-Discovery- &amp; Netto-Airtime ueber Stoerung.</li>
 <li><code>fig_rf_delivery_stability.png</code> — Lieferquote + Routen-Stabilitaet (Flattern).</li>
 <li><code>fig_rf_adoption.png</code> — Netto-Airtime &amp; Liefergewinn ueber Adoptionsgrad.</li>
+</ul>
+<hr />
+<h2 id="english-translation">🇬🇧 English Translation</h2>
+<h1 id="path-success-reinforcement-mechanism-b-study">Path Success Reinforcement (Mechanism B) — Study</h1>
+<p><em>Building block 3 of the invisible, node-local optimization layer (<code>Invisible_Optimizing_Layer.md</code>).
+Purely node-local, no new packet type, transparent. Validated on the REAL neighbor-graph topology
+(real edges + real avg_snr), churn profile from <code>advert_count</code>. Script: <code>reinforce_sim.py</code>,
+results: <code>reinforce_results.json</code>. Seed 42, 6 seeds, 22 sources x 4 destinations x 40 send-ticks
+per configuration.</em></p>
+<p>Topology (giant component): <strong>632 nodes, 1577 edges, avg. degree 3.45</strong> (sparse, real).</p>
+<hr />
+<h2 id="1-question-model">1. Question &amp; Model</h2>
+<p><strong>Baseline (MeshCore today, flood-and-cache, "first packet wins"):</strong> A source caches exactly ONE
+path per destination (the first successful flood path). Every message is sent unicast over that
+path. If an edge fails transiently or an intermediate node disappears, delivery fails. Only after
+<strong>3 consecutive failures</strong> is the path discarded and an expensive <strong>re-discovery (flood)</strong>
+triggered.</p>
+<p><strong>B (Reinforcement):</strong> Additionally per destination:
+- an <strong>EWMA success metric</strong> <code>s</code> (α=0.30; from ACK/delivery feedback),
+- a <strong>backup path</strong> (feasible successor), passively learned from overheard path chains (0 airtime;
+  modeled as the 2nd-best edge-disjoint ETX path).</p>
+<p>Logic: if <code>s</code> falls below <code>SWITCH_THR=0.55</code>, B <strong>proactively switches to the backup BEFORE</strong> the
+3 hard failures + re-flood become necessary. On an acute failure, the other known path is tried
+immediately; re-flood only if the backup also fails or none is known (in that case B falls back
+exactly to baseline behavior).</p>
+<p><strong>Methodology:</strong> Per <code>(source, destination)</code>, 40 send attempts are simulated under transient link
+failure (10/20/30 %) or node churn (from <code>advert_count</code>). Baseline and B run on <strong>identical
+disturbance sequences (Common Random Numbers)</strong> -&gt; paired comparison. Adoption sweep: fraction of
+source nodes using B (1 node -&gt; 100 %). Re-discovery airtime = transmitting nodes per flood
+(identical flood model as v4); unicast airtime = hops per attempt.</p>
+<hr />
+<h2 id="2-results-benefit-cost-net">2. Results (BENEFIT / COST / NET)</h2>
+<h3 id="benefit-fully-adopted">BENEFIT (fully adopted)</h3>
+<table>
+<thead>
+<tr>
+<th>Link failure</th>
+<th>Delivery rate Base -&gt; B</th>
+<th>Delta delivery rate</th>
+<th>Net airtime delta</th>
+<th>Re-discovery airtime saved</th>
+<th>Suboptimal del./pair</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10 %</td>
+<td>0.529 -&gt; 0.586</td>
+<td><strong>+5.7 pp</strong></td>
+<td><strong>−20.0 %</strong></td>
+<td>+22.8 %</td>
+<td>5.7</td>
+</tr>
+<tr>
+<td>20 %</td>
+<td>0.373 -&gt; 0.416</td>
+<td><strong>+4.4 pp</strong></td>
+<td><strong>−16.5 %</strong></td>
+<td>+17.9 %</td>
+<td>5.6</td>
+</tr>
+<tr>
+<td>30 %</td>
+<td>0.280 -&gt; 0.303</td>
+<td><strong>+2.3 pp</strong></td>
+<td><strong>−11.0 %</strong></td>
+<td>+11.9 %</td>
+<td>5.3</td>
+</tr>
+</tbody>
+</table>
+<p>Node churn (advert_count, at 10 % link failure, fully adopted):</p>
+<table>
+<thead>
+<tr>
+<th>Churn</th>
+<th>Delivery rate Base -&gt; B</th>
+<th>Delta</th>
+<th>Net airtime delta</th>
+<th>Refloods/pair Base -&gt; B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5 %</td>
+<td>0.477 -&gt; 0.529</td>
+<td>+5.1 pp</td>
+<td>−18.2 %</td>
+<td>4.75 -&gt; 3.92</td>
+</tr>
+<tr>
+<td>10 %</td>
+<td>0.435 -&gt; 0.487</td>
+<td>+5.2 pp</td>
+<td>−18.3 %</td>
+<td>5.55 -&gt; 4.60</td>
+</tr>
+<tr>
+<td>20 %</td>
+<td>0.363 -&gt; 0.404</td>
+<td>+4.1 pp</td>
+<td>−15.0 %</td>
+<td>6.87 -&gt; 5.93</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Mean over link failure (fully adopted): net airtime −15.8 %, delivery rate +4.1 pp,
+re-discovery airtime −17.5 %.</strong> The effect scales monotonically with adoption fraction
+(1 node ≈ 0, full = max), because B is a pure source/cache decision and acts independently per
+source.</p>
+<h3 id="cost-losses-honest">COST / Losses (honest)</h3>
+<ul>
+<li><strong>Path switches:</strong> ~0.08–0.09 switches per send-tick under disturbance (1 switch per ~11 ticks) —
+  these are ALMOST EXCLUSIVELY reactions to real failures, not pointless toggling.</li>
+<li><strong>Disturbance-free flutter test (no link/node failure):</strong> ~0.029 switches/tick, BUT:
+  delivery rate still rises (0.825 -&gt; 0.856; +3.2 pp) and net airtime falls (<strong>−11.5 %</strong>). The
+  switching is therefore <strong>productive, not harmful</strong> — it reacts to real per-link SNR noise that
+  baseline only catches after 3 failures + re-flood. <strong>No harmful flapping.</strong> (The GO/NO-GO
+  evaluation deliberately does not ask "does B switch at all", but "does switching without
+  disturbance harm delivery rate/airtime?" — answer: no.)</li>
+<li><strong>Suboptimal deliveries:</strong> ~5.3–5.7 per pair (out of 40 ticks) travel over a longer-than-optimal
+  path (backup detour). This is the main reason the airtime gain is not even larger — but the net
+  result remains clearly positive.</li>
+<li><strong>Backup quality:</strong> in this sparse topology (avg. degree 3.45), an edge-disjoint backup exists
+  for only ~43 % of pairs. For the rest, B falls back to re-flood (= baseline behavior).</li>
+</ul>
+<h3 id="net">NET</h3>
+<p>Total airtime (unicast + re-floods) decreases in EVERY disturbance configuration; delivery rate
+increases in every one; route stability is maintained (no flapping). Sensitivity to backup
+learning quality (<code>learn_loss</code>, at 20 % link failure, fully adopted):</p>
+<table>
+<thead>
+<tr>
+<th>learn_loss</th>
+<th>Backup fraction</th>
+<th>Delta delivery rate</th>
+<th>Net airtime</th>
+<th>Re-discovery saved</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 %</td>
+<td>0.43</td>
+<td>+6.3 pp</td>
+<td>−25.0 %</td>
+<td>+27.1 %</td>
+</tr>
+<tr>
+<td>30 %</td>
+<td>0.30</td>
+<td>+4.4 pp</td>
+<td>−16.5 %</td>
+<td>+17.9 %</td>
+</tr>
+<tr>
+<td>60 %</td>
+<td>0.17</td>
+<td>+2.8 pp</td>
+<td>−9.5 %</td>
+<td>+10.3 %</td>
+</tr>
+<tr>
+<td>100 %</td>
+<td>0.00</td>
+<td>−0.0 pp</td>
+<td>+0.8 %</td>
+<td>−0.8 %</td>
+</tr>
+</tbody>
+</table>
+<p>-&gt; The benefit scales cleanly and MONOTONICALLY with backup availability; at 0 % backup, B is
+<strong>practically identical</strong> to baseline (safe fallback, no relevant degradation; the +0.8 % airtime
+at ll=100 % is noise/rounding with no delivery effect).</p>
+<hr />
+<h2 id="3-go-no-go_1">3. Go / No-Go</h2>
+<p><strong>GO.</strong> B is <strong>safe</strong> across all tested disturbance scenarios (link failure 10/20/30 %, churn
+5/10/20 %) and across the entire adoption sweep (delivery rate &gt;= baseline, worst delta = −0.00005,
+i.e. within noise) and <strong>beneficial</strong> (net airtime mean −15.8 %, delivery rate +4.1 pp,
+re-discovery airtime −17.5 %). No harmful flapping: the observed switching is productive (even
+without disturbance, delivery rate rises +3.2 pp and airtime falls −11.5 %). When no backup is
+available, B falls back to baseline without loss (<code>learn_loss</code>=100 %: delta ≈ 0).</p>
+<blockquote>
+<p>Caveat on the GO statement: the benefit depends on available backups and on existing delivery
+feedback. In network segments without an edge-disjoint backup or without an ACK packet type,
+the effect is ~0 (but never negative). It is a <strong>safe net gain where the prerequisites are
+present</strong>, never a risk.</p>
+</blockquote>
+<hr />
+<h2 id="4-on-node-memory-per-destination">4. On-Node Memory per Destination</h2>
+<p>MeshCore already caches the primary path (no extra overhead). <strong>B overhead per destination:</strong>
+EWMA success (1 B) + fail counter (1 B) + backup path (length + hash segments, ~5–7 B typical,
+max 18 B for a 15-hop backup). <strong>Typically ~9 B/destination; 64 destinations ≈ 0.6 KB.</strong> Fixed
+table, no dynamic allocation (MeshCore rule). Fits comfortably on nRF52840 (256 KB) / ESP32-S3
+(512 KB). CPU: 1 EWMA update + 1 comparison per delivery; no heap/sort/float path.</p>
+<hr />
+<h2 id="5-honest-limitations">5. Honest Limitations</h2>
+<ul>
+<li><strong>ACK feedback only for some packet types:</strong> The EWMA success metric requires delivery feedback.
+  MeshCore has ACKs only for certain packet types (e.g. direct messages), not for pure
+  flood-adverts. For feedback-less packets the signal is missing -&gt; B silently falls back to
+  baseline there. The simulation assumes feedback for all ticks (upper bound of benefit).</li>
+<li><strong>Idealized flood:</strong> Re-discovery airtime is from the same idealized timing model as v4
+  (first-wins, no collisions/capture). Absolute values (airtime/pair in the hundreds) are
+  optimistic; the RELATIVE comparison baseline vs. B uses the same model and is robust.</li>
+<li><strong>Backup quality from passive learning:</strong> The backup is modeled as the 2nd-best (edge-disjoint)
+  path in the FULL graph; in reality passive learning is incomplete -&gt; <code>learn_loss</code> sensitivity
+  (0/30/60/100 %) shows the dependency. Default 30 %. At 100 % <code>learn_loss</code>, B falls back exactly
+  to baseline (safe).</li>
+<li><strong>Disturbance as independent per-tick process</strong> (no time-correlated fading). Conservative for
+  the EWMA — real temporal correlation of link quality would actually help B (the success metric
+  would have a stronger early-warning signal).</li>
+<li><strong>Backup availability:</strong> in the sparse real topology, an edge-disjoint second path exists for
+  only ~43 % of pairs -&gt; more than half the potential effect is topology-limited (no risk, but a
+  ceiling on the gain).</li>
+</ul>
+<hr />
+<h2 id="6-files">6. Files</h2>
+<ul>
+<li><code>reinforce_sim.py</code> — simulation for this study.</li>
+<li><code>reinforce_results.json</code> — all metrics (sweeps, decision, on-node).</li>
+<li><code>fig_rf_airtime.png</code> — re-discovery &amp; net airtime over disturbance level.</li>
+<li><code>fig_rf_delivery_stability.png</code> — delivery rate + route stability (flapping).</li>
+<li><code>fig_rf_adoption.png</code> — net airtime &amp; delivery gain over adoption fraction.</li>
 </ul>
 
 

@@ -773,7 +773,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+    MeshCore Routing Analyse und Optimierung
   
 
     
@@ -829,7 +829,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    MeshCore Simulation ECHTE Daten
   
 
     
@@ -1035,7 +1035,7 @@
   <span class="md-ellipsis">
     
   
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
+    PROVENANCE
   
 
     
@@ -1397,6 +1397,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1476,7 +1487,7 @@
   <span class="md-ellipsis">
     
   
-    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+    Phase2 Convergence Validation
   
 
     
@@ -1588,7 +1599,7 @@
   <span class="md-ellipsis">
     
   
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+    Suppression Design
   
 
     
@@ -1714,6 +1725,17 @@
     <span class="md-ellipsis">
       
         7. Limitierungen (ehrlich)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
       
     </span>
   </a>
@@ -1965,6 +1987,226 @@ Konfidenzintervalle. Alles auf Hardware ungetestet — Bench-Gerät vor produkti
 <p><em>Diese Studie verschiebt die Projekt-Priorität von SNR-Gewichtung hin zu </em><em>hop-basierter
 Pfadwahl (M5/M1)</em><em>, einem </em><em>datenbasierten flood.max (15)</em><em> und </em><em>adaptiver, selbstbegrenzender
 Airtime-Suppression</em><em> — mit </em><em>passivem Topologie-Lernen</em><em> als kostenlosem Fundament.</em></p>
+<hr />
+<h2 id="english-translation">🇬🇧 English Translation</h2>
+<h1 id="study-routing-optimisations-for-meshcore-in-mixed-firmware-operation">Study: Routing Optimisations for MeshCore in Mixed-Firmware Operation</h1>
+<p><em>Simulated on real CoreScope data (109,980 packets, 1,962 nodes). Quality &amp; stability take precedence
+over maximum optimality. All mechanisms are coexistence-compatible with the original firmware.</em></p>
+<p>Companion documents: <a href="../STUDY_DESIGN/">STUDY_DESIGN.md</a> (my thought process &amp; protocol),
+<a href="../STUDY_RESULTS/">STUDY_RESULTS.md</a> (raw results tables), <code>study_sim.py</code> (simulation),
+<code>study_results.json</code>, plots <code>fig_study_*.png</code>. Data basis see <code>../sim/MeshCore_Simulation_v3_Realdaten.md</code>.</p>
+<hr />
+<h2 id="1-executive-summary-for-the-impatient">1. Executive Summary (for the impatient)</h2>
+<p>We simulated <strong>8 routing mechanisms</strong> (conventional to unconventional) on the real 776-node repeater
+topology, systematically varying <strong>how many nodes carry the new firmware</strong> (1 node → all). The
+benchmark was a hard <strong>safety invariant</strong>: a mechanism must not, at <em>any</em> adoption level, reduce
+delivery ratio or increase airtime.</p>
+<p><strong>The result is a clear three-way split:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Mechanisms</th>
+<th>Property</th>
+<th>Recommendation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1 — "Good Citizens"</strong></td>
+<td>M5 (Best-of-N at destination), M1 (hop-weighted delay), M7=15 (flood.max 15)</td>
+<td>safe from <strong>1 node</strong>, monotonic, never worse</td>
+<td><strong>deploy without hesitation</strong></td>
+</tr>
+<tr>
+<td><strong>2 — Airtime levers</strong></td>
+<td>M3 (Shorter-Path-Cancel), M2 (Counter-Suppression), M4 (MPR/CDS)</td>
+<td>large airtime gains (−19…−99 %), but safe only <strong>up to ~10–25 % adoption</strong></td>
+<td>build <strong>adaptive/self-limiting</strong>, roll out gradually</td>
+</tr>
+<tr>
+<td><strong>3 — Free foundation</strong></td>
+<td>M6 (passive topology learning + backup path)</td>
+<td><strong>0 airtime</strong>, saves 94–96 % re-discovery</td>
+<td><strong>lay foundation first</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Most important stability finding:</strong> The aggressive airtime levers (M2/M3/M4) only work because
+<strong>stock nodes continue flooding as a safety net</strong>. At 100 % adoption <em>without</em> this net, e.g.
+MPR/CDS collapses into coverage loss (delivery ratio 0.93 → 0.07). <strong>Consequence:</strong> these mechanisms
+may only suppress when the node <em>locally confirms sufficient redundancy</em> — then they remain safe even
+at full adoption. This is the central design requirement of this study.</p>
+<hr />
+<h2 id="2-starting-point-what-the-real-data-said-about-the-levers">2. Starting Point (what the real data said about the levers)</h2>
+<ul>
+<li>Real detour median <strong>2.1×</strong>, flood paths up to 63 hops, <strong>~751 transmitting repeaters per flood</strong> →
+  airtime is the bottleneck, redundancy the biggest lever.</li>
+<li><strong>SNR is a weak lever</strong> (distance barely explains SNR, PLE≈0.4) → <strong>hop count</strong> is the reliable
+  signal. This shifts focus away from SNR weighting (Phase 1) towards hop-based methods.</li>
+<li>Every flood packet carries its <strong>complete hop chain</strong> → topology is <em>passively, freely</em> learnable.</li>
+</ul>
+<p>From this, my guiding principle: <strong>Use what is already in the packet (hops), decide locally, transmit
+less — but never at the cost of reachability.</strong></p>
+<hr />
+<h2 id="3-method-brief">3. Method (brief)</h2>
+<ul>
+<li><strong>Topology:</strong> real active repeater component (776 nodes / 9,226 edges), calibrated
+  range/reliability model as in v3. Cross-validation against observed edges: the geometric model
+  reproduces 41.7 % — partial overlap, honestly documented.</li>
+<li><strong>Flood model:</strong> Airtime = Σ rebroadcasts per delivery; delivery ratio; hops/detour;
+  route stability. Baseline M0 = stock flood, first-wins.</li>
+<li><strong>Adoption sweep:</strong> α ∈ {0, 1 node, 1 %, 5 %, 10 %, 25 %, 50 %, 100 %}, both random <em>and</em>
+  "top-traffic repeaters first" (realistic rollout), ≥5 seeds.</li>
+<li><strong>Mixed operation:</strong> new nodes apply their local rule; stock nodes flood normally.</li>
+<li><strong>Safety invariant:</strong> delivery ratio ≥ baseline <strong>and</strong> airtime ≤ baseline at <em>every</em> α.</li>
+</ul>
+<p>Baseline (M0): delivery ratio <strong>0.930</strong>, airtime <strong>751 TX/delivery</strong>, detour median <strong>1.11</strong>.</p>
+<hr />
+<h2 id="4-results-per-mechanism">4. Results per Mechanism</h2>
+<table>
+<thead>
+<tr>
+<th>Mechanism</th>
+<th>Type</th>
+<th>Airtime gain</th>
+<th>Safe up to α</th>
+<th>Effect</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>M5 Best-of-N at destination (hops)</strong></td>
+<td>local, destination</td>
+<td>±0</td>
+<td><strong>all (from 1 node)</strong></td>
+<td>Detour <strong>1.11→1.00</strong></td>
+<td>✅ Tier 1</td>
+</tr>
+<tr>
+<td><strong>M1 Hop-weighted delay</strong></td>
+<td>local, relay</td>
+<td>±0</td>
+<td><strong>all</strong></td>
+<td>Detour→1.00, delivery ratio slightly better</td>
+<td>✅ Tier 1</td>
+</tr>
+<tr>
+<td><strong>M7=15 flood.max 15</strong></td>
+<td>local/config</td>
+<td>−3.6 %</td>
+<td><strong>all</strong></td>
+<td>cuts extreme detours</td>
+<td>✅ Tier 1</td>
+</tr>
+<tr>
+<td><strong>M3 Shorter-Path-Cancel</strong></td>
+<td>local, relay</td>
+<td><strong>−18.9 %</strong></td>
+<td><strong>0.25</strong></td>
+<td>Airtime ↓ without coverage loss (up to threshold)</td>
+<td>⚠️ Tier 2</td>
+</tr>
+<tr>
+<td><strong>M2 Counter-Suppression (k=3)</strong></td>
+<td>local, relay</td>
+<td><strong>−23.1 %</strong></td>
+<td><strong>0.25</strong></td>
+<td>gossip suppression</td>
+<td>⚠️ Tier 2</td>
+</tr>
+<tr>
+<td><strong>M4 MPR/CDS relay reduction</strong></td>
+<td>local+passive</td>
+<td>−9.9 % (safe) … −99.5 % (unsafe)</td>
+<td><strong>0.10</strong></td>
+<td>only dominating set transmits</td>
+<td>⚠️ Tier 2 (delicate)</td>
+</tr>
+<tr>
+<td><strong>M7=12 flood.max 12</strong></td>
+<td>local/config</td>
+<td>larger</td>
+<td><strong>&lt;1.0</strong></td>
+<td><strong>too aggressive</strong> for network diameter</td>
+<td>❌ rejected (→ 15)</td>
+</tr>
+<tr>
+<td><strong>M6 passive topology learning + backup</strong></td>
+<td>passive</td>
+<td><strong>−94…96 % re-discovery</strong></td>
+<td><strong>all</strong></td>
+<td>backup path instead of re-flood on link failure</td>
+<td>✅ Tier 3 (foundation)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Safety violations (most important stability result):</strong> M5, M1, M7=15 violate the invariant
+<strong>at no α</strong>. Violations occur from: M2k2 α≥0.25 · M2k3/M3 α≥0.5 · M4 α≥0.25 (top-traffic) or
+≥0.05 (random) · M7=12 at α=1.0. At α=1.0 <strong>without</strong> the stock safety net, M4 collapses
+(delivery ratio 0.07) — exactly the predicted coverage risk without a critical stock mass.</p>
+<p><strong>Combination M3+M5+M7:</strong> with flood.max=12 only safe up to α=0.10 (−8.4 %, detour 1.00); <strong>with
+flood.max=15 it remains safe longer</strong> — the recommended combination.</p>
+<p><strong>Stress (churn 20 % by advert_count, link failure 10/20 %):</strong> route stability remains 1.00 (no
+flapping, no partition). <strong>M6</strong> saves <strong>94–96 %</strong> of re-discovery airtime on link failure
+(baseline reflood ~680 TX) — by far the strongest <em>free</em> lever.</p>
+<hr />
+<h2 id="5-interpretation-the-central-stability-insight">5. Interpretation &amp; the Central Stability Insight</h2>
+<p>The study cleanly separates two classes:</p>
+<ol>
+<li>
+<p><strong>Path <em>quality</em> mechanisms (M5, M1, M7):</strong> change <em>which</em> path wins, not <em>how many</em> transmit.
+   They are <strong>structurally safe</strong> — a node that prefers the shorter path cannot worsen reachability.
+   That is why they are safe from the first node and monotonic.</p>
+</li>
+<li>
+<p><strong>Airtime <em>suppression</em> mechanisms (M3, M2, M4):</strong> a node that <em>stays silent</em> saves airtime —
+   but when too many stay silent, coverage breaks. Their safety depends on <em>enough others</em> (stock or
+   new) still transmitting. Hence the adoption threshold.</p>
+</li>
+</ol>
+<p><strong>The solution for class 2 is not "deploy less", but "suppress adaptively":</strong> A new node may only
+cancel its rebroadcast when it <em>locally observes</em> that the packet has already been forwarded
+sufficiently often / via an equally short path (M3 is exactly this in weak form; M2 with higher k
+likewise). If this condition is tied strictly enough to <em>actually heard redundancy</em>, the mechanism
+remains <strong>safe even at 100 % adoption</strong>, because each node only stays silent once coverage is
+demonstrably already in place. This is the path to capturing the large airtime gains <em>without</em> the
+stock safety net — and the most important implementation requirement that follows from this study.</p>
+<hr />
+<h2 id="6-recommended-roadmap-staged-mixed-operation-safe-stability-oriented">6. Recommended Roadmap (staged, mixed-operation-safe, stability-oriented)</h2>
+<p><strong>Stage A — immediately, "never worse" (Tier 1 + foundation):</strong>
+1. <strong>M7=15:</strong> <code>flood.max</code> from 64 to ~15 (empirical network diameter P90=18; 12 is too aggressive).
+   Pure config, effective per node. <em>(Updates the previous "deliberately left unchanged" position
+   with data.)</em>
+2. <strong>M1 hop-weighted rebroadcast delay</strong> as replacement/complement for the weak SNR lever
+   (<code>getRetransmitDelay</code>): copies with fewer accumulated hops transmit earlier. Local, monotonic.
+3. <strong>M5 Best-of-N at destination (by hops):</strong> the deliberately deferred Phase-1 core — now confirmed
+   by data as <em>the</em> detour-killer (1.11→1.00 from 1 node). Clarify feasibility: collection window
+   at destination without breaking dedup (core risk, careful + bench test).
+4. <strong>M6 passive topology learning:</strong> build a local link table from the hop chains (0 airtime) →
+   backup path instead of re-flood on link failure. Foundation for everything else.</p>
+<p><strong>Stage B — adaptive airtime suppression (Tier 2, cautiously):</strong>
+5. <strong>M3 Shorter-Path-Cancel</strong> and <strong>M2 Counter-Suppression (k=3)</strong> — but <strong>adaptively</strong> (only
+   suppress when locally confirmed redundancy, see §5), so they remain safe beyond 25 % adoption.
+   Measure before/after with telemetry/<code>trace</code>.</p>
+<p><strong>Stage C — longer-term perspective:</strong>
+6. <strong>M4 MPR/CDS</strong> only with a hard redundancy guarantee and a conservative relay set; greatest
+   potential, highest risk — last.</p>
+<p>SNR weighting (Phase 1 <code>tx_snr_weight</code>) remains as a "never worse" option but loses priority
+relative to the hop-based methods (finding from real data).</p>
+<hr />
+<h2 id="7-limitations-honest">7. Limitations (honest)</h2>
+<p>Link model is geometric (log-distance, PLE-floor 2.0; terrain/antenna height missing) → <strong>absolute</strong>
+airtime figures are model-dependent, <strong>relative</strong> mechanism comparisons are more robust.
+Cross-validation covers 41.7 % of observed edges. Timing backoff is modelled (not HW-measured) →
+M1/M3 depend on the timing model. M2 approximates continuous backoff coarsely. M6 computed as an
+airtime-savings model, not a full DV-protocol simulation. Sample: 5 seeds × 120 pairs, no confidence
+intervals. Everything untested on hardware — bench device before a production repeater.</p>
+<hr />
+<p><em>This study shifts the project priority from SNR weighting towards </em><em>hop-based path selection
+(M5/M1)</em><em>, a </em><em>data-driven flood.max (15)</em><em>, and </em><em>adaptive, self-limiting airtime suppression</em><em> —
+with </em><em>passive topology learning</em><em> as the free foundation.</em></p>
 
 
 

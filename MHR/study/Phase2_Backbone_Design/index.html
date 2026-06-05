@@ -773,7 +773,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+    MeshCore Routing Analyse und Optimierung
   
 
     
@@ -829,7 +829,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    MeshCore Simulation ECHTE Daten
   
 
     
@@ -1035,7 +1035,7 @@
   <span class="md-ellipsis">
     
   
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
+    PROVENANCE
   
 
     
@@ -1470,6 +1470,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1493,7 +1504,7 @@
   <span class="md-ellipsis">
     
   
-    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+    Phase2 Convergence Validation
   
 
     
@@ -1605,7 +1616,7 @@
   <span class="md-ellipsis">
     
   
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+    Suppression Design
   
 
     
@@ -1754,6 +1765,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1879,6 +1901,108 @@ erzeugt <strong>Routing-Loops/Instabilität in einem Live-Mesh</strong>. Das bli
 zeitaufgelöste Konvergenz validiert ist, widerspricht der Projektpriorität (Qualität/Stabilität).
 Daher: dieses Design + der Validierungs-Gate sind der verantwortliche „nächste Schritt" für Phase 2;
 der Code folgt nach bestandener Validierung.</p>
+<hr />
+<h2 id="english-translation">🇬🇧 English Translation</h2>
+<h1 id="phase-2-proactive-regional-backbone-implementation-design-validation-plan">Phase 2 — Proactive Regional Backbone: Implementation Design + Validation Plan</h1>
+<p><em>Design-first. Phase 2 is the largest intervention (proactive control plane). The backbone simulation
+(<code>Backbone_Phase2_Study.md</code>) showed: net-positive ONLY with regional hierarchy + DV period ≥ 300 s +
+sufficient traffic. Convergence/loop-freedom has NOT yet been validated in time-resolved fashion. Hence
+the concrete protocol design here </em><em>and the validation gate that must pass before a single line of firmware is written.</em>**</p>
+<p>Builds on <code>../MeshCore_Hybrid_Routing_v2_Robustheit.md</code> (H1–H7) and the invisible layer
+(<code>Invisible_Optimizing_Layer.md</code>). Distinction: the invisible layer is free/passive; the backbone is
+more powerful but costs control airtime → its own, careful stage.</p>
+<hr />
+<h2 id="1-architecture-zrp-principle-proactive-at-the-core-reactive-at-the-edge">1. Architecture (ZRP principle: proactive at the core, reactive at the edge)</h2>
+<pre><code>L2  Client edge   : reactive. Discovery short-circuit: flood only to the nearest backbone repeater,
+                    then backbone unicast from there. Fallback to today's flood-and-cache when no
+                    backbone route exists (mixed-FW / partition).
+L1b Inter-region  : border repeaters exchange AGGREGATED info: &quot;Region X reachable via me, cost C&quot;.
+L1a Intra-region  : proactive DV ONLY within the region (few nodes, fast convergence).
+L0  Link sensing  : EWMA-ETX from passive learning (exists: putNeighbour + 2-hop table).
+</code></pre>
+<p><strong>H1 (regional hierarchy) is MANDATORY</strong> — the sim showed: flat network-wide DV tips into airtime
+deficit at full adoption. Regions come from the existing <code>region_map</code>.</p>
+<h2 id="2-wire-format-mixed-firmware-safe">2. Wire Format (mixed-firmware-safe)</h2>
+<ul>
+<li><strong>New, ignorable payload type</strong> <code>PAYLOAD_TYPE_DV = 0x0C</code> (reserved; legacy nodes discard it
+  harmlessly → graceful). NO changes to existing types.</li>
+<li><strong>DV update</strong> (compact, one packet): <code>{ seqno(u16), n, [ dest(region-id | repeater-hash), metric(ETX, u16), fd(feasible distance, u16) ] × n ]</code>. Intra-region lists repeaters; inter-region (border) lists aggregated regions.</li>
+<li><strong>Zero-hop transmission:</strong> as a local route type processed only by direct neighbors and <strong>not</strong>
+  re-flooded (like adverts). This is the key against control-airtime explosion — no network-wide
+  LSA flooding (the OSPF trap).</li>
+</ul>
+<h2 id="3-protocol-rules">3. Protocol Rules</h2>
+<ul>
+<li><strong>Period ≥ 300 s</strong> (sim: below this, control traffic consumes the benefit; default 600 s, CLI-tunable).</li>
+<li><strong>Babel feasibility + seqno (H2):</strong> a neighbor becomes next-hop only if its announced cost is
+  <strong>strictly less than</strong> the most recently achieved feasible distance → loop-freedom <em>during</em>
+  convergence, without a global topology view. Per-destination sequence number.</li>
+<li><strong>Feasible-successor backup (H3):</strong> per destination, one primary + one pre-validated loop-free
+  backup next-hop. Primary failure → immediately use backup, no re-flood.</li>
+<li><strong>Metric:</strong> ETX from EWMA-SNR + advert reception rate (reliability-dominant, v2-H4), with hysteresis
+  (switch only at ≥ ~15% improvement) to prevent flapping.</li>
+<li><strong>Data routing:</strong> destination known via backbone → unicast along DV path (saves flood airtime).
+  Otherwise → discovery short-circuit, otherwise → full flood (today's behavior, always as fallback).</li>
+<li><strong>Stability gating (H4):</strong> flapping nodes (advert_count profile) may be endpoints but not preferred
+  transit nodes.</li>
+</ul>
+<h3 id="3a-churn-hardening-mandatory-proven-necessary-by-gate-3">3a. Churn Hardening (MANDATORY — proven necessary by Gate 3)</h3>
+<p>The purely periodic DV (points above only) failed the time-resolved churn gate: after churn stopped,
+<strong>persistent inter-region aggregate loops</strong> remained (two border routers mutually pointed at a still-live
+aggregate of a third destination region; the per-origin Babel FD rejected neither of them). The
+following three mechanisms are therefore <strong>part of the specification and not optional</strong> — they bring
+Gate 3 from FAIL (OLD) to PASS (see <code>study/Phase2_Convergence_Validation.md</code>):</p>
+<ol>
+<li><strong>Trigger-on-change (rate-limited).</strong> On metric/next-hop change, immediately send a DV update
+   instead of waiting for the periodic interval → faster re-convergence and immediate propagation of
+   retractions. <strong>Rate limit mandatory</strong> (<code>discover_limiter</code> style): per-node minimum interval between
+   triggered updates (sim: ≥ 2 ticks/60 s) <strong>and</strong> network-wide ceiling on triggered senders per time
+   window → no update storm / no airtime explosion. Excess triggers remain "dirty" and fire in the
+   next available slot.</li>
+<li><strong>Hold-down + route poisoning on node/link failure.</strong> A lost route with no live feasible-successor
+   backup is <strong>explicitly withdrawn with an incremented seqno to ∞ (poison)</strong> — so the retraction
+   overwrites stale aggregates at the receiver instead of being outvoted by them. Followed by a short
+   <strong>hold-down period</strong> (sim: ~2 announcement periods) for this destination, during which <strong>no worse
+   alternative</strong> is accepted → prevents premature adoption of a loop route and thus eliminates
+   residual loops. (Aggregate retraction runs trigger-on-change, see point 1.)</li>
+<li><strong>Origin-independent aggregate feasibility (Babel invariant for H1).</strong> The feasible distance for
+   a region aggregate <code>("R", dreg)</code> is tracked <strong>per destination region, not per ABR origin</strong>: an
+   aggregate may become next-hop only if its cost is <strong>strictly less than</strong> the most recently achieved
+   FD for <em>that</em> destination region — regardless of which border router/ABR it comes from. This
+   restores the "one seqno owner per destination" character of the Babel condition for the aggregated
+   hierarchy and is the core loop-breaker; hold-down/poisoning clean up the stale generation alongside it.</li>
+</ol>
+<p>Hysteresis (≥ 15%, point above) remains additionally active. Additional memory cost: one FD value
+per destination region + one hold-down timer per affected destination (negligible compared to the DV
+table).</p>
+<h2 id="4-mixed-firmware-never-worse">4. Mixed Firmware &amp; "Never Worse"</h2>
+<ul>
+<li>DV packets ignorable → stock nodes unaffected. Backbone routes are ONLY used when present and
+  better; otherwise exactly today's flood-and-cache. With x% backbone-capable repeaters: sim showed
+  graceful + net-positive from the first node (with H1). Default-OFF until bench approval.</li>
+</ul>
+<h2 id="5-memory-fixed-no-dynamic-allocation">5. Memory (fixed, no dynamic allocation)</h2>
+<p>DV table per region + neighbor costs + feasible successors. v2 estimate ~1–3 KB → fits on
+nRF52840 (256 KB) and ESP32-S3 (512 KB). Tables fixed-size, eviction least-stable.</p>
+<h2 id="6-validation-gate-must-pass-before-firmware-code">6. VALIDATION GATE (must pass BEFORE firmware code)</h2>
+<p>The backbone sim provided the airtime economics but NOT correctness over time. Before code:
+1. <strong>Time-resolved convergence:</strong> does the DV converge on the real topology? <strong>Zero transient
+   loops</strong> thanks to feasibility? Measure convergence time.
+2. <strong>Churn/flapping:</strong> under node churn (advert_count profile) — do routes remain stable and
+   fully re-converge after churn stops (residual loops=0, residual switches=0)? Requires the
+   churn hardening from Section 3a (trigger-on-change + hold-down/poisoning + origin-independent
+   aggregate FD); without it, persistent H1 aggregate loops remain (FAIL). Quantify switch rate.
+3. <strong>Mixed-firmware sweep:</strong> x% backbone-capable, remainder stock — graceful? net-positive at
+   what threshold? never worse?
+4. <strong>Control budget under real advert intervals/duty cycle:</strong> does DV overhead fit alongside
+   existing traffic within the 10%-sub-band budget?
+Only when 1–4 pass → multi-part firmware implementation (payload type handler, DV table, periodic
+zero-hop exchange, route lookup integrated with <code>sendDirect</code>/flood fallback), <strong>default-OFF</strong>, bench test.</p>
+<h2 id="7-why-design-first-honestly">7. Why Design-First (honestly)</h2>
+<p>A proactive DV protocol with loop-freedom + convergence is correctness-critical: one bug creates
+<strong>routing loops/instability in a live mesh</strong>. Coding this blindly before time-resolved convergence
+is validated contradicts the project priority (quality/stability). Therefore: this design + the
+validation gate are the responsible "next step" for Phase 2; the code follows after validation passes.</p>
 
 
 

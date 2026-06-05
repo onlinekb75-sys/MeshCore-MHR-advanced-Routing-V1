@@ -773,7 +773,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+    MeshCore Routing Analyse und Optimierung
   
 
     
@@ -829,7 +829,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    MeshCore Simulation ECHTE Daten
   
 
     
@@ -1119,6 +1119,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1189,7 +1200,7 @@
   <span class="md-ellipsis">
     
   
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
+    PROVENANCE
   
 
     
@@ -1504,7 +1515,7 @@
   <span class="md-ellipsis">
     
   
-    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+    Phase2 Convergence Validation
   
 
     
@@ -1616,7 +1627,7 @@
   <span class="md-ellipsis">
     
   
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+    Suppression Design
   
 
     
@@ -1770,6 +1781,17 @@
     <span class="md-ellipsis">
       
         Limitierungen (wissenschaftlich ehrlich)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
       
     </span>
   </a>
@@ -2190,6 +2212,396 @@ aggressiveren Suppressions-Stufen brauchen mehr Vorsicht als die Studie nahelegt
    fast keine Detours zeigt, während reale Pakete (A4 in v3) Median 2,1× Detour hatten.</li>
 <li><strong>SNR-Reliability-Kurve ist eine Modellwahl</strong> (logistisch, Breite 4 dB um −12 dB-Schwelle):
    echtes avg_snr geht ein, aber die Abbildung SNR→p ist kalibriert, nicht gemessen.</li>
+</ol>
+<hr />
+<h2 id="english-translation">🇬🇧 English Translation</h2>
+<h1 id="meshcore-simulation-v4-on-the-real-server-measured-link-topology">MeshCore Simulation v4 — on the REAL, Server-Measured Link Topology</h1>
+<p><strong>Data source:</strong> Server-resolved <code>neighbor_graph.json</code> (CoreScope pipeline, snapshot 2026-05-30).
+<strong>Dataset:</strong> 1034 nodes, 1956 edges with <strong>real per-link <code>avg_snr</code></strong> (median ~4.2 dB),
+<code>weight</code> = observation count, <code>ambiguous</code> flag (173 edges = 8.8%). Enrichment (geo/role/
+traffic) via pubkey-(prefix-)join with <code>nodes.json</code> (1962 nodes).
+<strong>Reproducible:</strong> master seed 42, 6 seeds for all random components, 150 source-destination pairs/seed.
+<strong>Script:</strong> <code>mhr_sim_real_v4.py</code> · <strong>Results:</strong> <code>sim_results_v4.json</code> · <strong>Plots:</strong> <code>fig_v4_*.png</code>.</p>
+<blockquote>
+<p><strong>Why v4 instead of v3?</strong> v3 and the study built the routing graph from a
+GEOMETRIC log-distance link model (range discs, top-20 neighbors per node).
+That model matched only ~41.7% of the actually observed edges, and its SNR-distance
+assumption is refuted by real data (|corr(log d, SNR)| ≈ 0.42, PLE ≈ 0.4 instead of 2.55). v4
+instead uses the <strong>real measured edges</strong> as the routing graph and the <strong>real per-link SNR</strong>
+for reliability/ETX — the most accurate available basis.</p>
+</blockquote>
+<hr />
+<h2 id="1-real-topology">1) Real Topology</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>v4 (real edges)</th>
+<th>v3-Sim (geometric)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nodes (core, without <code>ambiguous</code>)</td>
+<td><strong>1034</strong></td>
+<td>881 active subgraph</td>
+</tr>
+<tr>
+<td>Edges</td>
+<td><strong>1783</strong> (173 ambiguous discarded)</td>
+<td>9,861 (top-20 range)</td>
+</tr>
+<tr>
+<td><strong>Avg. degree</strong></td>
+<td><strong>3.45</strong> (median 2, max 92)</td>
+<td><strong>~23.7</strong></td>
+</tr>
+<tr>
+<td>Components</td>
+<td>202</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Largest connected component</td>
+<td><strong>632</strong> (61%)</td>
+<td>831</td>
+</tr>
+<tr>
+<td>Nodes with geo (joinable)</td>
+<td>930/1034</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Roles</td>
+<td>821 repeater, 146 companion, 56 room, 11 observer</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key difference:</strong> v4 is a <strong>SPARSE real topology</strong> (avg. degree 3.45) with many leaf nodes
+(405 nodes degree 1, 168 degree 2) and few hubs (max. degree 92). v3 was a <strong>dense geometric
+graph</strong> (avg. degree ~24). This sparsity is the decisive driver of all v4 deviations: the real
+network has <strong>far less path redundancy</strong> than the geometric model suggested.</p>
+<p><strong>Link reliability/ETX from real SNR (not distance):</strong> Per edge
+<code>p = clip(σ((avg_snr − (−12 dB)) / 4), 0.02, 0.995)</code> (logistic around the reception threshold),
+<code>ETX = 1/p²</code>. Median link SNR 4.2 dB → median reliability <strong>0.98</strong>; P10 SNR −6.6 dB → weak
+links remain detectable. <code>weight</code> (observation count, median 40) is retained as a stability
+measure in the edge attribute.</p>
+<hr />
+<h2 id="2-does-the-study-hold-on-real-edges-finding-by-finding">2) Does the Study Hold on Real Edges? (Finding by Finding)</h2>
+<h3 id="2a-baseline-first-wins-flood-vs-mhr-confirmed">2a) Baseline (first-wins flood) vs. MHR — <strong>CONFIRMED</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Baseline (flood)</th>
+<th>MHR (ETX/hop-guided)</th>
+<th>Delta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Delivery rate</td>
+<td>0.931</td>
+<td>— (path exists)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Avg. hops</td>
+<td>5.05</td>
+<td><strong>4.84</strong></td>
+<td>−4%</td>
+</tr>
+<tr>
+<td>Detour (baseline/MHR), median · mean</td>
+<td>—</td>
+<td>—</td>
+<td><strong>1.00× · 1.06×</strong></td>
+</tr>
+<tr>
+<td>Pairs where baseline is longer</td>
+<td>—</td>
+<td>—</td>
+<td><strong>26%</strong></td>
+</tr>
+<tr>
+<td>Avg. transmission events (airtime)</td>
+<td><strong>616.8</strong></td>
+<td><strong>4.84</strong> (unicast)</td>
+<td><strong>−99.2%</strong></td>
+</tr>
+<tr>
+<td>Avg. path reliability</td>
+<td>0.707</td>
+<td><strong>0.806</strong></td>
+<td><strong>+14%</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Confirmation:</strong> The <strong>airtime advantage</strong> of metric-guided MHR remains enormous on real edges
+(−99.2%). On the <strong>sparse</strong> real topology, the baseline flood propagates network-wide through
+almost the entire 632-node component (~617 transmission events per discovery), while MHR uses
+only the ~5 hops of the selected path. Reliability increases (+14%, real SNR), hops decrease slightly.</p>
+<p><strong>Deviation (honest):</strong> The <strong>detour advantage</strong> shrinks to practically zero
+(median 1.00×, mean 1.06×). Reason: in a <strong>sparse</strong> topology there are almost no alternative
+paths — the first-wins flood almost always finds the same (short) path as MHR, simply because
+there are no long detour alternatives. This <strong>puts into perspective</strong> the v3 sim detour argument
+(median 1.17× there) and the measured A4 detour (median 2.1× from real packets) — the latter
+arose from real timing/collision/mixed-firmware effects that this idealized flood model does
+<strong>not</strong> capture. <strong>The robust MHR gain on real edges is airtime and reliability, not hop detour.</strong></p>
+<h3 id="2b-floodmax-sweep-floodmax-15-confirmed-with-nuance">2b) flood.max Sweep — <strong>flood.max = 15 CONFIRMED (with nuance)</strong></h3>
+<p>Real network diameter (hop sample of the giant component): <strong>P90 = 12 hops, max = 14</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>flood.max</th>
+<th>Delivery rate</th>
+<th>Delta vs. baseline</th>
+<th>Airtime vs. baseline</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td>0.951</td>
+<td><strong>+0.020</strong></td>
+<td>−1.4%</td>
+</tr>
+<tr>
+<td>12</td>
+<td>0.943</td>
+<td>+0.012</td>
+<td>−0.2%</td>
+</tr>
+<tr>
+<td><strong>15</strong></td>
+<td><strong>0.939</strong></td>
+<td><strong>+0.008</strong></td>
+<td>±0.0%</td>
+</tr>
+<tr>
+<td>18</td>
+<td>0.931</td>
+<td>±0.000</td>
+<td>±0.0%</td>
+</tr>
+<tr>
+<td>20</td>
+<td>0.931</td>
+<td>±0.000</td>
+<td>±0.0%</td>
+</tr>
+<tr>
+<td>64</td>
+<td>0.931</td>
+<td>±0.000</td>
+<td>±0.0%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Finding:</strong> On the real topology, <code>flood.max</code> changes <strong>nothing</strong> in delivery rate or
+airtime from 15 onward — because the real diameter (P90 = 12) is clearly below it; higher limits
+are pure reserve. Values <strong>≤ 12</strong> actually truncate some of the few long (15–18-hop) paths and
+slightly increase the measured delivery rate (+0.01…0.02) with barely changed airtime — but this
+is an effect of the <strong>idealized</strong> topology (no collisions) and not a safety gain.</p>
+<p><strong>Implication:</strong> <strong><code>flood.max = 15</code> remains a safe, sensible choice on the real topology</strong>
+(delivery rate ≥ baseline, airtime ≤ baseline, reserve above the P90 diameter of 12). There is
+<strong>no</strong> evidence to deviate from 15; 12 would be right at the real P90 diameter (too little
+reserve), 64 is unnecessarily high. <strong><code>MHR_HOP_HORIZON = 12</code></strong> is consistent as a value with
+the real P90 diameter, but too tight as a <em>hard</em> flood limit — 15 leaves the necessary reserve.</p>
+<h3 id="2c-adoption-sweep-safety-invariant-tripartition-confirmed-but-suppression-safety-zone-shrinks-drastically">2c) Adoption Sweep + Safety Invariant — <strong>Tripartition CONFIRMED, but Suppression Safety Zone SHRINKS DRASTICALLY</strong></h3>
+<p>Safety invariant: delivery rate ≥ baseline − noise band AND airtime ≤ baseline + noise band.</p>
+<p><strong>Group 1 — "good citizens" (safe at ANY alpha, monotone): CONFIRMED</strong>
+- <strong>M1 (hop-weighted delay):</strong> deliv +0.02 across all alpha, airtime ≈ baseline. Safe from 1 node → all.
+- <strong>M5 (best-of-N at destination by hops):</strong> exactly neutral (deliv/airtime = baseline), safe everywhere.
+- <strong>M7_15 (flood.max = 15):</strong> deliv +0.008, airtime neutral, safe everywhere.</p>
+<p><strong>Group 2 — "adaptive suppression" (NO LONGER safe up to alpha=1): DEVIATION</strong></p>
+<table>
+<thead>
+<tr>
+<th>Mechanism</th>
+<th>safe up to alpha ≈</th>
+<th>at alpha = 1.0: delivery rate</th>
+<th>Airtime</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M3 (shorter-path-cancel)</td>
+<td><strong>0.10</strong></td>
+<td>0.762 (<strong>−0.17</strong>)</td>
+<td>−37.8%</td>
+</tr>
+<tr>
+<td>COMBI (M1+M3+M5+M7)</td>
+<td><strong>0.05</strong></td>
+<td>0.759 (<strong>−0.17</strong>)</td>
+<td>−39.3%</td>
+</tr>
+<tr>
+<td>M4 (MPR/CDS silence)</td>
+<td><strong>0.05</strong> (≤1%)</td>
+<td>0.536 (<strong>−0.40</strong>)</td>
+<td>−87.2%</td>
+</tr>
+<tr>
+<td>M2k2 / M2k3 (counter-suppress)</td>
+<td>breaks early</td>
+<td>0.63 / 0.76</td>
+<td>−53% / −34%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>This is the most important v4 deviation from the study.</strong> In v3/study, the suppression
+mechanisms were considered safe up to high alpha because the <strong>dense geometric graph
+(avg. degree ~24)</strong> offered massive path redundancy — suppressed senders were replaced by
+neighbors. On the <strong>sparse real topology (avg. degree 3.45)</strong> this redundancy does <strong>not</strong> exist:
+every suppressed rebroadcast may have been the <strong>only</strong> path to a leaf node, so delivery rate
+breaks down even at moderate adoption. <strong>M4 (MPR/CDS) breaks earliest (from alpha ≈ 0.05)</strong> —
+this confirms the study warning "MPR collapses into coverage loss at full adoption", <strong>but on
+real edges this happens much earlier and more severely</strong>.</p>
+<p><strong>Foundation group (M0/baseline + neutral mechanisms):</strong> unchanged, safe.</p>
+<blockquote>
+<p><strong>Consequence:</strong> Pure <strong>airtime suppression (tier B/C) is NOT safe for mixed-firmware operation
+beyond alpha ≈ 5–10%</strong> on the real sparse topology without a hard redundancy guarantee. The
+v3/study optimism for M3/M4/COMBI at high adoption does NOT hold on real edges.</p>
+</blockquote>
+<h3 id="2d-snr-question-revisited-puts-v3-in-perspective-snr-is-a-somewhat-stronger-lever-on-real-edges-than-thought-but-not-a-hop-substitute">2d) SNR Question Revisited — <strong>PUTS v3 IN PERSPECTIVE (SNR is a somewhat stronger lever on real edges than thought, but not a hop substitute)</strong></h3>
+<p>Real per-link SNR is now available (no distance proxy):</p>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>v4 finding</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Corr(mean path SNR, hop count)</td>
+<td><strong>+0.17</strong> (weak)</td>
+</tr>
+<tr>
+<td>ETX path vs. pure hop path: avg. extra hops</td>
+<td><strong>+0.19</strong></td>
+</tr>
+<tr>
+<td>ETX path vs. hop path: avg. reliability gain</td>
+<td><strong>+0.168</strong> (median +0.041)</td>
+</tr>
+<tr>
+<td>Share of pairs where ETX path ≠ hop path</td>
+<td><strong>18%</strong></td>
+</tr>
+<tr>
+<td>Corr(single-link SNR, node degree)</td>
+<td><strong>−0.52</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Confirmation of v3 (direction):</strong> SNR correlates only <strong>weakly</strong> with path shortness (+0.17) — a
+short path is not automatically SNR-strong. Hop count remains the dominant shortness lever.</p>
+<p><strong>Qualification (honest):</strong> Unlike v3 suggested, SNR is <strong>not worthless</strong>: an
+SNR-/ETX-guided path yields in 18% of pairs a <strong>different</strong> (and on average <strong>+0.168 more
+reliable</strong>) path than the pure hop-shortest — for only <strong>+0.19 extra hops</strong>. Real
+per-link SNR is therefore a <strong>usable reliability tiebreaker</strong>, not a replacement for the
+hop metric. The strong <strong>negative</strong> relationship link-SNR ↔ node degree (−0.52) is revealing:
+<strong>hub nodes have on average WEAKER individual links</strong> (many distant/marginal neighbors),
+while nodes with few, nearby neighbors have strong links. This is precisely why an
+ETX metric (SNR-weighted) does not blindly favor hubs — a real advantage over pure hop count.</p>
+<hr />
+<h2 id="3-firmware-implications">3) Firmware Implications</h2>
+<p><strong>Does v4 confirm the shipped tier A?</strong> — <strong>YES, fully, with additional sharpening:</strong></p>
+<ol>
+<li><strong><code>flood.max = 15</code></strong> — <strong>confirmed.</strong> Real diameter P90 = 12 → 15 is the correct choice
+   (reserve above the diameter, delivery rate ≥ baseline, airtime neutral). Do <strong>not</strong> lower
+   to 12 (too close to P90), do <strong>not</strong> leave at 64 (unnecessary). 15 stays.</li>
+<li><strong>Hop-weighted rebroadcast delay (<code>tx_hop_weight = 0.6</code>)</strong> — <strong>confirmed.</strong> M1 is safe and
+   monotone across the entire adoption sweep (deliv +0.02, airtime neutral), reliably steers
+   the flood via shorter paths. <code>tx_hop_weight = 0.6</code> is a good value; no change needed.</li>
+<li><strong>EWMA neighbor SNR + SNR/ETX tiebreak</strong> — <strong>strengthened.</strong> v4 shows: real per-link SNR is
+   a <strong>usable reliability tiebreaker</strong> (18% different paths, +0.168 reliability for +0.19 hops),
+   and hub links are genuinely weaker (corr −0.52). An ETX metric that uses SNR <strong>as a tiebreaker
+   after hops</strong> (not primarily) is data-evidently sensible. <strong><code>MHR_HOP_HORIZON</code></strong> should remain
+   at <strong>12</strong> (= real P90 diameter) as the path-length horizon; the <em>flood limit</em> <code>flood.max</code>
+   at <strong>15</strong>.</li>
+</ol>
+<p><strong>What v4 newly cautions (vs. study/roadmap):</strong></p>
+<ol>
+<li><strong>Do NOT deploy airtime suppression (tier B/C: M2/M3/M4/COMBI) without a hard redundancy guarantee.</strong>
+   On the real sparse topology (avg. degree 3.45), any pure suppression breaks the delivery rate
+   already from <strong>alpha ≈ 5–10%</strong> (M4 from alpha ≈ 5%, −0.40 at full adoption). The high-adoption
+   safety of these mechanisms attested in v3/study <strong>does not hold on real edges</strong>. Recommendation:</li>
+<li>Tier B/C only with <strong>locally confirmed redundancy</strong> (k ≥ 2 independent cover senders <em>heard</em>
+     before suppressing) and <strong>reliability floor</strong> (never cut the only path to a leaf node).</li>
+<li>Before hardware rollout, mandatory verification on this real topology, not on the geometric model.</li>
+</ol>
+<p><strong>Net:</strong> Tier A (hop-delay, flood.max 15, tx_hop_weight 0.6, EWMA-SNR) is <strong>fully confirmed and safe</strong>
+on real edges. The actual gain is <strong>airtime</strong> (−99% for MHR unicast, flood activates ~617 repeaters
+in reality) and <strong>reliability</strong> (+14%), not hop detour. The more aggressive suppression tiers require
+more caution than the study implied.</p>
+<hr />
+<h2 id="generated-artifacts">Generated Artifacts</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mhr_sim_real_v4.py</code></td>
+<td>Complete v4 pipeline (seed 42, 6 seeds, commented)</td>
+</tr>
+<tr>
+<td><code>sim_results_v4.json</code></td>
+<td>All metrics (topology, baseline-vs-MHR, flood.max sweep, adoption sweep, SNR)</td>
+</tr>
+<tr>
+<td><code>fig_v4_topology.png</code></td>
+<td>Real neighbor-graph topology, edges colored by real avg_snr</td>
+</tr>
+<tr>
+<td><code>fig_v4_baseline_vs_mhr.png</code></td>
+<td>Baseline vs. MHR (hops, airtime, reliability)</td>
+</tr>
+<tr>
+<td><code>fig_v4_floodmax_sweep.png</code></td>
+<td>flood.max sweep (delivery rate + airtime vs. baseline)</td>
+</tr>
+<tr>
+<td><code>fig_v4_adoption_safety.png</code></td>
+<td>Safety matrix (mechanism × alpha), top traffic</td>
+</tr>
+<tr>
+<td><code>fig_v4_snr_vs_reliability.png</code></td>
+<td>SNR vs. path shortness + ETX path reliability advantage</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="limitations-scientifically-honest">Limitations (Scientifically Honest)</h2>
+<ol>
+<li><strong>The neighbor graph captures only ACTUALLY USED links.</strong> Edges arise from observed
+   relay paths — <strong>potential</strong> (but unused within the observation window) links are missing. The real
+   topology is therefore likely slightly denser than shown here; the sparsity (and the inferred
+   low redundancy) is an <strong>upper bound of caution</strong>, but could make suppression look marginally
+   better in reality than v4 shows. The directional finding (suppression breaks early) remains robust.</li>
+<li><strong>Snapshot:</strong> a single export (2026-05-30). Time-of-day/churn effects are not averaged.</li>
+<li><strong>Observer bias:</strong> the graph relies on observer locations (centered on the Rhineland);
+   regions with few observers are underrepresented (smaller components, possibly artificially
+   disconnected).</li>
+<li><strong><code>ambiguous</code> edges discarded</strong> (173 = 8.8%): the core analysis is conservative; these edges
+   would slightly increase connectivity (giant component somewhat larger). Counted separately.</li>
+<li><strong>Pubkey join incomplete:</strong> 137 truncated endpoint keys without a unique match in <code>nodes.json</code>
+   → these nodes without geo/stats (topology plot shows only 930/1034 nodes geographically). The
+   routing analysis still runs on all core nodes (identity = pubkey).</li>
+<li><strong>Flood model without duty cycle/CSMA collisions:</strong> counts transmission events, does not model
+   channel collisions or 10%-duty-cycle throttling. The real airtime pressure is therefore likely
+   even more underestimated — in favor of MHR. Conversely, this explains why the <strong>idealized</strong> flood
+   here shows almost no detours, while real packets (A4 in v3) had a median 2.1× detour.</li>
+<li><strong>SNR reliability curve is a model choice</strong> (logistic, width 4 dB around −12 dB threshold):
+   real avg_snr is used as input, but the SNR→p mapping is calibrated, not measured.</li>
 </ol>
 
 

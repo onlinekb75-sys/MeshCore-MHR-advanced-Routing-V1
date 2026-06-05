@@ -773,7 +773,7 @@
   <span class="md-ellipsis">
     
   
-    MeshCore – Analyse der Pfadfindung und Vorschläge gegen Umwege
+    MeshCore Routing Analyse und Optimierung
   
 
     
@@ -829,7 +829,7 @@
   <span class="md-ellipsis">
     
   
-    Simulation mit ECHTEN CoreScope-Daten – 25 Knoten Rheinland
+    MeshCore Simulation ECHTE Daten
   
 
     
@@ -1035,7 +1035,7 @@
   <span class="md-ellipsis">
     
   
-    Datensatz-Herkunft (Provenance) &amp; Nutzung
+    PROVENANCE
   
 
     
@@ -1374,6 +1374,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1565,7 +1576,7 @@
   <span class="md-ellipsis">
     
   
-    Phase 2 — Zeitaufgeloeste Konvergenz-Validierung (Korrektheits-GATE)
+    Phase2 Convergence Validation
   
 
     
@@ -1677,7 +1688,7 @@
   <span class="md-ellipsis">
     
   
-    Design: Redundanz-gesicherte Flood-Suppression (Stufe B, sicher)
+    Suppression Design
   
 
     
@@ -1892,6 +1903,17 @@
     <span class="md-ellipsis">
       
         9. Einordnung gegenüber der unsichtbaren Schicht
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#english-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🇬🇧 English Translation
       
     </span>
   </a>
@@ -2341,6 +2363,424 @@ aber <strong>nicht gratis</strong>: er ist NETTO nur in einem definierten Fenste
 ein Gewinn. <strong>Empfehlung:</strong> Backbone als optionale Phase-2-Kür <strong>mit Pflicht-H1</strong>, defaultmäßig konservative
 DV-Periode (≥ 300 s), und nur dort aktivieren, wo das Daten-Aufkommen die fixe Kontroll-Investition trägt —
 die unsichtbare Schicht bleibt das risikolose Fundament darunter.</p>
+<hr />
+<h2 id="english-translation">🇬🇧 English Translation</h2>
+<h1 id="backbone-phase-2-proactive-regionalbackbone-control-plane-benefit-vs-cost-vs-net-airtime">Backbone Phase 2 — Proactive Regional/Backbone Control Plane: Benefit vs. Cost vs. NET Airtime</h1>
+<p><em>Mechanism A of Phase 2. Honest, separately measured airtime accounting on the REAL topology.
+Script: <code>backbone_sim.py</code> · Data: <code>backbone_results.json</code> · Plots: <code>fig_bb_*.png</code>.
+Reproducible (Seed 42, 6 seeds, 120 pairs/seed).</em></p>
+<blockquote>
+<p><strong>The core question:</strong> Does a proactive backbone (stable repeaters periodically exchange
+Distance-Vector updates, so that DATA runs as <strong>unicast</strong> instead of network-wide <strong>flood</strong>)
+save <strong>NET</strong> airtime — <strong>after subtracting</strong> the control updates it costs itself? And if so:
+in which window of backbone size, DV period, and adoption?</p>
+</blockquote>
+<hr />
+<h2 id="1-methodology-honest-measured-separately">1. Methodology (honest, measured separately)</h2>
+<p><strong>Topology:</strong> real <code>neighbor_graph.json</code> (1956 edges, ambiguous ones discarded) → giant component
+<strong>632 nodes / 1577 edges</strong>, avg. degree 4.99. Per-link reliability from real <code>avg_snr</code> (logistic
+around the reception threshold), ETX = 1/p². Identical to <code>mhr_sim_real_v4.py</code>.</p>
+<p><strong>Two airtime units</strong> — the decisive methodological step:
+1. <strong>TX events</strong> (transmitting nodes) — comparable with prior work (v4/study).
+2. <strong>Physical time-on-air (ms)</strong> per LoRa ToA (Semtech formula, SF11/BW250k "long-fast").
+   Required because DATA packets (≈40 B → <strong>494 ms</strong> ToA) and small DV control packets are
+   <strong>differently sized</strong>. <strong>Only in ms can data savings and control costs be honestly compared</strong> —
+   TX counting alone would systematically underestimate or overestimate control costs.</p>
+<p><strong>Backbone model:</strong>
+- Selection of stable repeaters by <code>relay_count_24h</code> (active transit), tie-break by degree (hub/border).
+  Companions are by definition <strong>not</strong> backbone-capable (do not forward). 563 candidates.
+- DATA: endpoints "attach" via local ≤2-hop flood to the nearest active backbone node
+  (ingress/egress); between them <strong>ETX-shortest, proactively known unicast path</strong> (0 discovery airtime).
+  Pairs not reachable via backbone → <strong>fallback to current flood-and-cache</strong>.
+- <strong>Control costs (DV):</strong> each active backbone node sends <strong>one zero-hop broadcast</strong> per period
+  (no flood, 1 TX). Packet size = header + #entries × 4 B. ToA per update via LoRa formula.</p>
+<p><strong>NET</strong> (over 24 h, key figure):</p>
+<pre><code>NET = (Baseline-Data-ToA − Backbone-Data-ToA) × #Discovery-Floods  −  Control-ToA
+      └────────────────── BENEFIT (saved) ──────────────────┘        └── COST ──┘
+</code></pre>
+<p><strong>Baseline (pure flood-and-cache):</strong> delivery rate <strong>0.929</strong>, <strong>617 TX events/delivery</strong>
+(= <strong>304 s</strong> ToA at 494 ms/hop), avg. 5.0 hops.</p>
+<p><strong>Two DV scaling models</strong> (both shown — honest in both directions):
+- <strong>FLAT DV</strong> (default of all sweeps): each node carries <strong>all</strong> destinations of its backbone component
+  → O(N). Pessimistic but fair assumption for a naive backbone.
+- <strong>REGION HIERARCHY (H1)</strong>: intra-region capped at ~20 destinations + aggregated inter-region entries
+  → O(region size). The design-intended variant.</p>
+<hr />
+<h2 id="2-data-vs-control-vs-net-airtime-numbers">2. Data vs. Control vs. NET Airtime (Numbers)</h2>
+<h3 id="2a-over-backbone-size-flat-dv-dv-300-s-adoption-100-2000-floods24-h">2a. Over Backbone Size (FLAT DV, DV 300 s, adoption 100 %, 2000 floods/24 h)</h3>
+<table>
+<thead>
+<tr>
+<th>Backbone</th>
+<th>Nodes</th>
+<th>% via BB</th>
+<th>Data savings</th>
+<th>Control costs</th>
+<th><strong>NET</strong></th>
+<th>Delivery</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5 %</td>
+<td>28</td>
+<td>4 %</td>
+<td>+29,194 s</td>
+<td>−2,447 s</td>
+<td><strong>+26,748 s</strong></td>
+<td>0.950</td>
+</tr>
+<tr>
+<td>10 %</td>
+<td>56</td>
+<td>24 %</td>
+<td>+151,067 s</td>
+<td>−9,871 s</td>
+<td><strong>+141,196 s</strong></td>
+<td>0.967</td>
+</tr>
+<tr>
+<td>20 %</td>
+<td>113</td>
+<td>53 %</td>
+<td>+333,689 s</td>
+<td>−59,872 s</td>
+<td><strong>+273,817 s</strong> ✅ best</td>
+<td>0.958</td>
+</tr>
+<tr>
+<td>35 %</td>
+<td>197</td>
+<td>60 %</td>
+<td>+381,189 s</td>
+<td>−230,755 s</td>
+<td><strong>+150,434 s</strong></td>
+<td>0.954</td>
+</tr>
+<tr>
+<td>50 %</td>
+<td>282</td>
+<td>67 %</td>
+<td>+428,611 s</td>
+<td>−564,887 s</td>
+<td><strong>−136,277 s</strong> ❌</td>
+<td>0.949</td>
+</tr>
+<tr>
+<td>70 %</td>
+<td>394</td>
+<td>80 %</td>
+<td>+497,560 s</td>
+<td>−1,371,112 s</td>
+<td><strong>−873,552 s</strong> ❌</td>
+<td>0.976</td>
+</tr>
+<tr>
+<td>100 %</td>
+<td>563</td>
+<td>98 %</td>
+<td>+593,297 s</td>
+<td>−3,045,451 s</td>
+<td><strong>−2,452,154 s</strong> ❌</td>
+<td>0.999</td>
+</tr>
+</tbody>
+</table>
+<p>→ <strong>Data savings grow sublinearly (saturating), control costs grow superlinearly</strong>
+(more nodes × larger DV tables). With flat DV, NET tips negative <strong>above ~35–40 %</strong>.
+Plot: <code>fig_bb_net_airtime.png</code>.</p>
+<h3 id="2b-over-dv-period-backbone-35-flat">2b. Over DV Period (backbone 35 %, flat)</h3>
+<table>
+<thead>
+<tr>
+<th>DV period</th>
+<th>Control costs</th>
+<th><strong>NET</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>30 s</td>
+<td>−2,307,551 s</td>
+<td><strong>−1,926,362 s</strong> ❌</td>
+</tr>
+<tr>
+<td>60 s</td>
+<td>−1,153,775 s</td>
+<td><strong>−772,587 s</strong> ❌</td>
+</tr>
+<tr>
+<td>120 s</td>
+<td>−576,888 s</td>
+<td><strong>−195,699 s</strong> ❌</td>
+</tr>
+<tr>
+<td><strong>300 s</strong></td>
+<td>−230,755 s</td>
+<td><strong>+150,434 s</strong> ✅</td>
+</tr>
+<tr>
+<td>600 s</td>
+<td>−115,378 s</td>
+<td><strong>+265,811 s</strong> ✅</td>
+</tr>
+<tr>
+<td>1800 s</td>
+<td>−38,459 s</td>
+<td><strong>+342,730 s</strong> ✅</td>
+</tr>
+<tr>
+<td>3600 s</td>
+<td>−19,230 s</td>
+<td><strong>+361,959 s</strong> ✅</td>
+</tr>
+</tbody>
+</table>
+<p>→ <strong>Tipping point for flat 35 % backbone lies between 120 s and 300 s.</strong> Updating faster than every
+~5 min consumes the entire benefit via control traffic. Plot: <code>fig_bb_dv_period.png</code>.</p>
+<h3 id="2c-flat-dv-vs-region-hierarchy-h1-the-rescue-anchor-for-large-backbones">2c. Flat DV vs. Region Hierarchy (H1) — the rescue anchor for large backbones</h3>
+<table>
+<thead>
+<tr>
+<th>Backbone</th>
+<th>FLAT entries</th>
+<th>FLAT NET</th>
+<th>H1 entries</th>
+<th><strong>H1 NET</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>35 %</td>
+<td>114</td>
+<td>+150,434 s</td>
+<td>21</td>
+<td><strong>+331,150 s</strong></td>
+</tr>
+<tr>
+<td>50 %</td>
+<td>204</td>
+<td>−136,277 s ❌</td>
+<td>27</td>
+<td><strong>+345,527 s</strong> ✅</td>
+</tr>
+<tr>
+<td>70 %</td>
+<td>354</td>
+<td>−873,552 s ❌</td>
+<td>36</td>
+<td><strong>+345,672 s</strong> ✅</td>
+</tr>
+<tr>
+<td>100 %</td>
+<td>552</td>
+<td>−2,452,154 s ❌</td>
+<td>47</td>
+<td><strong>+329,255 s</strong> ✅</td>
+</tr>
+</tbody>
+</table>
+<p>→ <strong>Exactly the effect predicted by design (H1):</strong> without hierarchy, a flat backbone does not scale
+(DV tables O(N), packets fragment, control airtime explodes). <strong>With</strong> regional capping, NET remains
+clearly positive even at 100 % backbone and is nearly size-invariant (~+330,000 s/24 h).</p>
+<hr />
+<h2 id="3-go-no-go_1">3. GO / NO-GO</h2>
+<h3 id="go-but-conditional-not-a-blank-check">✅ <strong>GO — but conditional, not a blank check.</strong></h3>
+<p>The proactive backbone is worthwhile <strong>net</strong>, <strong>when all four conditions</strong> are met:</p>
+<ol>
+<li><strong>Region hierarchy (H1) is mandatory, not optional.</strong> A flat network-wide DV is net-positive only in
+   a narrow window (small backbone ≤ 35 % <strong>and</strong> DV period ≥ 300 s) and otherwise tips sharply negative.
+   With H1, NET is positive across <strong>all</strong> backbone sizes (~+330,000 s/24 h).</li>
+<li><strong>DV period ≥ 300 s</strong> (5 min). Below that, control traffic consumes the benefit (tipping point 120–300 s
+   at flat 35 % backbone).</li>
+<li><strong>Sufficient DATA traffic.</strong> The backbone is a <strong>fixed</strong> control investment; it does not amortize until
+   <strong>~2000 network-wide discovery floods/24 h</strong> (at 35 %/300 s flat — see §4). At low traffic
+   (≤ 1000/24 h), NET is negative: you are paying for a backbone that barely anyone uses.</li>
+<li><strong>Moderate backbone size.</strong> Without H1: 10–35 %. With H1: almost arbitrary, optimal around 35–50 %
+   (maximum coverage at still manageable table size).</li>
+</ol>
+<p><strong>Best window</strong> (measured):
+- <em>Without H1:</em> <strong>Backbone 20 %, DV ≥ 300 s</strong> → NET <strong>+273,817 s/24 h</strong> (= 4.6 h radio occupancy saved),
+  53 % of pairs via backbone, delivery rate 0.958 ≥ baseline 0.929.
+- <em>With H1:</em> <strong>Backbone 35–50 %, DV 300–600 s</strong> → NET <strong>+330,000–345,000 s/24 h</strong>, 60–67 % via backbone.</p>
+<h3 id="when-no-go">When <strong>NO-GO</strong>:</h3>
+<ul>
+<li>DV period &lt; 120 s (control traffic always dominates).</li>
+<li>Flat backbone &gt; 40 % (without H1 strongly negative).</li>
+<li>Low data volume (&lt; ~1000 floods/24 h) — fixed control costs do not amortize.</li>
+</ul>
+<hr />
+<h2 id="4-amortization-traffic-sensitivity-backbone-35-300-s-flat">4. Amortization (Traffic Sensitivity, Backbone 35 %/300 s flat)</h2>
+<table>
+<thead>
+<tr>
+<th>Floods/24 h</th>
+<th>Data savings</th>
+<th>Control (fixed)</th>
+<th><strong>NET</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100</td>
+<td>+19,059 s</td>
+<td>−230,755 s</td>
+<td><strong>−211,696 s</strong> ❌</td>
+</tr>
+<tr>
+<td>500</td>
+<td>+95,297 s</td>
+<td>−230,755 s</td>
+<td><strong>−135,458 s</strong> ❌</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>+190,594 s</td>
+<td>−230,755 s</td>
+<td><strong>−40,161 s</strong> ❌</td>
+</tr>
+<tr>
+<td><strong>2000</strong></td>
+<td>+381,189 s</td>
+<td>−230,755 s</td>
+<td><strong>+150,434 s</strong> ✅ break-even</td>
+</tr>
+<tr>
+<td>4000</td>
+<td>+762,377 s</td>
+<td>−230,755 s</td>
+<td><strong>+531,622 s</strong> ✅</td>
+</tr>
+<tr>
+<td>8000</td>
+<td>+1,524,755 s</td>
+<td>−230,755 s</td>
+<td><strong>+1,294,000 s</strong> ✅</td>
+</tr>
+</tbody>
+</table>
+<p>→ <strong>Break-even ≈ 2000 discovery floods/24 h.</strong> Control costs are fixed (traffic-independent),
+savings scale linearly with data volume. <strong>With H1, break-even drops drastically</strong>
+(control costs at 35 % only ~50,000 s instead of 230,755 s → break-even at ~260 floods/24 h).
+Plot: <code>fig_bb_traffic.png</code>.</p>
+<hr />
+<h2 id="5-delivery-path-optimality-convergence-mixed-firmware">5. Delivery, Path Optimality, Convergence, Mixed Firmware</h2>
+<ul>
+<li><strong>Delivery rate (safety):</strong> In all NET-positive scenarios <strong>≥ baseline (0.929)</strong> — range
+  0.947–0.999. The backbone does not worsen delivery (fallback flood guarantees that where no
+  backbone route exists). <strong>Safety invariant satisfied.</strong></li>
+<li><strong>Path optimality:</strong> Unicast over the ETX-shortest proactive path → deterministic, no random
+  detour. Detour vs. shortest path is tracked; the backbone chooses by metric, not "first-wins".</li>
+<li><strong>Convergence:</strong> not time-simulated in the analytical DV model; the design (H2: Babel-Feasibility</li>
+<li>Seqno) guarantees loop-freedom <em>during</em> convergence. Convergence costs are embedded in the
+  periodic updates (fully accounted here). A real time-/churn-resolved convergence simulation
+  is the next open validation (see Limitations).</li>
+<li><strong>Mixed firmware (adoption, backbone 35 %/300 s, flat):</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Adoption</th>
+<th>Active BB nodes</th>
+<th>% via BB</th>
+<th>Control</th>
+<th><strong>NET</strong></th>
+<th>Delivery</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10 %</td>
+<td>20</td>
+<td>11 %</td>
+<td>−1,703 s</td>
+<td><strong>+67,071 s</strong> ✅</td>
+<td>0.947</td>
+</tr>
+<tr>
+<td>25 %</td>
+<td>49</td>
+<td>14 %</td>
+<td>−5,589 s</td>
+<td><strong>+84,594 s</strong> ✅</td>
+<td>0.968</td>
+</tr>
+<tr>
+<td>50 %</td>
+<td>98</td>
+<td>32 %</td>
+<td>−26,951 s</td>
+<td><strong>+171,009 s</strong> ✅</td>
+<td>0.961</td>
+</tr>
+<tr>
+<td>75 %</td>
+<td>148</td>
+<td>54 %</td>
+<td>−109,053 s</td>
+<td><strong>+223,836 s</strong> ✅</td>
+<td>0.972</td>
+</tr>
+<tr>
+<td>100 %</td>
+<td>197</td>
+<td>60 %</td>
+<td>−230,755 s</td>
+<td><strong>+150,434 s</strong> ✅</td>
+<td>0.954</td>
+</tr>
+</tbody>
+</table>
+<p>→ <strong>Graceful &amp; monotonically positive from the first node.</strong> Already NET-positive at 10 % adoption;
+  non-adopters continue to flood (safe fallback), delivery rate stays ≥ baseline. The gain increases
+  with adoption until (with flat DV) growing control costs push it back down from ~100 % — with
+  H1 this decline would not occur. Plot: <code>fig_bb_adoption.png</code>.</p>
+<hr />
+<h2 id="6-bugs-errors-during-development">6. Bugs / Errors During Development</h2>
+<ul>
+<li><strong>Indentation syntax error</strong> (leading space before <code>in_bb = attach_repeater(...)</code>) — introduced on
+  first write, immediately fixed; script has run error-free in a single pass since then.</li>
+<li>No runtime errors. <code>BB_FAST=1</code> smoke test and full run (6 seeds) clean.</li>
+</ul>
+<hr />
+<h2 id="7-files">7. Files</h2>
+<ul>
+<li><code>docs/MHR/study/backbone_sim.py</code> — simulation (self-executed, error-free).</li>
+<li><code>docs/MHR/study/backbone_results.json</code> — all raw sweeps + key metrics summary.</li>
+<li><code>docs/MHR/study/fig_bb_net_airtime.png</code> — data/control/NET over backbone size (core plot).</li>
+<li><code>docs/MHR/study/fig_bb_adoption.png</code> — mixed firmware: NET &amp; coverage over adoption.</li>
+<li><code>docs/MHR/study/fig_bb_dv_period.png</code> — tipping point of DV period.</li>
+<li><code>docs/MHR/study/fig_bb_traffic.png</code> — amortization over data volume.</li>
+<li><code>docs/MHR/study/fig_bb_grid.png</code> — 2D NET window (size × period).</li>
+</ul>
+<hr />
+<h2 id="8-limitations-honest">8. Limitations (honest)</h2>
+<ol>
+<li><strong>Idealized flood without collisions.</strong> The flood model counts transmitting nodes but models
+   <strong>no</strong> CSMA collisions/capture. Real flooding is <em>more expensive</em> due to collisions → the data
+   savings here are rather <strong>conservative</strong> (lower bound of benefit).</li>
+<li><strong>DV costs as an analytical model.</strong> Period × ToA × #active nodes, with DV table size from
+   component/region size. No simulated retransmits/losses of DV packets (real control costs would
+   be <em>higher</em> → NET estimate here rather <strong>optimistic</strong> on the cost side). These two effects
+   (1 conservative, 2 optimistic) act in opposite directions.</li>
+<li><strong>neighbor-graph = only USED links.</strong> The real topology contains only observed edges; latent
+   links are missing. Backbone connectivity and attach hops could be more favorable in reality.</li>
+<li><strong>Traffic assumption (#floods/24 h) is the dominant free parameter.</strong> NET depends linearly on it;
+   the real network-wide discovery flood rate is not directly measurable from the data (only
+   relay_count as proxy). Therefore presented as an explicit sweep, not asserted as a fixed number.</li>
+<li><strong>Convergence time / churn flutter not time-resolved.</strong> Loop-freedom &amp; stability are design
+   arguments (H2/H3), not dynamically simulated here. Next open validation.</li>
+<li><strong>Region assignment approximated</strong> (region_cap as a cap, not from real <code>region_map</code> boundaries) —
+   the H1 numbers represent the order of magnitude of scaling, not an exact deployment prediction.</li>
+</ol>
+<hr />
+<h2 id="9-classification-vs-the-invisible-layer">9. Classification vs. the Invisible Layer</h2>
+<p>The invisible, node-local layer (<code>Invisible_Optimizing_Layer.md</code>) saves airtime at <strong>0 control costs</strong>
+and is always safe. The backbone is <strong>more powerful</strong> (deterministic unicast paths, higher coverage),
+but <strong>not free</strong>: it is NET-positive only in a defined window (H1 + DV ≥ 300 s + sufficient traffic).
+<strong>Recommendation:</strong> backbone as an optional Phase-2 enhancement <strong>with mandatory H1</strong>, conservative
+DV period by default (≥ 300 s), and only activated where data volume justifies the fixed control
+investment — the invisible layer remains the risk-free foundation beneath it.</p>
 
 
 
